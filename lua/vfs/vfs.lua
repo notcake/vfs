@@ -73,7 +73,7 @@ if CLIENT then
 end
 	
 include ("adaptors/expression2_editor.lua")
-include ("adaptors/expression2_files.lua")
+-- include ("adaptors/expression2_files.lua")
 include ("adaptors/expression2_upload.lua")
 
 VFS.AddReloadCommand ("vfs/vfs.lua", "vfs", "VFS")
