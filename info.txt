@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Virtual File System"
+	"version"     "1.00"
+	"author_name" "!cake"
+	"author_url"  ""
+	"info"        "A networked filesystem"
+	"override"    "0"
+}
