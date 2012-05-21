@@ -288,7 +288,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 						if isLocalPlayer then
 							for _, ply in ipairs (player.GetAll ()) do
 								if ply:GetFriendStatus () == "friend" then
-									GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends"):AddUser (GAuth.GetSystemId (), userId)
+									GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends"):AddUser (GAuth.GetSystemId (), ply:SteamID ())
 								end
 							end
 						end
@@ -309,7 +309,11 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 		if CLIENT then
 			local friendsGroup = GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends")
 			if friendsGroup then
-				(ply:GetFriendStatus () == "friend" and friendsGroup.AddUser or friendsGroup.RemoveUser) (friendsGroup, GAuth.GetSystemId (), userId)
+				if ply:GetFriendStatus () == "friend" then
+					friendsGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
+				else
+					friendsGroup:RemoveUser (GAuth.GetSystemId (), ply:SteamID ())
+				end
 			end
 		end
 	end
