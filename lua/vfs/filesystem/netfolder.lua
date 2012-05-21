@@ -217,6 +217,11 @@ function self:PermissionsChanged ()
 	if self.LastAccess == access then return end
 	self.LastAccess = access
 	if not self.LastAccess then
+		for _, childNode in pairs (self.Children) do
+			childNode:DispatchEvent ("Deleted")
+			self:DispatchEvent ("NodeDeleted", childNode)
+		end
+	
 		self.Children = {}
 		self.LowercaseChildren = {}
 		self.ReceivedChildren = false

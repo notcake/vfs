@@ -22,6 +22,7 @@ include ("clipboard.lua")
 include ("path.lua")
 include ("openflags.lua")
 include ("returncode.lua")
+include ("permissionsaver.lua")
 include ("seektype.lua")
 include ("updateflags.lua")
 include ("filesystem/nodetype.lua")
@@ -156,6 +157,9 @@ VFS.Root:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner"
 VFS.Root:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner",    "Write",              GAuth.Access.Allow)
 VFS.Root:ClearPredictedFlag ()
 
+VFS.PermissionSaver:Load ()
+VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
+
 if SERVER then
 	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Public",
 		function (returnCode, folder)
@@ -212,7 +216,7 @@ if SERVER then
 		end
 	)
 	
-	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
+	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/vfs/lua",
 		function (returnCode, folder)
 			if not folder then return end
 			local folder = VFS.Root:Mount ("Source", folder, "Source")
@@ -282,7 +286,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 						end
 					)
 				end
-				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
+				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/vfs/lua",
 					function (returnCode, node)
 						folder:Mount ("Source", node, "Source")
 							:SetDeletable (false)
@@ -334,5 +338,6 @@ VFS.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 )
 
 VFS:AddEventListener ("Unloaded", function ()
+	VFS.PermissionSaver:dtor ()
 	VFS.PlayerMonitor:dtor ()
 end)

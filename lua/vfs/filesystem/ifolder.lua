@@ -144,6 +144,21 @@ function self:EnumerateChildren (authId, callback)
 end
 
 --[[
+	IFolder:EnumerateChildren ()
+		Returns: INode[] children
+]]
+function self:EnumerateChildrenSynchronous ()
+	if not self.Children then VFS.Error ("IFolder:EnumerateChildrenSynchronous : Not implemented") return end
+	
+	local children = {}
+	for name, childNode in pairs (self.Children) do
+		children [name] = childNode
+	end
+	
+	return children
+end
+
+--[[
 	IFolder:GetChild (authId, path, function (returnCode, INode childNode))
 		
 		Do not implement this, implement IFolder:GetDirectChild instead

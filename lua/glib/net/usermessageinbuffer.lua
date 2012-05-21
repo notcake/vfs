@@ -33,8 +33,17 @@ function self:Int32 ()
 	return self.Usermessage:ReadLong ()
 end
 
+function self:Char ()
+	return string.char (self:UInt8 ())
+end
+
 function self:String ()
-	return self.Usermessage:ReadString ()
+	local length = self:UInt8 ()
+	local str = ""
+	for i = 1, length do
+		str = str .. self:Char ()
+	end
+	return str
 end
 
 function self:Boolean ()

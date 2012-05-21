@@ -130,6 +130,10 @@ function self:IsFolder ()
 	return self:GetNodeType () & VFS.NodeType.Folder ~= 0
 end
 
+function self:IsLocalNode ()
+	return not self:IsNetNode ()
+end
+
 function self:IsMountedNode ()
 	return false
 end

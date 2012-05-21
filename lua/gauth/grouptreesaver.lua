@@ -2,6 +2,8 @@ local self = {}
 GAuth.GroupTreeSaver = GAuth.MakeConstructor (self)
 
 function self:ctor ()
+	self.Version = 1
+
 	self.NeedsSaving = false
 	
 	timer.Create ("GAuth.GroupTreeSaver", 10, 0,
@@ -114,8 +116,15 @@ function self:Load (callback)
 	callback = callback or GAuth.NullCallback
 
 	local data = file.Read ("gauth_" .. (SERVER and "sv" or "cl") .. ".txt") or ""
+	if data == "" then callback (VFS.ReturnCode.Success) return end
 	local inBuffer = GAuth.StringInBuffer (data)
 	inBuffer:String () -- discard warning
+	local version = inBuffer:UInt32 ()
+	if version ~= self.Version then
+		GAuth.Error ("GAuth.GroupTreeSaver:Load : Cannot load version " .. version .. " files. Current version is " .. self.Version .. ".")
+		callback (GAuth.ReturnCode.Success)
+		return
+	end
 	self:LoadNextGroup (inBuffer,
 		function (returnCode)
 			self.NeedsSaving = false
@@ -166,6 +175,7 @@ Warning: Do not try editing this file without a hex editor.
          doing.
 ============================================================
 ]])
+	outBuffer:UInt32 (self.Version)
 	self:SaveNode (GAuth.Groups, outBuffer)
 	outBuffer:String ("")
 	
@@ -177,6 +187,7 @@ function self:SaveNode (groupTreeNode, outBuffer)
 	local save = true
 	if groupTreeNode:GetHost () ~= GAuth.GetLocalId () then save = false end
 	if GAuth.Groups == groupTreeNode then save = false end
+	if not groupTreeNode:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then save = false end
 	
 	if save then
 		outBuffer:String (groupTreeNode:GetFullName ())

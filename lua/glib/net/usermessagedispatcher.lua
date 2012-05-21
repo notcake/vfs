@@ -44,8 +44,17 @@ function self:Int32 (n)
 	umsg.Long (n)
 end
 
+function self:Char (char)
+	self:UInt8 (string.byte (char))
+end
+
 function self:String (data)
-	umsg.String (data)
+	-- umsg.String can mix up uppercase / lowercase characters.
+	
+	self:UInt8 (data:len ())
+	for i = 1, data:len () do
+		self:Char (data:sub (i, i))
+	end
 end
 
 function self:Boolean (b)

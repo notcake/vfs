@@ -250,6 +250,13 @@ function self:IsAuthorized (authId, actionId, permissionBlock)
 	return self:GetAccess (authId, actionId, permissionBlock or self) == GAuth.Access.Allow
 end
 
+function self:IsDefault ()
+	if not self.InheritOwner then return false end
+	if not self.InheritPermissions then return false end
+	if next (self.GroupEntries) then return false end
+	return true
+end
+
 function self:RemoveGroupEntry (authId, groupId, callback)
 	callback = callback or GAuth.NullCallback
 
@@ -290,7 +297,7 @@ function self:SetGroupPermission (authId, groupId, actionId, access, callback)
 	if self:DispatchEvent ("RequestSetGroupPermission", authId, groupId, actionId, access, callback) then return end
 	
 	if self.GroupEntries [groupId] then
-		if self.GroupEntries [groupId] [actionId] ~= access then
+		if (self.GroupEntries [groupId] [actionId] or GAuth.Access.None) ~= access then
 			self.GroupEntries [groupId] [actionId] = access
 			self:DispatchEvent ("GroupPermissionChanged", groupId, actionId, access)
 			self:DispatchEvent ("PermissionsChanged")
@@ -394,18 +401,21 @@ end
 
 -- Events
 function self:NotifyGroupEntryAdded (groupId)
+	if self.GroupEntries [groupId] then return end
 	self.GroupEntries [groupId] = self.GroupEntries [groupId] or {}
 	self:DispatchEvent ("GroupEntryAdded", groupId)
 	self:DispatchEvent ("PermissionsChanged")
 end
 
 function self:NotifyGroupEntryRemoved (groupId)
+	if not self.GroupEntries [groupId] then return end
 	self.GroupEntries [groupId] = nil
 	self:DispatchEvent ("GroupEntryRemoved", groupId)
 	self:DispatchEvent ("PermissionsChanged")
 end
 
 function self:NotifyGroupPermissionChanged (groupId, actionId, access)
+	if self.GroupEntries [groupId] and (self.GroupEntries [groupId] [actionId] or GAuth.Access.None) == access then return end
 	self.GroupEntries [groupId] = self.GroupEntries [groupId] or {}
 	self.GroupEntries [groupId] [actionId] = access
 	self:DispatchEvent ("GroupPermissionChanged", groupId, actionId, access)
@@ -413,6 +423,7 @@ function self:NotifyGroupPermissionChanged (groupId, actionId, access)
 end
 
 function self:NotifyInheritOwnerChanged (inheritOwner)
+	if self.InheritOwner == inheritOwner then return end
 	if not inheritOwner then self.OwnerId = self:GetOwner () end
 	self.InheritOwner = inheritOwner
 	self:DispatchEvent ("InheritOwnerChanged", inheritOwner)
@@ -420,12 +431,14 @@ function self:NotifyInheritOwnerChanged (inheritOwner)
 end
 
 function self:NotifyInheritPermissionsChanged (inheritPermissions)
+	if self.InheritPermissions == inheritPermissions then return end
 	self.InheritPermissions = inheritPermissions
 	self:DispatchEvent ("InheritPermissionsChanged", inheritPermissions)
 	self:DispatchEvent ("PermissionsChanged")
 end
 
 function self:NotifyOwnerChanged (ownerId)
+	if self.OwnerId == ownerId then return end
 	self.OwnerId = ownerId
 	self:DispatchEvent ("OwnerChanged", ownerId)
 	self:DispatchEvent ("PermissionsChanged")

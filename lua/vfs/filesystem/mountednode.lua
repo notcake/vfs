@@ -83,6 +83,10 @@ function self:IsMountedNode ()
 	return true
 end
 
+function self:IsNetNode ()
+	return self.MountedNode:IsNetNode ()
+end
+
 function self:Rename (authId, name, callback)
 	callback = callback or VFS.NullCallback
 	
