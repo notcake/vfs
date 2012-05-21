@@ -327,10 +327,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 
 GAuth.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 	function (_, ply, userId)
-		if userId == "" then
-			GAuth.Error ("GAuth.PlayerDisconnected: " .. tostring (ply) .. " has a blank steam id.")
-			return
-		end
+		if userId == "" then return end
 		GAuth.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
 			if GAuth.Groups:GetChild (userId) then

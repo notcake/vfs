@@ -238,6 +238,16 @@ if SERVER then
 		end
 	)
 	
+	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
+		function (returnCode, folder)
+			if not folder then return end
+			local folder = VFS.Root:Mount ("GCompute Source", folder, "GCompute Source")
+			folder:SetDeletable (false)
+			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
+			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
+		end
+	)
+	
 	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gooey/lua",
 		function (returnCode, folder)
 			if not folder then return end
@@ -304,6 +314,12 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 							:SetDeletable (false)
 					end
 				)
+				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
+					function (returnCode, node)
+						folder:Mount ("GCompute Source", node, "GCompute Source")
+							:SetDeletable (false)
+					end
+				)
 				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gooey/lua",
 					function (returnCode, node)
 						folder:Mount ("UI Source", node, "UI Source")
@@ -337,10 +353,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 
 VFS.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 	function (_, ply, userId)
-		if ply:SteamID () == "" then
-			VFS.Error ("VFS.PlayerDisconnected: " .. tostring (ply) .. " has a blank steam id.")
-			return
-		end
+		if userId == "" then return end
 		VFS.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
 			if VFS.Root:GetChildSynchronous (userId) then
