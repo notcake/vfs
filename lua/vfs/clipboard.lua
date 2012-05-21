@@ -129,6 +129,7 @@ function self:PasteFolder (destContainingFolder, sourceFolder, i, callback)
 				function (returnCode, child)
 					if returnCode == VFS.ReturnCode.Success then
 						children [#children + 1] = child
+					elseif returnCode == VFS.ReturnCode.EndOfBurst then
 					else
 						pasteNextChild (returnCode)
 					end

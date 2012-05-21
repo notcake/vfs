@@ -43,7 +43,6 @@ function self:ctor ()
 	self.NodePermissionsChanged = function (node, childNode)
 		if self.IgnorePermissionsChanged then return end
 		if self.SavableNodes [childNode] then
-			ErrorNoHalt (childNode:GetPath () .. "\n")
 			self:FlagUnsaved ()
 		end
 	end
@@ -51,12 +50,37 @@ function self:ctor ()
 	self.NodeRenamed = function (node, childNode, oldName, newName)
 		if not self.SavableNodes [childNode] then return end
 	
-		local path = childNode:GetPath ()
-		local parts = path:Split ("/")
-		path [#path] = oldName
-		local oldPath = table.concat (path, "/")
-		self.SavedBlocks [childNode:GetPath ()] = self.SavedBlocks [oldPath]
+		local newPath = childNode:GetPath ()
+		local parts = newPath:Split ("/")
+		parts [#parts] = oldName
+		local oldPath = table.concat (parts, "/")
+		
+		local changedCount = self.SavedBlocks [oldPath] and 1 or 0
+		self.SavedBlocks [newPath] = self.SavedBlocks [oldPath]
 		self.SavedBlocks [oldPath] = nil
+		
+		if childNode:IsFolder () then
+			-- Fixup child node paths
+		
+			local changedPaths = {}
+			for originalPath, _ in pairs (self.SavedBlocks) do
+				if originalPath:sub (1, oldPath:len () + 1) == oldPath .. "/" then
+					changedPaths [#changedPaths + 1] = originalPath
+				end
+			end
+			
+			for _, originalPath in ipairs (changedPaths) do
+				self.SavedBlocks [newPath .. originalPath:sub (oldPath:len () + 1)] = self.SavedBlocks [originalPath]
+				self.SavedBlocks [originalPath] = nil
+				ErrorNoHalt ("Changing " .. originalPath .. " to " .. newPath .. originalPath:sub (oldPath:len () + 1) .. "\n")
+			end
+			
+			changedCount = changedCount + #changedPaths
+		end
+		
+		if changedCount > 0 then
+			self:FlagUnsaved ()
+		end
 	end
 end
 
@@ -161,11 +185,10 @@ Warning: Do not try editing this file without a hex editor.
 ]])
 	outBuffer:UInt32 (self.Version)
 	for node, _ in pairs (self.SavableNodes) do
-		if not node:GetPermissionBlock ():IsDefault () and
-			node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then
-			self.SavedBlocks [node:GetPath ()] = node:GetPermissionBlock ():Serialize ():GetString ()
-		else
+		if node:GetPermissionBlock ():IsDefault () then
 			self.SavedBlocks [node:GetPath ()] = nil
+		elseif node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then
+			self.SavedBlocks [node:GetPath ()] = node:GetPermissionBlock ():Serialize ():GetString ()
 		end
 	end
 	for path, permissionBlockData in pairs (self.SavedBlocks) do

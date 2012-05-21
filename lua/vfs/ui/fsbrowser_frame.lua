@@ -24,15 +24,7 @@ function self:Init ()
 		if node:IsFolder () then
 			self:SetFolder (node)
 		else
-			--local FileType = Tubes.FileTypes.GetFileType (item.Item)
-			--local Opener = Tubes.FileTypes.GetOpener (FileType)
-			--if Opener then
-			--	Opener (item.Item)
-			--else
-				VFS.Editor ():GetFrame ():LoadFile (node)
-				VFS.Editor ():GetFrame ():SetVisible (true)
-				VFS.Editor ():GetFrame ():MoveToFront ()
-			--end
+			VFS.FileTypes:Open (node)
 		end
 	end)
 	

@@ -17,6 +17,7 @@ function self:HandleInitialPacket (inBuffer)
 	self.ChildName = inBuffer:String ()
 	
 	local folder = self:GetRemoteEndPoint ():GetRoot ():GetChildSynchronous (self.FolderPath)
+	folder = folder and folder:GetInner ()
 	if not folder then return end
 	if not folder:IsNetNode () then return end
 	local deletedNode = folder.Children [self.ChildName] or (folder:IsCaseInsensitive () and folder.LowercaseChildren [self.ChildName:lower ()] or nil)

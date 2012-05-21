@@ -47,6 +47,17 @@ include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
 include ("filesystem/mountedfilestream.lua")
 
+if CLIENT then
+	include ("filetypes.lua")
+	include ("filetype.lua")
+	include ("filetypes/adv_duplicator.lua")
+	include ("filetypes/cpuchip.lua")
+	include ("filetypes/expression2.lua")
+	include ("filetypes/gpuchip.lua")
+	include ("filetypes/spuchip.lua")
+	include ("filetypes/starfall.lua")
+end
+
 include ("protocol/protocol.lua")
 include ("protocol/session.lua")
 include ("protocol/nodecreationnotification.lua")
@@ -73,6 +84,7 @@ if CLIENT then
 	VFS.IncludeDirectory ("vfs/ui")
 end
 	
+include ("adaptors/adv_duplicator.lua")
 include ("adaptors/expression2_editor.lua")
 -- include ("adaptors/expression2_files.lua")
 include ("adaptors/expression2_upload.lua")

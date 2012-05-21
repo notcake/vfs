@@ -31,6 +31,7 @@ function self:HandleInitialPacket (inBuffer)
 	self.UpdateFlags = inBuffer:UInt8 ()
 	
 	local node = self:GetRemoteEndPoint ():GetRoot ():GetChildSynchronous (self.Path)
+	node = node and node:GetInner ()
 	if not node then return end
 	if not node:IsNetNode () then return end
 	

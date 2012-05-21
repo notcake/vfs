@@ -11,6 +11,7 @@ function self:ctor (realFile, openFlags)
 		self.Contents = file.Read (self:GetPath (), true) or ""
 		self.Length = self.Contents:len ()
 	end
+	self.File:SetSize (self.Length)
 	
 	self.ContentsChanged = false
 end

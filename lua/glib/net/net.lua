@@ -118,7 +118,8 @@ if SERVER then
 					local channelName = inBuffer:String ()
 					local handler = GLib.Net.ChannelHandlers [channelName]
 					if not handler then
-						ErrorNoHalt ("No handler for " .. channelName .. "\n")
+						ErrorNoHalt ("glib_data : From " .. steamId .. ": No handler for " .. GLib.PrettifyString (channelName) .. "\n")
+						ErrorNoHalt ("Original data: " .. GLib.PrettifyString (GLib.Net.ConCommandBuffers [steamId]):sub (1, 100) .. "\n")
 					end
 					if handler then PCallError (handler, steamId, inBuffer) end
 					GLib.Net.ConCommandBuffers [steamId] = ""

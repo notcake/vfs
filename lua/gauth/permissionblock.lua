@@ -280,8 +280,10 @@ function self:Serialize (outBuffer)
 	for groupId, groupEntry in pairs (self.GroupEntries) do
 		outBuffer:String (groupId)
 		for actionId, access in pairs (groupEntry) do
-			outBuffer:String (actionId)
-			outBuffer:UInt8 (access)
+			if access ~= GAuth.Access.None then
+				outBuffer:String (actionId)
+				outBuffer:UInt8 (access)
+			end
 		end
 		outBuffer:String ("")
 	end

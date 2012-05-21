@@ -174,14 +174,14 @@ function GLib.MakeConstructor (metatable, base, base2)
 		setmetatable (object, metatable)
 		
 		-- Create constructor and destructor
-		if not object.__ctor or not object.__dtor then
+		if not rawget (metatable, "__ctor") or not rawget (metatable, "__dtor") then
 			local base = metatable
 			local ctors = {}
 			local dtors = {}
 			while base ~= nil do
-				ctors [#ctors + 1] = base.ctor
-				ctors [#ctors + 1] = base.ctor2
-				dtors [#dtors + 1] = base.dtor
+				ctors [#ctors + 1] = rawget (base, "ctor")
+				ctors [#ctors + 1] = rawget (base, "ctor2")
+				dtors [#dtors + 1] = rawget (base, "dtor")
 				base = base.__base
 			end
 			
@@ -201,6 +201,20 @@ function GLib.MakeConstructor (metatable, base, base2)
 		object:__ctor (...)
 		return object
 	end
+end
+
+function GLib.PrettifyString (str)
+	local out = ""
+	for i = 1, str:len () do
+		local char = str:sub (i, i)
+		local byte = string.byte (char)
+		if byte < 32 or byte >= 127 then
+			out = out .. string.format ("[%02x]", byte)
+		else
+			out = out .. char
+		end
+	end
+	return out
 end
 
 function GLib.PrintStackTrace (levels, offset)
@@ -243,9 +257,15 @@ function GLib.UnloadSystem (systemTableName)
 	_G [systemTableName] = nil
 end
 
+function GLib.WeakTable ()
+	local tbl = {}
+	setmetatable (tbl, { __mode = "kv" })
+	return tbl
+end
+
 function GLib.WeakKeyTable ()
 	local tbl = {}
-	setmetatable (tbl, { __mode = "v" })
+	setmetatable (tbl, { __mode = "k" })
 	return tbl
 end
 

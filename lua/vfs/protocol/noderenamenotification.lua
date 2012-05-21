@@ -20,6 +20,7 @@ function self:HandleInitialPacket (inBuffer)
 	self.NewName = inBuffer:String ()
 	
 	local folder = self:GetRemoteEndPoint ():GetRoot ():GetChildSynchronous (self.FolderPath)
+	folder = folder and folder:GetInner ()
 	if not folder then return end
 	if not folder:IsNetNode () then return end
 	local renamedNode = folder:GetDirectChildSynchronous (self.OldName)
