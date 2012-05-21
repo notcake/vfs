@@ -342,8 +342,10 @@ VFS.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 			return
 		end
 		if SERVER then
-			VFS.Root:GetChildSynchronous (ply:SteamID ()):SetDeletable (true)
-			VFS.Root:DeleteChild (GAuth.GetSystemId (), ply:SteamID ())
+			if VFS.Root:GetChildSynchronous (ply:SteamID ()) then
+				VFS.Root:GetChildSynchronous (ply:SteamID ()):SetDeletable (true)
+				VFS.Root:DeleteChild (GAuth.GetSystemId (), ply:SteamID ())
+			end
 		end
 		VFS.EndPointManager:RemoveEndPoint (ply:SteamID ())
 	end

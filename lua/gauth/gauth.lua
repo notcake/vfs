@@ -326,8 +326,10 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 			return
 		end
 		if SERVER then
-			GAuth.Groups:GetChild (ply:SteamID ()):SetRemovable (true)
-			GAuth.Groups:RemoveNode (GAuth.GetSystemId (), ply:SteamID ())
+			if GAuth.Groups:GetChild (ply:SteamID ()) then
+				GAuth.Groups:GetChild (ply:SteamID ()):SetRemovable (true)
+				GAuth.Groups:RemoveNode (GAuth.GetSystemId (), ply:SteamID ())
+			end
 		end
 		GAuth.EndPointManager:RemoveEndPoint (ply:SteamID ())
 	end
