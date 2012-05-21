@@ -128,6 +128,7 @@ include ("permissiondictionary.lua")
 
 include ("permissionblocknetworkermanager.lua")
 include ("permissionblocknetworker.lua")
+include ("grouptreesaver.lua")
 include ("grouptreesender.lua")
 
 include ("protocol/protocol.lua")
@@ -301,6 +302,9 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 		if isLocalPlayer then
 			GAuth.EndPointManager:GetEndPoint ("Server"):SendNotification (GAuth.Protocol.InitialSyncRequest ())
 			GAuth.GroupTreeSender:SendNode ("Server", GAuth.Groups)
+			
+			GAuth.GroupTreeSaver:HookNodeRecursive (GAuth.Groups)
+			GAuth.GroupTreeSaver:Load ()
 		end
 		if CLIENT then
 			local friendsGroup = GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends")
@@ -326,5 +330,6 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 )
 
 GAuth:AddEventListener ("Unloaded", function ()
+	GAuth.GroupTreeSaver:dtor ()
 	GAuth.PlayerMonitor:dtor ()
 end)

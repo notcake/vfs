@@ -76,7 +76,7 @@ function self:Init ()
 			self.Menu:FindItem ("OpenSeparator"):SetVisible (not targetItem:IsRoot ())
 			
 			local pasteFolder = targetItem
-			if not pasteFolder:IsFolder () then pasteFolder = pasteFolder:GetParentNode () end
+			if not pasteFolder:IsFolder () then pasteFolder = pasteFolder:GetParentFolder () end
 			local permissionBlock = targetItem:GetPermissionBlock ()
 			if not permissionBlock then
 				self.Menu:FindItem ("Open"):SetDisabled (not targetItem:IsFile ())

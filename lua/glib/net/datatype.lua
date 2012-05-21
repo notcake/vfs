@@ -10,8 +10,9 @@ GLib.Net.DataType =
 	Int64	= 7,
 	Float	= 8,
 	Double	= 9,
-	String	= 10,
-	Boolean	= 11
+	Char    = 10,
+	String	= 11,
+	Boolean	= 12
 }
 GLib.InvertTable (GLib.Net.DataType)
 
@@ -28,5 +29,6 @@ GLib.Net.DataTypeSizes =
 	Int64	= 8,
 	Float	= 4,
 	Double	= 8,
+	Char    = 1,
 	String	= function (str) return str:len () + 1 end
 }

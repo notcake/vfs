@@ -115,7 +115,7 @@ function self:Error (message)
 end
 
 function self:GetFileName ()
-	return self.FileName:GetText ():gsub ("[\r\n\t\\/:*?|<>\"]", "_")
+	return self.FileName:GetText ():gsub ("[\r\n\t:*?|<>\"]", "_")
 end
 
 function self:GetFolder ()

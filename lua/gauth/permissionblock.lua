@@ -83,6 +83,7 @@ function self:AddGroupEntry (authId, groupId, callback)
 	
 	self.GroupEntries [groupId] = {}
 	self:DispatchEvent ("GroupEntryAdded", groupId)
+	self:DispatchEvent ("PermissionsChanged")
 	
 	callback (GAuth.ReturnCode.Success)
 end
@@ -107,6 +108,30 @@ function self:CopyFrom (permissionBlock)
 		for actionId, access in pairs (groupEntry) do
 			self.GroupEntries [groupId] [actionId] = access
 		end
+	end
+end
+
+function self:Deserialize (inBuffer)
+	if type (inBuffer) == "string" then inBuffer = GAuth.StringInBuffer (inBuffer) end
+
+	self:SetInheritOwner (GAuth.GetSystemId (), inBuffer:Boolean ())
+	self:SetInheritPermissions (GAuth.GetSystemId (), inBuffer:Boolean ())
+	if not self:InheritsOwner () then
+		self:SetOwner (GAuth.GetSystemId (), inBuffer:String ())
+	else
+		self.OwnerId = inBuffer:String ()
+	end
+	
+	local groupId = inBuffer:String ()
+	while groupId ~= "" do
+		self:AddGroupEntry (GAuth.GetSystemId (), groupId)
+		
+		local actionId = inBuffer:String ()
+		while actionId ~= "" do
+			self:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, inBuffer:UInt8 ())
+			actionId = inBuffer:String ()
+		end
+		groupId = inBuffer:String ()
 	end
 end
 
@@ -240,6 +265,23 @@ function self:RemoveGroupEntry (authId, groupId, callback)
 	callback (GAuth.ReturnCode.Success)
 end
 
+function self:Serialize (outBuffer)
+	outBuffer = outBuffer or GAuth.StringOutBuffer ()
+	outBuffer:Boolean (self.InheritOwner)
+	outBuffer:Boolean (self.InheritPermissions)
+	outBuffer:String (self.OwnerId)
+	for groupId, groupEntry in pairs (self.GroupEntries) do
+		outBuffer:String (groupId)
+		for actionId, access in pairs (groupEntry) do
+			outBuffer:String (actionId)
+			outBuffer:UInt8 (access)
+		end
+		outBuffer:String ("")
+	end
+	outBuffer:String ("")
+	return outBuffer
+end
+
 function self:SetGroupPermission (authId, groupId, actionId, access, callback)
 	callback = callback or GAuth.NullCallback
 
@@ -354,6 +396,7 @@ end
 function self:NotifyGroupEntryAdded (groupId)
 	self.GroupEntries [groupId] = self.GroupEntries [groupId] or {}
 	self:DispatchEvent ("GroupEntryAdded", groupId)
+	self:DispatchEvent ("PermissionsChanged")
 end
 
 function self:NotifyGroupEntryRemoved (groupId)

@@ -83,43 +83,21 @@ function self:CreateNode (authId, path, isFolder, callback)
 	local path = VFS.Path (path)
 	
 	if path:IsEmpty () then
-		callback (VFS.ReturnCode.Success, self)
+		if self:IsFolder () == isFolder then
+			callback (VFS.ReturnCode.Success, self)
+		else
+			callback (isFolder and VFS.ReturnCode.NotAFolder or VFS.ReturnCode.NotAFile)
+		end
 		return
 	end
 
 	local segment = path:GetSegment (0)
-	self:GetDirectChild (authId, segment,
+	path:RemoveFirstSegment ()
+	self:CreateDirectNode (authId, segment, not path:IsEmpty () or isFolder,
 		function (returnCode, node)
-			path:RemoveFirstSegment ()
-			if returnCode == VFS.ReturnCode.Success then
-				if path:IsEmpty () then
-					if node:IsFolder () == isFolder then callback (returnCode, node)
-					elseif isFolder then callback (VFS.ReturnCode.NotAFolder)
-					else
-						callback (VFS.ReturnCode.NotAFile)
-					end
-				elseif node:IsFolder () then
-					node:CreateNode (authId, path, isFolder, callback)
-				else
-					callback (VFS.ReturnCode.NotAFolder)
-				end
-			elseif returnCode == VFS.ReturnCode.NotFound then
-				self:CreateDirectNode (authId, segment, isFolder,
-					function (returnCode, node)
-						if returnCode == VFS.ReturnCode.Success then
-							if path:IsEmpty () then
-								callback (returnCode, node)
-							else
-								node:CreateNode (authId, path, isFolder, callback)
-							end
-						else
-							callback (returnCode)
-						end
-					end
-				)
-			else
-				callback (returnCode)
-			end
+			if returnCode ~= VFS.ReturnCode.Success then callback (returnCode) return end
+			if path:IsEmpty () then callback (VFS.ReturnCode.Success, node) return end
+			node:CreateNode (authId, path, isFolder, callback)
 		end
 	)
 end

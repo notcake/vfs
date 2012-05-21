@@ -257,6 +257,8 @@ end
 
 include ("eventprovider.lua")
 include ("playermonitor.lua")
+include ("stringinbuffer.lua")
+include ("stringoutbuffer.lua")
 include ("utf8.lua")
 
 include ("net/net.lua")

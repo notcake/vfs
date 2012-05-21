@@ -33,21 +33,29 @@ function self:ctor (name)
 end
 
 function self:AddGroup (authId, name, callback)
+	self:AddGroupTreeNode (authId, name, false, callback)
+end
+
+function self:AddGroupTree (authId, name, callback)
+	self:AddGroupTreeNode (authId, name, true, callback)
+end
+
+function self:AddGroupTreeNode (authId, name, isGroupTree, callback)
 	callback = callback or GAuth.NullCallback
 	name = name:gsub ("/", "")
 
 	if self.Children [name] then
-		if not self.Children [name]:IsGroupTree () then
+		if self.Children [name]:IsGroupTree () == isGroupTree then
 			callback (GAuth.ReturnCode.Success, self.Children [name])
 		else
 			callback (GAuth.ReturnCode.NodeAlreadyExists)
 		end
 		return
 	end
-	if not self:GetPermissionBlock ():IsAuthorized (authId, "Create Group") then callback (GAuth.ReturnCode.AccessDenied) return end
+	if not self:GetPermissionBlock ():IsAuthorized (authId, "Create Group" .. (isGroupTree and " Tree" or "")) then callback (GAuth.ReturnCode.AccessDenied) return end
 	
 	if not self:IsPredicted () and not self:IsHostedLocally () then
-		local nodeAdditionRequest = GAuth.Protocol.NodeAdditionRequest (self, name, false,
+		local nodeAdditionRequest = GAuth.Protocol.NodeAdditionRequest (self, name, isGroupTree,
 			function (returnCode)
 				callback (returnCode, self.Children [name])
 			end
@@ -56,48 +64,38 @@ function self:AddGroup (authId, name, callback)
 		return
 	end
 	
-	self.Children [name] = GAuth.Group (name)
+	self.Children [name] = (isGroupTree and GAuth.GroupTree or GAuth.Group) (name)
 	self.Children [name]:SetParentNode (self)
 	self.Children [name]:SetHost (self:GetHost ())
 	
-	self:DispatchEvent ("GroupAdded", self.Children [name])
+	self:DispatchEvent (isGroupTree and "GroupTreeAdded" or "GroupAdded", self.Children [name])
 	self:DispatchEvent ("NodeAdded", self.Children [name])
 	
 	callback (GAuth.ReturnCode.Success, self.Children [name])
 end
 
-function self:AddGroupTree (authId, name, callback)
+function self:AddGroupTreeNodeRecursive (authId, name, isGroupTree, callback)
 	callback = callback or GAuth.NullCallback
-	name = name:gsub ("/", "")
-
-	if self.Children [name] then
-		if self.Children [name]:IsGroupTree () then
-			callback (GAuth.ReturnCode.Success, self.Children [name])
+	
+	if parts == "" then
+		if self:IsGroupTree () == isGroupTree then
+			callback (GAuth.ReturnCode.Success, self)
 		else
 			callback (GAuth.ReturnCode.NodeAlreadyExists)
 		end
 		return
 	end
-	if not self:GetPermissionBlock ():IsAuthorized (authId, "Create Group Tree") then callback (GAuth.ReturnCode.AccessDenied) return end
 	
-	if not self:IsPredicted () and not self:IsHostedLocally () then
-		local nodeAdditionRequest = GAuth.Protocol.NodeAdditionRequest (self, name, true,
-			function (returnCode)
-				callback (returnCode, self.Children [name])
-			end
-		)
-		GAuth.EndPointManager:GetEndPoint (self:GetHost ()):StartSession (nodeAdditionRequest)
-		return
-	end
-	
-	self.Children [name] = GAuth.GroupTree (name)
-	self.Children [name]:SetParentNode (self)
-	self.Children [name]:SetHost (self:GetHost ())
-	
-	self:DispatchEvent ("GroupTreeAdded", self.Children [name])
-	self:DispatchEvent ("NodeAdded", self.Children [name])
-	
-	callback (GAuth.ReturnCode.Success, self.Children [name])
+	local parts = name:Split ("/")
+	local segment = table.remove (parts, 1)
+	name = table.concat (parts, "/")
+	self:AddGroupTreeNode (authId, segment, #parts > 0 or isGroupTree,
+		function (returnCode, groupTreeNode)
+			if returnCode ~= GAuth.ReturnCode.Success then callback (returnCode) return end
+			if name == "" then callback (GAuth.ReturnCode.Success, groupTreeNode) return end
+			groupTreeNode:AddGroupTreeNodeRecursive (authId, name, isGroupTree, callback)
+		end
+	)
 end
 
 function self:ContainsUser (userId, permissionBlock)
