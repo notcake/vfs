@@ -1,6 +1,7 @@
 GLib.Net = {}
 GLib.Net.PlayerMonitor = GLib.PlayerMonitor ("GLib.Net")
 GLib.Net.ChannelHandlers = {}
+GLib.Net.ChannelQueues = {} -- used on client only to queue up packets to be sent to the server
 GLib.Net.OpenChannels = {}
 
 local function PlayerFromId (userId)
@@ -34,6 +35,12 @@ elseif CLIENT then
 			GLib.Net.ConCommandDispatcher:Dispatch (destinationId, channelName, packet)
 		else
 			ErrorNoHalt ("GLib.Net : Channel " .. channelName .. " is not open.\n")
+			GLib.Net.ChannelQueues [channelName] = GLib.Net.ChannelQueues [channelName] or {}
+			if #GLib.Net.ChannelQueues [channelName] > 256 then
+				GLib.Error ("GLib.Net.DispatchPacket : " .. channelName .. " queue is growing too long!")
+			end
+			GLib.Net.ChannelQueues [channelName] [#GLib.Net.ChannelQueues [channelName] + 1] = packet
+			packet.DestinationId = destinationId
 		end
 	end
 end
@@ -130,7 +137,15 @@ if SERVER then
 	)
 elseif CLIENT then
 	usermessage.Hook ("glib_channel_open", function (umsg)
-		GLib.Net.OpenChannels [umsg:ReadString ()] = true
+		local channelName = umsg:ReadString ()
+		GLib.Net.OpenChannels [channelName] = true
+		
+		if GLib.Net.ChannelQueues [channelName] then
+			for _, packet in ipairs (GLib.Net.ChannelQueues [channelName]) do
+				GLib.Net.DispatchPacket (packet.DestinationId, channelName, packet)
+			end
+			GLib.Net.ChannelQueues [channelName] = {}
+		end
 	end)
 	
 	local function RequestChannelList ()
