@@ -116,7 +116,7 @@ function self:Load (callback)
 	callback = callback or GAuth.NullCallback
 
 	local data = file.Read ("gauth_" .. (SERVER and "sv" or "cl") .. ".txt") or ""
-	if data == "" then callback (VFS.ReturnCode.Success) return end
+	if data == "" then callback (GAuth.ReturnCode.Success) return end
 	local inBuffer = GAuth.StringInBuffer (data)
 	inBuffer:String () -- discard warning
 	local version = inBuffer:UInt32 ()

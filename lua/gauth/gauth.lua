@@ -263,6 +263,11 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Owner",
 )
 GAuth.Groups:ClearPredictedFlag ()
 
+if SERVER then
+	GAuth.GroupTreeSaver:HookNodeRecursive (GAuth.Groups)
+	GAuth.GroupTreeSaver:Load ()
+end
+
 GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 	function (_, ply, userId, isLocalPlayer)
 		GAuth.Groups:MarkPredicted ()
@@ -286,8 +291,9 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 						playerGroup:SetRemovable (false)
 						if isLocalPlayer then
 							for _, ply in ipairs (player.GetAll ()) do
+								ErrorNoHalt ("LOCALPLAYER : " .. tostring (ply) .. " : " .. ply:GetFriendStatus () .. "\n")
 								if ply:GetFriendStatus () == "friend" then
-									GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends"):AddUser (GAuth.GetSystemId (), ply:SteamID ())
+									playerGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
 								end
 							end
 						end
@@ -308,6 +314,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 		if CLIENT then
 			local friendsGroup = GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends")
 			if friendsGroup then
+				ErrorNoHalt ("PLAYERJOIN : " .. tostring (ply) .. " : " .. ply:GetFriendStatus () .. "\n")
 				if ply:GetFriendStatus () == "friend" then
 					friendsGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
 				else
