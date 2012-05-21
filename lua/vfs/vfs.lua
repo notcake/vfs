@@ -251,7 +251,7 @@ end
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
-	function (_, ply, isLocalPlayer)
+	function (_, ply, userId, isLocalPlayer)
 		local folder = nil
 		if isLocalPlayer then
 			-- create the VFolder and mount it into the root NetFolder
@@ -261,17 +261,17 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 			-- pre-empt the NetFolder creation
 			local endPoint = nil
 			if SERVER then
-				endPoint = VFS.EndPointManager:GetEndPoint (ply:SteamID ())
+				endPoint = VFS.EndPointManager:GetEndPoint (userId)
 			elseif CLIENT then
 				endPoint = VFS.Client
 			end
-			folder = endPoint:GetRoot ():CreatePredictedFolder (ply:SteamID ())
+			folder = endPoint:GetRoot ():CreatePredictedFolder (userId)
 		end
 		folder:SetDeletable (false)
 		folder:MarkPredicted ()
 		folder:SetDisplayName (ply:Nick ())
 		if SERVER then
-			VFS.Root:Mount (ply:SteamID (), folder)
+			VFS.Root:Mount (userId, folder)
 			folder:GetPermissionBlock ():SetParentFunction (
 				function ()
 					return VFS.Root:GetPermissionBlock ()
@@ -321,7 +321,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 		end
 		
 		-- Do permission block stuff after folder has been inserted into filesystem tree
-		folder:SetOwner (GAuth.GetSystemId (), ply:SteamID ())
+		folder:SetOwner (GAuth.GetSystemId (), userId)
 		folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
 		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner",    "Modify Permissions", GAuth.Access.Allow)
 		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Owner",    "Set Owner",          GAuth.Access.Allow)
@@ -336,18 +336,18 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 )
 
 VFS.PlayerMonitor:AddEventListener ("PlayerDisconnected",
-	function (_, ply)
+	function (_, ply, userId)
 		if ply:SteamID () == "" then
 			VFS.Error ("VFS.PlayerDisconnected: " .. tostring (ply) .. " has a blank steam id.")
 			return
 		end
+		VFS.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
-			if VFS.Root:GetChildSynchronous (ply:SteamID ()) then
-				VFS.Root:GetChildSynchronous (ply:SteamID ()):SetDeletable (true)
-				VFS.Root:DeleteChild (GAuth.GetSystemId (), ply:SteamID ())
+			if VFS.Root:GetChildSynchronous (userId) then
+				VFS.Root:GetChildSynchronous (userId):SetDeletable (true)
+				VFS.Root:DeleteChild (GAuth.GetSystemId (), userId)
 			end
 		end
-		VFS.EndPointManager:RemoveEndPoint (ply:SteamID ())
 	end
 )
 

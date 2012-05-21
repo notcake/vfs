@@ -21,21 +21,20 @@ function self:ctor (systemName)
 				ply.SteamID and
 				ply:Name () ~= "unconnected" then
 				local steamID = ply:SteamID ()
-				if steamID == "BOT" or steamID == "NULL" then
-					self.QueuedPlayers [ply] = nil
-				elseif steamID ~= "STEAM_ID_PENDING" then
+				if steamID ~= "STEAM_ID_PENDING" then
 					self.QueuedPlayers [ply] = nil
 					local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
 					if SinglePlayer () and isLocalPlayer then steamID = "STEAM_0:0:0" end
+					if steamID == "BOT" or steamID == "NULL" then steamID = "BOT" end
 					self.Players [steamID] =
 					{
 						Player = ply,
 						Name = ply:Name ()
 					}
 					self.EntitiesToUserIds [ply] = steamID
-					self:DispatchEvent ("PlayerConnected", ply, isLocalPlayer)
+					self:DispatchEvent ("PlayerConnected", ply, steamID, isLocalPlayer)
 					if isLocalPlayer then
-						self:DispatchEvent ("LocalPlayerConnected", ply)
+						self:DispatchEvent ("LocalPlayerConnected", ply, steamID)
 					end
 				end
 			end
@@ -45,14 +44,15 @@ function self:ctor (systemName)
 	hook.Add ("EntityRemoved", self.SystemName .. ".PlayerDisconnected", function (ply)
 		if type (ply) == "Player" and
 			ply:IsValid () then
+			local steamID = ply:SteamID ()
+			local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
+			if SinglePlayer () and isLocalPlayer then steamID = "STEAM_0:0:0" end
+			if steamID == "BOT" or steamID == "NULL" then steamID = "BOT" end
 			if SERVER then
-				local steamID = ply:SteamID ()
-				local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
-				if SinglePlayer () and isLocalPlayer then steamID = "STEAM_0:0:0" end
 				self.Players [steamID] = nil
 				self.EntitiesToUserIds [ply] = nil
 			end
-			self:DispatchEvent ("PlayerDisconnected", ply)
+			self:DispatchEvent ("PlayerDisconnected", ply, steamID)
 		end
 	end)
 

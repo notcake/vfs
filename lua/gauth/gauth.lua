@@ -264,8 +264,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Owner",
 GAuth.Groups:ClearPredictedFlag ()
 
 GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
-	function (_, ply, isLocalPlayer)
-		local userId = isLocalPlayer and GAuth.GetLocalId () or ply:SteamID ()
+	function (_, ply, userId, isLocalPlayer)
 		GAuth.Groups:MarkPredicted ()
 		GAuth.Groups:AddGroupTree (GAuth.GetSystemId (), userId,
 			function (returnCode, groupTree)
@@ -320,18 +319,18 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 )
 
 GAuth.PlayerMonitor:AddEventListener ("PlayerDisconnected",
-	function (_, ply)
-		if ply:SteamID () == "" then
+	function (_, ply, userId)
+		if userId == "" then
 			GAuth.Error ("GAuth.PlayerDisconnected: " .. tostring (ply) .. " has a blank steam id.")
 			return
 		end
+		GAuth.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
-			if GAuth.Groups:GetChild (ply:SteamID ()) then
-				GAuth.Groups:GetChild (ply:SteamID ()):SetRemovable (true)
-				GAuth.Groups:RemoveNode (GAuth.GetSystemId (), ply:SteamID ())
+			if GAuth.Groups:GetChild (userId) then
+				GAuth.Groups:GetChild (userId):SetRemovable (true)
+				GAuth.Groups:RemoveNode (GAuth.GetSystemId (), userId)
 			end
 		end
-		GAuth.EndPointManager:RemoveEndPoint (ply:SteamID ())
 	end
 )
 

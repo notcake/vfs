@@ -86,7 +86,7 @@ if SERVER then
 	GLib.Net.ConCommandBuffers = {}
 
 	GLib.Net.PlayerMonitor:AddEventListener ("PlayerConnected",
-		function (_, ply)
+		function (_, ply, userId)
 			for channelName, _ in pairs (GLib.Net.OpenChannels) do
 				umsg.Start ("glib_channel_open", ply)
 					umsg.String (channelName)

@@ -64,6 +64,8 @@ function self:IsNodeHooked (node)
 end
 
 function self:UnhookNode (node)
+	self.HookedNodes [node] = nil
+
 	node:RemoveEventListener ("NodeCreated", tostring (self))
 	node:RemoveEventListener ("NodeDeleted", tostring (self))
 	node:RemoveEventListener ("NodeRenamed", tostring (self))

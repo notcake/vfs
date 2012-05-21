@@ -226,6 +226,10 @@ function self:PermissionsChanged ()
 		self.LowercaseChildren = {}
 		self.ReceivedChildren = false
 	end
+	
+	if self:GetParentFolder () then
+		self:GetParentFolder ():DispatchEvent ("NodePermissionsChanged", self)
+	end
 end
 
 function self:Renamed ()
