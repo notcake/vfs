@@ -34,7 +34,7 @@ elseif CLIENT then
 		if GLib.Net.IsChannelOpen (channelName) then
 			GLib.Net.ConCommandDispatcher:Dispatch (destinationId, channelName, packet)
 		else
-			ErrorNoHalt ("GLib.Net : Channel " .. channelName .. " is not open.\n")
+			GLib.Debug ("GLib.Net : Channel " .. channelName .. " is not open.\n")
 			GLib.Net.ChannelQueues [channelName] = GLib.Net.ChannelQueues [channelName] or {}
 			if #GLib.Net.ChannelQueues [channelName] > 256 then
 				GLib.Error ("GLib.Net.DispatchPacket : " .. channelName .. " queue is growing too long!")
