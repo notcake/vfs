@@ -281,6 +281,10 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 				groupTree:AddGroup (GAuth.GetSystemId (), "Player",
 					function (returnCode, playerGroup)
 						playerGroup:SetRemovable (false)
+						
+						-- The host has to be set explicitly in case the server has sent
+						-- this group to the client before it gets created here.
+						playerGroup:SetHost (userId)
 						playerGroup:MarkPredicted ()
 						playerGroup:AddUser (GAuth.GetSystemId (), userId)
 						playerGroup:ClearPredictedFlag ()
@@ -289,9 +293,9 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 				groupTree:AddGroup (GAuth.GetSystemId (), "Friends",
 					function (returnCode, playerGroup)
 						playerGroup:SetRemovable (false)
+						playerGroup:SetHost (userId) -- ensure host is set correctly
 						if isLocalPlayer then
 							for _, ply in ipairs (player.GetAll ()) do
-								ErrorNoHalt ("LOCALPLAYER : " .. tostring (ply) .. " : " .. ply:GetFriendStatus () .. "\n")
 								if ply:GetFriendStatus () == "friend" then
 									playerGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
 								end
@@ -314,7 +318,6 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 		if CLIENT then
 			local friendsGroup = GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends")
 			if friendsGroup then
-				ErrorNoHalt ("PLAYERJOIN : " .. tostring (ply) .. " : " .. ply:GetFriendStatus () .. "\n")
 				if ply:GetFriendStatus () == "friend" then
 					friendsGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
 				else

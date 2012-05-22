@@ -145,7 +145,8 @@ function Expression2EditorFrame:InstallFileSystemBrowserOverride (path, displayP
 	-- Fixup tab paths
 	for i = 1, self:GetNumTabs () do
 		if not self:GetEditor (i).vfs_enabled then
-			if self:GetEditor (i).chosenfile then
+			ErrorNoHalt (self:GetEditor (i).chosenfile .. "\n")
+			if self:GetEditor (i).chosenfile and self:GetEditor (i).chosenfile ~= "generic" then
 				self:GetEditor (i).displaypath = LocalPlayer ():Name () .. "/" .. self:GetEditor (i).chosenfile
 				self:GetEditor (i).chosenfile = GAuth.GetLocalId () .. "/" .. self:GetEditor (i).chosenfile
 				self:GetEditor (i).vfs_enabled = true
@@ -286,9 +287,9 @@ end
 
 -- Imported from wire/client/wire_expression2_editor : Editor:SaveFile
 function Expression2EditorFrame:SaveFile (path, close, saveAs)
-	self:ExtractName ()
-	
-	local suggestedName = self.savefilefn:gsub ("[ \r\n\t\\/:*?|<>\"]", "_")
+	local suggestedName = self:GetCode ():match ("@name ([^\r\n]+)") or ""
+	suggestedName = suggestedName:gsub ("[ \r\n\t\\/:*?|<>\"]", "_")
+	if suggestedName == "" then suggestedName = "filename" end
 	if suggestedName:sub (-1, -4):lower () ~= ".txt" then
 		suggestedName = suggestedName .. ".txt"
 	end
@@ -299,7 +300,7 @@ function Expression2EditorFrame:SaveFile (path, close, saveAs)
 		self:Close ()
 		return
 	end
-	if not path or saveAs or path == self.Location .. "/" .. ".txt" then
+	if not path or path == self.Location .. "/" .. ".txt" or path == "generic" or saveAs then
 		if self.C ["Browser"].panel:GetSelectedFolder () then
 			path = self.C ["Browser"].panel:GetSelectedFolder ():GetPath ()
 		end
