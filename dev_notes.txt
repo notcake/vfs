@@ -1,6 +1,7 @@
 1. Metatables. Metatables everwhere.
-2. Player folders aren't actually named after them. What you see is just a display name. Their real name would be the steam id of the corresponding player.
-3. Many functions take a variable called authId and a callback function. These types of function will always return nothing but will call the callback function at some point.
+2. Callbacks. Callbacks everywhere.
+3. Player folders aren't actually named after them. What you see is just a display name. Their real name would be the steam id of the corresponding player.
+4. Many functions take a variable called authId and a callback function. These types of function will always return nothing but will call the callback function at some point.
 
 authId is used to tell who is trying to carry out the action and decide if they're allowed to do so. For most purposes, GAuth.GetLocalId () should be used as its value.
 GAuth.GetLocalId () will return either the client's steam ID or "Server" if it's called on the server.
@@ -11,8 +12,8 @@ Return codes can take a couple of values, but usually you'll only be interested 
 For some functions (eg. IFolder:EnumerateChildren and IFileStream:Read), the callback may be called multiple times. Watch out for this.
 The callback may be called with a 2nd argument for some functions, such as IFolder:CreateFile (), where it'll be passed the newly created IFile.
 
-The root filesystem folder can be found at VFS.Root.
-The root group list can be found at GAuth.Groups.
+The root filesystem folder can be found at VFS.Root. VFS.Root is an IFolder.
+The root group list can be found at GAuth.Groups. GAuth.Groups is a GroupTree (not documented here).
 
 Function list:
 	INode:Delete (authId, function (returnCode))
