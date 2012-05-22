@@ -144,7 +144,7 @@ function self:EnumerateChildren (authId, callback)
 end
 
 --[[
-	IFolder:EnumerateChildren ()
+	IFolder:EnumerateChildrenSynchronous ()
 		Returns: INode[] children
 ]]
 function self:EnumerateChildrenSynchronous ()
