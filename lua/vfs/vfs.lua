@@ -339,6 +339,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				)
 				
 				VFS.EndPointManager:GetEndPoint ("Server"):HookNode (mountedFolder)
+				VFS.PermissionBlockNetworker:SynchronizeBlock ("Server", mountedFolder:GetPermissionBlock ())
 			end
 		end
 		
