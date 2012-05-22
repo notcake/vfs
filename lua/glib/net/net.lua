@@ -5,13 +5,12 @@ GLib.Net.ChannelQueues = {} -- used on client only to queue up packets to be sen
 GLib.Net.OpenChannels = {}
 
 local function PlayerFromId (userId)
-	local players = player.GetAll ()
-	if userId == "Everyone" then return players end
-	for _, ply in pairs (players) do
-		if ply:SteamID () == userId then return ply end
+	if userId == "Everyone" then return player.GetAll () end
+	local ply = GLib.Net.PlayerMonitor:GetUserEntity (userId)
+	if not ply then
+		ErrorNoHalt ("GLib: PlayerFromId (" .. tostring (userId) .. ") failed to find player!\n")
 	end
-	ErrorNoHalt ("GLib: PlayerFromId (" .. tostring (userId) .. ") failed to find player!\n")
-	return nil
+	return ply
 end
 
 -- Packet transmission

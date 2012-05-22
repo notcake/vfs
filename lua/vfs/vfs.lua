@@ -354,8 +354,8 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 VFS.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 	function (_, ply, userId)
 		if userId == "" then return end
-		VFS.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
+			VFS.EndPointManager:RemoveEndPoint (userId)
 			if VFS.Root:GetChildSynchronous (userId) then
 				VFS.Root:GetChildSynchronous (userId):SetDeletable (true)
 				VFS.Root:DeleteChild (GAuth.GetSystemId (), userId)

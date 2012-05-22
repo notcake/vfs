@@ -331,8 +331,8 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 GAuth.PlayerMonitor:AddEventListener ("PlayerDisconnected",
 	function (_, ply, userId)
 		if userId == "" then return end
-		GAuth.EndPointManager:RemoveEndPoint (userId)
 		if SERVER then
+			GAuth.EndPointManager:RemoveEndPoint (userId)
 			if GAuth.Groups:GetChild (userId) then
 				GAuth.Groups:GetChild (userId):SetRemovable (true)
 				GAuth.Groups:RemoveNode (GAuth.GetSystemId (), userId)
