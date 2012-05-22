@@ -21,7 +21,7 @@ function self:ctor (name)
 	
 	self.Icon = "gui/g_silkicons/group"
 	
-	self:AddEventListener ("NotifyUserAddded",  self.NotifyUserAdded)	
+	self:AddEventListener ("NotifyUserAdded",  self.NotifyUserAdded)	
 	self:AddEventListener ("NotifyUserRemoved", self.NotifyUserRemoved)
 end
 

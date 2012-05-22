@@ -153,6 +153,8 @@ function self:MountLocal (name, node)
 	self.LowercaseChildren [name:lower ()] = self.Children [name]
 	
 	self:DispatchEvent ("NodeCreated", self.Children [name])
+	
+	return self.Children [name]
 end
 
 function self:RenameChild (authId, name, newName, callback)

@@ -263,10 +263,11 @@ end
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 	function (_, ply, userId, isLocalPlayer)
 		local folder = nil
+		local mountedFolder = nil
 		if isLocalPlayer then
 			-- create the VFolder and mount it into the root NetFolder
 			folder = VFS.VFolder (GAuth.GetLocalId (), VFS.Root)
-			VFS.Root:MountLocal (GAuth.GetLocalId (), folder)
+			mountedFolder = VFS.Root:MountLocal (GAuth.GetLocalId (), folder)
 		else
 			-- pre-empt the NetFolder creation
 			local endPoint = nil
@@ -276,6 +277,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				endPoint = VFS.Client
 			end
 			folder = endPoint:GetRoot ():CreatePredictedFolder (userId)
+			mountedFolder = folder
 		end
 		folder:SetDeletable (false)
 		folder:MarkPredicted ()
@@ -303,6 +305,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				for _, realPath in ipairs (mountPaths) do
 					VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
 						function (returnCode, node)
+							if not node then return end
 							folder:Mount (node:GetName (), node)
 								:SetDeletable (false)
 						end
@@ -310,18 +313,21 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				end
 				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/vfs/lua",
 					function (returnCode, node)
+						if not node then return end
 						folder:Mount ("Source", node, "Source")
 							:SetDeletable (false)
 					end
 				)
 				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
 					function (returnCode, node)
+						if not node then return end
 						folder:Mount ("GCompute Source", node, "GCompute Source")
 							:SetDeletable (false)
 					end
 				)
 				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gooey/lua",
 					function (returnCode, node)
+						if not node then return end
 						folder:Mount ("UI Source", node, "UI Source")
 							:SetDeletable (false)
 					end
@@ -332,7 +338,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 					end
 				)
 				
-				VFS.EndPointManager:GetEndPoint ("Server"):HookNode (folder)
+				VFS.EndPointManager:GetEndPoint ("Server"):HookNode (mountedFolder)
 			end
 		end
 		
