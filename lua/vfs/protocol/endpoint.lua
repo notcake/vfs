@@ -57,7 +57,7 @@ function self:HookNode (node)
 	
 	node:AddEventListener ("NodeCreated",            tostring (self), self.NodeCreated)
 	node:AddEventListener ("NodeDeleted",            tostring (self), self.NodeDeleted)
-	node:AddEventListener ("NodePermissionsChanged", tostring (self), self.NodeRenamed)
+	node:AddEventListener ("NodePermissionsChanged", tostring (self), self.NodePermissionsChanged)
 	node:AddEventListener ("NodeRenamed",            tostring (self), self.NodeRenamed)
 	node:AddEventListener ("NodeUpdated",            tostring (self), self.NodeUpdated)
 	

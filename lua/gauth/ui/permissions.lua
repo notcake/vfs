@@ -14,6 +14,11 @@ function self:Init ()
 	self.SelectedGroupId = nil
 	self.SelectedPermissionBlock = nil
 	
+	self.HookedOwnerBlocks = {}
+	self.HookedPermissionBlocks = {}
+	self.PermissionBlockHeaders = {}
+	self.AddGroupEntryButton = nil
+	
 	self.Owner = vgui.Create ("DLabel", self)
 	self.Owner:SetText ("Owner: ")
 	self.OwnerIcon = vgui.Create ("GImage", self)
@@ -29,7 +34,12 @@ function self:Init ()
 			local dialog = GAuth.OpenUserSelectionDialog (
 				function (userId)
 					if not userId then return end
-					self:Confirm ("Are you sure you want to change the owner to " .. userId .. "?", "Confirm owner change",
+					
+					local ownerName = userId
+					local ownerEntity = GAuth.PlayerMonitor:GetUserEntity (ownerName)
+					if ownerEntity then ownerName = ownerEntity:Name () .. " (" .. userId .. ")" end
+					
+					self:Confirm ("Are you sure you want to change the owner to " .. ownerName .. "?", "Confirm owner change",
 						function (permissionBlock) permissionBlock:SetOwner (GAuth.GetLocalId (), userId) end,
 						GAuth.NullCallback,
 						permissionBlock,
@@ -76,6 +86,8 @@ function self:Init ()
 			if a.PermissionBlockIndex < b.PermissionBlockIndex then return false end
 			if a.IsPermissionBlock then return true end
 			if b.IsPermissionBlock then return false end
+			if a.IsGroupAdder then return false end
+			if b.IsGroupAdder then return true end
 			return a:GetText ():lower () < b:GetText ():lower ()
 		end
 	)
@@ -119,8 +131,23 @@ function self:Init ()
 		end
 	):SetIcon ("gui/g_silkicons/group_delete")
 	
+	self.Groups:AddEventListener ("Click", tostring (self),
+		function (_, item)
+			if not item then return end
+			if item.IsGroupAdder then
+				local permissionBlock = self.PermissionBlock
+				GAuth.OpenGroupSelectionDialog (
+					function (group)
+						if not group then return end
+						permissionBlock:AddGroupEntry (GAuth.GetLocalId (), group:GetFullName ())
+					end
+				):SetTitle ("Add group...")
+			end
+		end
+	)
+	
 	self.Groups:AddEventListener ("SelectionChanged",
-		function (_, item)			
+		function (_, item)
 			self.SelectedGroup = item and item.Group or nil
 			self.SelectedGroupId = item and item.GroupId
 			self.SelectedPermissionBlock = item and item.PermissionBlock
@@ -213,12 +240,12 @@ function self:PerformLayout ()
 end
 
 function self:Remove ()
-	self.PermissionBlock:RemoveEventListener ("GroupEntryAdded", tostring (self))
-	self.PermissionBlock:RemoveEventListener ("GroupEntryRemoved", tostring (self))
-	self.PermissionBlock:RemoveEventListener ("GroupPermissionChanged", tostring (self))
-	self.PermissionBlock:RemoveEventListener ("InheritOwnerChanged", tostring (self))
-	self.PermissionBlock:RemoveEventListener ("InheritPermissionsChanged", tostring (self))
-	self.PermissionBlock:RemoveEventListener ("OwnerChanged", tostring (self))
+	for i = 1, #self.HookedOwnerBlocks do
+		self:UnhookBlockOwner (self.HookedOwnerBlocks [i])
+	end
+	for i = 1, #self.HookedPermissionBlocks do
+		self:UnhookBlockPermissions (self.HookedPermissionBlocks [i])
+	end
 
 	GAuth:RemoveEventListener ("Unloaded", tostring (self))
 	_R.Panel.Remove (self)
@@ -253,10 +280,18 @@ function self:SetPermissionBlock (permissionBlock)
 	
 	self:UpdateInheritOwner ()
 	self:UpdateInheritPermissions ()
-	self:CheckPermissions ()
 	
 	self:UpdateOwner ()
-	self:PopulateGroupEntries ()
+	
+	-- Populate group entries
+	self.Groups:Clear ()
+	self.PermissionBlockHeaders = {}
+	self:PopulateGroupEntries (self.PermissionBlock, 1)
+	self:AddPermissionBlockHeader (self.PermissionBlock, 1)
+	self:AddGroupEntryAdder (self.PermissionBlock, 1)
+	self.Groups:Sort ()
+	
+	self:CheckPermissions ()
 	
 	-- Populate permissions
 	self.PermissionList:Clear ()
@@ -269,75 +304,15 @@ function self:SetPermissionBlock (permissionBlock)
 	end
 	
 	-- Events
-	self.PermissionBlock:AddEventListener ("GroupEntryAdded", tostring (self),
-		function (permissionBlock, groupId)
-			self.TestPermissionBlock:AddGroupEntry (GAuth.GetSystemId (), groupId)
-			
-			self:AddGroup (groupId, self.PermissionBlock, 1)
-			self.Groups:Sort ()
-		end
-	)
-	
-	self.PermissionBlock:AddEventListener ("GroupEntryRemoved", tostring (self),
-		function (permissionBlock, groupId)
-			self.TestPermissionBlock:RemoveGroupEntry (GAuth.GetSystemId (), groupId)
-			
-			for _, item in pairs (self.Groups:GetItems ()) do
-				if item.GroupId == groupId and
-					item.PermissionBlock == permissionBlock then
-					self.Groups:RemoveItem (item)
-					return
-				end
-			end
-			
-			self:CheckPermissions ()
-		end
-	)
-	
-	self.PermissionBlock:AddEventListener ("GroupPermissionChanged", tostring (self),
-		function (permissionBlock, groupId, actionId, access)
-			self.TestPermissionBlock:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, access)
-			
-			self:CheckPermissions ()
-			self:PopulatePermissions ()
-		end
-	)
-	
-	self.PermissionBlock:AddEventListener ("InheritOwnerChanged", tostring (self),
-		function (permissionBlock, inheritOwner)
-			self.TestPermissionBlock:SetInheritOwner (GAuth.GetSystemId (), inheritOwner)
-			
-			self:CheckPermissions ()
-			self:PopulatePermissions ()
-			self:UpdateInheritOwner ()
-			self:UpdateOwner ()
-		end
-	)
-	
-	self.PermissionBlock:AddEventListener ("InheritPermissionsChanged", tostring (self),
-		function (permissionBlock, inheritPermissions)
-			self.TestPermissionBlock:SetInheritPermissions (GAuth.GetSystemId (), inheritPermissions)
-			
-			self:CheckPermissions ()
-			self:PopulateGroupEntries ()
-			self:PopulatePermissions ()
-			self:UpdateInheritPermissions ()
-		end
-	)
-	
-	self.PermissionBlock:AddEventListener ("OwnerChanged", tostring (self),
-		function (permissionBlock, ownerId)
-			self.TestPermissionBlock:SetOwner (GAuth.GetSystemId (), ownerId)
-		
-			self:CheckPermissions ()
-			self:PopulatePermissions ()
-			self:UpdateOwner ()
-		end
-	)
+	self:HookBlock (self.PermissionBlock, 1)
 end
 
 -- Internal, do not call
 function self:AddGroup (groupId, permissionBlock, permissionBlockIndex)
+	if not self.PermissionBlockHeaders [permissionBlockIndex] then
+		self:AddPermissionBlockHeader (permissionBlock, permissionBlockIndex)
+	end
+
 	local group = GAuth.ResolveGroup (groupId)
 	local item = self.Groups:AddItem (group and group:GetFullDisplayName () or groupId)
 	item:SetIcon (group and group:GetIcon () or "gui/g_silkicons/group")
@@ -348,6 +323,39 @@ function self:AddGroup (groupId, permissionBlock, permissionBlockIndex)
 	item.PermissionBlockIndex = permissionBlockIndex
 	item.IsPermissionBlock = false
 	item.IsGroup = true
+	item.IsGroupAdder = false
+end
+
+function self:AddPermissionBlockHeader (permissionBlock, permissionBlockIndex)
+	if self.PermissionBlockHeaders [permissionBlockIndex] then return end
+
+	local item = self.Groups:AddItem (permissionBlock:GetDisplayName ())
+	if item:GetText () == "" then item:SetText ("[root]") end
+	item:SetIcon ("gui/g_silkicons/key")
+	item:SetCanSelect (false)
+	item.PermissionBlock = permissionBlock
+	item.PermissionBlockIndex = permissionBlockIndex
+	item.IsPermissionBlock = true
+	item.IsGroup = false
+	item.IsGroupAdder = false
+	
+	self.PermissionBlockHeaders [permissionBlockIndex] = item
+end
+
+function self:AddGroupEntryAdder (permissionBlock, permissionBlockIndex)
+	if self.AddGroupEntryButton then return end
+
+	local item = self.Groups:AddItem ("Click here to add a group entry...")
+	item:SetIcon ("gui/g_silkicons/group_add")
+	item:SetIndent (16)
+	item:SetCanSelect (false)
+	item.PermissionBlock = permissionBlock
+	item.PermissionBlockIndex = permissionBlockIndex
+	item.IsPermissionBlock = false
+	item.IsGroup = false
+	item.IsGroupAdder = true
+	
+	self.AddGroupEntryButton = item
 end
 
 function self:CheckPermissions ()
@@ -360,50 +368,192 @@ function self:CheckPermissions ()
 	else
 		self.PermissionList:SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 	end
+	
+	if self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then
+		self:AddGroupEntryAdder (self.PermissionBlock, 1)
+	else
+		if self.AddGroupEntryButton then
+			self.Groups:RemoveItem (self.AddGroupEntryButton)
+			self.AddGroupEntryButton = nil
+		end
+	end
 end
 
-function self:PopulateGroupEntries ()
-	-- Prepare parent block list
-	local permissionBlocks = {}
-	local parentBlock = self.PermissionBlock
-	while parentBlock do
-		permissionBlocks [#permissionBlocks + 1] = parentBlock
-		parentBlock = parentBlock:InheritsPermissions () and parentBlock:GetParent ()
+function self:HookBlock (permissionBlock, permissionBlockIndex)
+	if not permissionBlock then return end
+	
+	self:HookBlockOwner (permissionBlock, permissionBlockIndex)
+	self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
+end
+
+function self:HookBlockOwner (permissionBlock, permissionBlockIndex)
+	if not permissionBlock then return end
+	
+	self.HookedOwnerBlocks [permissionBlockIndex] = permissionBlock
+	if permissionBlock:InheritsOwner () then
+		self:HookBlockOwner (permissionBlock:GetParent (), permissionBlockIndex + 1)
 	end
 	
-	local selectedGroupId = self.SelectedGroupId
-	local selectedPermissionBlock = self.SelectedPermissionBlock
-	
-	-- Populate group entries
-	self.Groups:Clear ()
-	local groups = {}
-	for i = 1, #permissionBlocks do
-		local permissionBlock = permissionBlocks [i]
-		local groupCount = 0
-		for groupId in permissionBlock:GetGroupEntryEnumerator () do
-			self:AddGroup (groupId, permissionBlock, i)
-			groupCount = groupCount + 1
+	permissionBlock:AddEventListener ("InheritOwnerChanged", tostring (self),
+		function (permissionBlock, inheritOwner)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:SetInheritOwner (GAuth.GetSystemId (), inheritOwner)
+				self:UpdateInheritOwner ()
+			end
+			
+			if inheritOwner then
+				self:HookBlockOwner (permissionBlock:GetParent (), permissionBlockIndex + 1)
+			else
+				for i = #self.HookedOwnerBlocks, permissionBlockIndex + 1, -1 do
+					self:UnhookBlockOwner (self.HookedOwnerBlocks [i])
+					self.HookedOwnerBlocks [i] = nil
+				end
+			end
+			
+			self:CheckPermissions ()
+			self:UpdateOwner ()
 		end
+	)
+	
+	permissionBlock:AddEventListener ("OwnerChanged", tostring (self),
+		function (permissionBlock, ownerId)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:SetOwner (GAuth.GetSystemId (), ownerId)
+				self:UpdateOwner ()
+			end
 		
-		if groupCount > 0 or i == 1 then
-			local item = self.Groups:AddItem (permissionBlock:GetDisplayName ())
-			if item:GetText () == "" then item:SetText ("[root]") end
-			item:SetIcon ("gui/g_silkicons/key")
-			item:SetCanSelect (false)
-			item.PermissionBlock = permissionBlock
-			item.PermissionBlockIndex = i
-			item.IsPermissionBlock = true
-			item.IsGroup = false
+			self:CheckPermissions ()
 		end
-	end
-	self.Groups:Sort ()
+	)
+end
+
+function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
+	if not permissionBlock then return end
 	
-	for _, item in pairs (self.Groups:GetItems ()) do
-		if item.GroupId == selectedGroupId and
-			item.PermissionBlock == selectedPermissionBlock then
-			item:Select ()
-			break
+	self.HookedPermissionBlocks [permissionBlockIndex] = permissionBlock
+	if permissionBlock:InheritsPermissions () then
+		self:HookBlockPermissions (permissionBlock:GetParent (), permissionBlockIndex + 1)
+	end
+	
+	permissionBlock:AddEventListener ("GroupEntryAdded", tostring (self),
+		function (permissionBlock, groupId)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:AddGroupEntry (GAuth.GetSystemId (), groupId)
+			end
+			
+			self:AddGroup (groupId, permissionBlock, permissionBlockIndex)
+			self.Groups:Sort ()
 		end
+	)
+	
+	permissionBlock:AddEventListener ("GroupEntryRemoved", tostring (self),
+		function (permissionBlock, groupId)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:RemoveGroupEntry (GAuth.GetSystemId (), groupId)
+			end
+			
+			local groupEntryCount = 0
+			for _, item in pairs (self.Groups:GetItems ()) do
+				if item.PermissionBlockIndex == permissionBlockIndex then
+					if item.GroupId == groupId then
+						self.Groups:RemoveItem (item)
+					elseif item.IsGroup then
+						groupEntryCount = groupEntryCount + 1
+					end
+				end
+			end
+			if groupEntryCount == 0 and permissionBlockIndex > 1 then
+				-- Remove permission block header
+				self.Groups:RemoveItem (self.PermissionBlockHeaders [permissionBlockIndex])
+				self.PermissionBlockHeaders [permissionBlockIndex] = nil
+			end
+			
+			self:CheckPermissions ()
+		end
+	)
+	
+	permissionBlock:AddEventListener ("GroupPermissionChanged", tostring (self),
+		function (permissionBlock, groupId, actionId, access)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, access)
+			end
+			
+			self:CheckPermissions ()
+			if self.SelectedGroupId == groupId then
+				self:PopulatePermissions ()
+			end
+		end
+	)
+	
+	permissionBlock:AddEventListener ("InheritPermissionsChanged", tostring (self),
+		function (permissionBlock, inheritPermissions)
+			if permissionBlock == self.PermissionBlock then
+				self.TestPermissionBlock:SetInheritPermissions (GAuth.GetSystemId (), inheritPermissions)
+				self:UpdateInheritPermissions ()
+			end
+			
+			if inheritPermissions then
+				-- Hook parent permission blocks
+				-- Add parent group entries
+				self:HookBlockPermissions (permissionBlock:GetParent (), permissionBlockIndex + 1)
+				self:PopulateGroupEntries (permissionBlock:GetParent (), permissionBlockIndex + 1)
+				self.Groups:Sort ()
+			else
+				-- Unhook parent permission blocks
+				for i = #self.HookedPermissionBlocks, permissionBlockIndex + 1, -1 do
+					self:UnhookBlockPermissions (self.HookedPermissionBlocks [i])
+					self.HookedPermissionBlocks [i] = nil
+				end
+				
+				-- Remove parent group entries
+				for _, item in pairs (self.Groups:GetItems ()) do
+					if item.PermissionBlockIndex > permissionBlockIndex then
+						-- Unregister permission block header
+						if item.IsPermissionBlock then
+							self.PermissionBlockHeaders [item.PermissionBlockIndex] = nil
+						end
+						self.Groups:RemoveItem (item)
+					end
+				end
+			end
+			
+			self:CheckPermissions ()
+			self:PopulatePermissions ()
+		end
+	)
+end
+
+function self:UnhookBlock (permissionBlock)
+	if not permissionBlock then return end
+	
+	self:UnhookBlockOwner (permissionBlock)
+	self:UnhookBlockPermissions (permissionBlock)
+end
+
+function self:UnhookBlockOwner (permissionBlock)
+	if not permissionBlock then return end
+
+	permissionBlock:RemoveEventListener ("InheritOwnerChanged",       tostring (self))
+	permissionBlock:RemoveEventListener ("OwnerChanged",              tostring (self))
+end
+
+function self:UnhookBlockPermissions (permissionBlock)
+	if not permissionBlock then return end
+
+	permissionBlock:RemoveEventListener ("GroupEntryAdded",           tostring (self))
+	permissionBlock:RemoveEventListener ("GroupEntryRemoved",         tostring (self))
+	permissionBlock:RemoveEventListener ("GroupPermissionChanged",    tostring (self))
+	permissionBlock:RemoveEventListener ("InheritPermissionsChanged", tostring (self))
+end
+
+function self:PopulateGroupEntries (permissionBlock, permissionBlockIndex)
+	if not permissionBlock then return end
+	
+	for groupId in permissionBlock:GetGroupEntryEnumerator () do
+		self:AddGroup (groupId, permissionBlock, permissionBlockIndex)
+	end
+	if permissionBlock:InheritsPermissions () then
+		self:PopulateGroupEntries (permissionBlock:GetParent (), permissionBlockIndex + 1)
 	end
 end
 
@@ -414,8 +564,13 @@ function self:PopulatePermissions ()
 			local access = self.SelectedPermissionBlock:GetGroupPermission (self.SelectedGroupId, permissionLine.ActionId)
 			if access == GAuth.Access.Allow then
 				permissionLine:SetCheckState (2, true)
+				permissionLine:SetCheckState (3, false)
 			elseif access == GAuth.Access.Deny then
+				permissionLine:SetCheckState (2, false)
 				permissionLine:SetCheckState (3, true)
+			else
+				permissionLine:SetCheckState (2, false)
+				permissionLine:SetCheckState (3, false)
 			end
 		else
 			-- group deselected

@@ -287,6 +287,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 						playerGroup:SetHost (userId)
 						playerGroup:MarkPredicted ()
 						playerGroup:AddUser (GAuth.GetSystemId (), userId)
+						playerGroup:SetIcon ("gui/g_silkicons/user")
 						playerGroup:ClearPredictedFlag ()
 					end
 				)

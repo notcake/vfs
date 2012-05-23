@@ -43,7 +43,7 @@ function self:ctor ()
 	end
 	
 	self.HostChanged = function (groupTreeNode, hostId)
-		self.PermissionBlockNetworker:UnhookBlock (groupTreeNode)
+		self.PermissionBlockNetworker:UnhookBlock (groupTreeNode:GetPermissionBlock ())
 		if groupTreeNode:IsHostedLocally () then
 			self.PermissionBlockNetworker:HookBlock (groupTreeNode:GetPermissionBlock ())
 		else

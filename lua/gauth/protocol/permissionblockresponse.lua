@@ -32,6 +32,7 @@ function self:HandleInitialPacket (inBuffer)
 end
 
 function self:HandlePacket (inBuffer)
+	if not self.Session then return end
 	self.Session:HandlePacket (inBuffer)
 end
 
