@@ -469,6 +469,7 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 			end
 			
 			self:CheckPermissions ()
+			self:PopulatePermissions ()
 		end
 	)
 	

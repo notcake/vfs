@@ -198,7 +198,7 @@ end
 function self:HandleNotification (remoteEndPoint, permissionBlockId, inBuffer)	
 	local permissionBlock = self:ResolvePermissionBlock (permissionBlockId)
 	if not permissionBlock then
-		ErrorNoHalt (self:GetSystemName () .. ".PermissionBlockNetworker:HandleNotification : Failed to resolve " .. permissionBlockId .. "\n")
+		GAuth.Debug (self:GetSystemName () .. ".PermissionBlockNetworker:HandleNotification : Failed to resolve " .. permissionBlockId .. "\n")
 		return
 	end
 	if not self:ShouldProcessNotification (remoteEndPoint:GetRemoteId (), permissionBlockId, permissionBlock) then return end
@@ -240,7 +240,7 @@ function self:HandleRequest (permissionBlockResponse, permissionBlockId, inBuffe
 	
 	local permissionBlock = self:ResolvePermissionBlock (permissionBlockId)
 	if not permissionBlock then
-		ErrorNoHalt (self:GetSystemName () .. ".PermissionBlockNetworker:HandleRequest : Failed to resolve " .. permissionBlockId .. "\n")
+		GAuth.Debug (self:GetSystemName () .. ".PermissionBlockNetworker:HandleRequest : Failed to resolve " .. permissionBlockId .. "\n")
 		return
 	end
 	

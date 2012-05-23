@@ -307,20 +307,17 @@ function self:Populate (filesystemNode, treeViewNode)
 			local childNode = treeViewNode.AddedNodes [node:GetName ()]
 			if not childNode then return end
 			
-			local canView = not node:GetPermissionBlock () or node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), node:IsFolder () and "View Folder" or "Read")
-			if childNode.CanView == canView then return end
-			childNode.CanView = canView
+			local canViewChanged, canReadChanged = self:UpdateIcon (childNode)
+			if not node:IsFolder () then return end
 			
-			if node:IsFolder () then
-				if canView then
-					childNode:SetIcon ("gui/g_silkicons/folder")
+			if canViewChanged then
+				if childNode.CanView then
 					childNode:SetExpandable (true)
 					childNode:MarkUnpopulated ()
 				else
-					childNode:SetIcon ("gui/g_silkicons/folder_delete")
 					self:UnhookNodeRecursive (childNode)
 					
-					-- Move selected item up if it's a child node
+					-- Move item selection upwards if necessary
 					local selectedItem = self:GetSelectedItem ()
 					if selectedItem and selectedItem:IsValid () then
 						while selectedItem and selectedItem:IsValid () do
@@ -338,8 +335,9 @@ function self:Populate (filesystemNode, treeViewNode)
 					childNode:SetExpandable (false)
 					childNode:MarkUnpopulated ()
 				end
-			else
-				childNode:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
+			end
+			if childNode.CanView and canReadChanged then
+				self:UpdateFileIconsRecursive (childNode)
 			end
 		end
 	)
@@ -397,19 +395,15 @@ function self:AddFilesystemNode (treeViewNode, filesystemNode)
 	local childNode = treeViewNode:AddNode (filesystemNode:GetName ())
 	childNode:SetExpandable (filesystemNode:IsFolder ())
 	childNode:SetText (filesystemNode:GetDisplayName ())
-	childNode.CanView = not filesystemNode:GetPermissionBlock () or filesystemNode:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), filesystemNode:IsFolder () and "View Folder" or "Read")
-	if filesystemNode:IsFolder () then
-		if childNode.CanView then
-			childNode:SetIcon ("gui/g_silkicons/folder")
-		else
-			childNode:SetIcon ("gui/g_silkicons/folder_delete")
-			childNode:SetExpandable (false)
-		end
-	else
-		childNode:SetIcon (childNode.CanView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
-	end
+	
 	childNode.Node = filesystemNode
 	childNode.IsFolder = filesystemNode:IsFolder ()
+	childNode.IsFile = filesystemNode:IsFile ()
+	
+	self:UpdateIcon (childNode)
+	if filesystemNode:IsFolder () and not childNode.CanView then
+		childNode:SetExpandable (false)
+	end
 	
 	treeViewNode.AddedNodes = treeViewNode.AddedNodes or {}
 	treeViewNode.AddedNodes [filesystemNode:GetName ()] = childNode
@@ -464,6 +458,37 @@ function self:ResolvePath (treeViewNode, path, callback)
 			end
 		)
 		if not treeViewNode.AddedNodes then self:Populate (treeViewNode.Node, treeViewNode) end
+	end
+end
+
+-- Returns true if the icon was changed
+function self:UpdateIcon (treeViewNode)
+	local node = treeViewNode.Node
+	local permissionBlock = node:GetPermissionBlock ()
+	local canRead = not permissionBlock or permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read")
+	local canView = not permissionBlock or (treeViewNode.IsFolder and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder") or canRead)
+	
+	local canViewChanged = treeViewNode.CanView ~= canView
+	local canReadChanged = treeViewNode.CanRead ~= canRead
+	treeViewNode.CanView = canView
+	treeViewNode.CanRead = canRead
+	
+	if treeViewNode.IsFolder and canViewChanged then
+		treeViewNode:SetIcon (canView and "gui/g_silkicons/folder" or "gui/g_silkicons/folder_delete")
+	elseif treeViewNode.IsFile and canReadChanged then
+		treeViewNode:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
+	end
+	return canViewChanged, canReadChanged
+end
+
+function self:UpdateFileIconsRecursive (treeViewNode)
+	if not treeViewNode.AddedNodes then return end
+	
+	for _, childNode in pairs (treeViewNode.AddedNodes) do
+		local _, canReadChanged = self:UpdateIcon (childNode)
+		if canReadChanged and childNode.IsFolder then
+			self:UpdateFileIconsRecursive (childNode)
+		end
 	end
 end
 

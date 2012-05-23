@@ -142,8 +142,9 @@ function self:GetAccess (authId, actionId, permissionBlock)
 	end
 
 	local parentAccess = GAuth.Access.None
-	if self.InheritPermissions and self:GetParent () then
-		parentAccess = self:GetParent ():GetAccess (authId, actionId, permissionBlock or self)
+	local parent = self:GetParent ()
+	if self.InheritPermissions and parent then
+		parentAccess = parent:GetAccess (authId, actionId, permissionBlock or self)
 	end
 	
 	if parentAccess == GAuth.Access.Deny then return GAuth.Access.Deny end
@@ -169,8 +170,9 @@ end
 
 function self:GetGroupAccess (groupId, actionId, permissionBlock)
 	local parentAccess = GAuth.Access.None
-	if self.InheritPermissions and self:GetParent () then
-		parentAccess = self:GetParent ():GetGroupAccess (groupId, actionId, permissionBlock or self)
+	local parent = self:GetParent ()
+	if self.InheritPermissions and parent then
+		parentAccess = parent:GetGroupAccess (groupId, actionId, permissionBlock or self)
 	end
 	
 	if parentAccess == GAuth.Access.Deny then return GAuth.Access.Deny end

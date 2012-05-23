@@ -16,6 +16,7 @@ local self = {}
 function self:Init ()
 	self.Folder = nil
 	self.ChildNodes = {}
+	self.HookedNodes = {} -- IFolders whose PermissionsChanged event have been hooked
 	self.LastAccess = false
 	self.LastReadAccess = false
 	
@@ -166,6 +167,28 @@ function self:Init ()
 			self:DispatchEvent ("SelectedFolderChanged", node and node:IsFolder () and node or nil)
 		end
 	)
+	
+	self.PermissionsChanged = function (_)
+		local access = self.Folder:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "View Folder")
+		local readAccess = self.Folder:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Read")
+		if self.LastAccess ~= access then
+			self.LastAccess = access
+			if self.LastAccess then
+				self:MergeRefresh ()
+			else
+				self:Clear ()
+				self.ChildNodes = {}
+			end
+		end
+		if self.LastReadAccess ~= readAccess then
+			self.LastReadAccess = readAccess
+			for _, listViewItem in pairs (self.ChildNodes) do
+				if listViewItem.IsFile then
+					self:UpdateIcon (listViewItem)
+				end
+			end
+		end
+	end
 end
 
 function self:Remove ()
@@ -256,7 +279,11 @@ function self:SetFolder (folder)
 		self.Folder:RemoveEventListener ("NodePermissionsChanged", tostring (self))
 		self.Folder:RemoveEventListener ("NodeRenamed", tostring (self))
 		self.Folder:RemoveEventListener ("NodeUpdated", tostring (self))
-		self.Folder:RemoveEventListener ("PermissionsChanged", tostring (self))
+		
+		for i = #self.HookedNodes, 1, -1 do
+			self.HookedNodes [i]:RemoveEventListener ("PermissionsChanged", tostring (self))
+			self.HookedNodes [i] = nil
+		end
 		self.Folder = nil
 	end
 	if not folder then return end
@@ -299,30 +326,13 @@ function self:SetFolder (folder)
 			end
 		end
 	)
-	
-	self.Folder:AddEventListener ("PermissionsChanged", tostring (self),
-		function (_)
-			local access = self.Folder:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "View Folder")
-			local readAccess = self.Folder:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Read")
-			if self.LastAccess ~= access then
-				self.LastAccess = access
-				if self.LastAccess then
-					self:MergeRefresh ()
-				else
-					self:Clear ()
-					self.ChildNodes = {}
-				end
-			end
-			if self.LastReadAccess ~= readAccess then
-				self.LastReadAccess = readAccess
-				for _, listViewItem in pairs (self.ChildNodes) do
-					if listViewItem.IsFile then
-						self:UpdateIcon (listViewItem)
-					end
-				end
-			end
-		end
-	)
+
+	local parentFolder = self.Folder
+	while parentFolder do
+		self.HookedNodes [#self.HookedNodes + 1] = parentFolder
+		parentFolder:AddEventListener ("PermissionsChanged", tostring (self), self.PermissionsChanged)
+		parentFolder = parentFolder:GetParentFolder ()
+	end
 	
 	self.LastAccess = self.Folder:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "View Folder")
 end
@@ -347,12 +357,13 @@ function self:AddNode (node)
 	local listViewItem = self:AddLine (node:GetName ())
 	listViewItem:SetText (node:GetDisplayName ())
 	listViewItem.Node = node
-	self:UpdateIcon (listViewItem)
 	
 	listViewItem.IsFolder = node:IsFolder ()
 	listViewItem.IsFile = node:IsFile ()
 	listViewItem.Size = node:IsFile () and node:GetSize () or -1
 	listViewItem.LastModified = node:GetModificationTime ()
+	
+	self:UpdateIcon (listViewItem)
 	
 	listViewItem:SetColumnText (2, listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
 	listViewItem:SetColumnText (3, listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
@@ -363,19 +374,16 @@ end
 
 function self:UpdateIcon (listViewItem)
 	local node = listViewItem.Node
-	if node:IsFolder () then
-		if not node:GetPermissionBlock () or node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "View Folder") then
-			listViewItem:SetIcon ("gui/g_silkicons/folder")
-		else
-			listViewItem:SetIcon ("gui/g_silkicons/folder_delete")
-		end
+	local permissionBlock = node:GetPermissionBlock ()
+	local canView = not permissionBlock or permissionBlock:IsAuthorized (GAuth.GetLocalId (), listViewItem.IsFolder and "View Folder" or "Read")
+	if listViewItem.IsFolder then
+		listViewItem:SetIcon (canView and "gui/g_silkicons/folder" or "gui/g_silkicons/folder_delete")
 	else
-		if not node:GetPermissionBlock () or node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Read") then
-			listViewItem:SetIcon ("gui/g_silkicons/page")
-		else
-			listViewItem:SetIcon ("gui/g_silkicons/page_delete")
-		end
+		listViewItem:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
 	end
 end
+
+-- Event handlers
+self.PermissionsChanged = VFS.NullCallback
 
 vgui.Register ("VFSFolderListView", self, "GListView")

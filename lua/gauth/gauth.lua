@@ -87,12 +87,24 @@ end
 
 function GAuth.ResolveGroupTreeNode (groupId)
 	if groupId == "" then return GAuth.Groups end
-	local parts = groupId:Split ("/")
+	
+	local groupIdLength = groupId:len ()
+	
+	-- First segment
+	local partStart = 1
+	local partEnd = groupId:find ("/", partStart, true)
+	partEnd = partEnd and partEnd - 1 or groupIdLength
+	
 	local node = GAuth.Groups
-	for i = 1, #parts do
+	while partStart <= groupIdLength do
 		if not node:IsGroupTree () then return nil end
-		node = node:GetChild (parts [i])
+		node = node:GetChild (groupId:sub (partStart, partEnd))
 		if not node then return nil end
+		
+		-- Next segment
+		partStart = partEnd + 2
+		partEnd = groupId:find ("/", partStart, true)
+		partEnd = partEnd and partEnd - 1 or groupIdLength
 	end
 	return node
 end
