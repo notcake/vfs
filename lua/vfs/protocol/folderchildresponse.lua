@@ -15,6 +15,8 @@ function self:HandleInitialPacket (inBuffer)
 			outBuffer:UInt8 (returnCode)
 			if returnCode == VFS.ReturnCode.Success then
 				self:SerializeNode (node, outBuffer)
+				
+				self:GetRemoteEndPoint ():HookNode (node:GetParentNode ())
 			end
 			self:QueuePacket (outBuffer)
 			self:Close ()

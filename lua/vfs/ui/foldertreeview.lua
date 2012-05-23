@@ -198,6 +198,24 @@ function self:Remove ()
 	_R.Panel.Remove (self)
 end
 
+function self:UnhookNode (node)
+	self.SubscribedNodes [node] = nil
+	
+	node:RemoveEventListener ("NodeCreated", tostring (self))
+	node:RemoveEventListener ("NodeDeleted", tostring (self))
+	node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
+	node:RemoveEventListener ("NodeRenamed", tostring (self))
+	node:RemoveEventListener ("NodeUpdated", tostring (self))
+end
+
+function self:UnhookNodeRecursive (treeViewNode)
+	self:UnhookNode (treeViewNode.Node)
+	if not treeViewNode.AddedNodes then return end
+	for _, childNode in pairs (treeViewNode.AddedNodes) do
+		self:UnhookNodeRecursive (childNode)
+	end
+end
+
 function self.DefaultComparator (a, b)
 	-- Put group trees at the top
 	if a == b then return false end
@@ -271,12 +289,7 @@ function self:Populate (filesystemNode, treeViewNode)
 				filesystemNode:AddEventListener ("NodeDeleted", tostring (self),
 					function (_, deletedNode)
 						local childNode = treeViewNode.AddedNodes [deletedNode:GetName ()]
-						deletedNode:RemoveEventListener ("NodeCreated", tostring (self))
-						deletedNode:RemoveEventListener ("NodeDeleted", tostring (self))
-						deletedNode:RemoveEventListener ("NodePermissionsChanged", tostring (self))
-						deletedNode:RemoveEventListener ("NodeRenamed", tostring (self))
-						deletedNode:RemoveEventListener ("NodeUpdated", tostring (self))
-						self.SubscribedNodes [deletedNode] = nil
+						self:UnhookNodeRecursive (childNode)
 						
 						treeViewNode.AddedNodes [deletedNode:GetName ()] = nil
 						if childNode then
@@ -305,6 +318,20 @@ function self:Populate (filesystemNode, treeViewNode)
 					childNode:MarkUnpopulated ()
 				else
 					childNode:SetIcon ("gui/g_silkicons/folder_delete")
+					self:UnhookNodeRecursive (childNode)
+					
+					-- Move selected item up if it's a child node
+					local selectedItem = self:GetSelectedItem ()
+					if selectedItem and selectedItem:IsValid () then
+						while selectedItem and selectedItem:IsValid () do
+							selectedItem = selectedItem:GetParentNode ()
+							if childNode == selectedItem then
+								self:SetSelectedItem (childNode)
+								break
+							end
+						end
+					end
+					
 					childNode.AddedNodes = {}
 					childNode:Clear ()
 					childNode:SetExpanded (false)
@@ -330,6 +357,7 @@ function self:Populate (filesystemNode, treeViewNode)
 	
 	filesystemNode:AddEventListener ("NodeUpdated", tostring (self),
 		function (_, updatedNode, updateFlags)
+			if not treeViewNode:IsValid () then return end
 			local childNode = treeViewNode.AddedNodes [updatedNode:GetName ()]
 			if not childNode then return end
 			if updateFlags & VFS.UpdateFlags.DisplayName == 0 then return end

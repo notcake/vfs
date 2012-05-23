@@ -22,6 +22,12 @@ function self:ctor (remoteId, systemName)
 		self:SendNotification (VFS.Protocol.NodeDeletionNotification (folder, childNode))
 	end
 	
+	self.NodePermissionsChanged = function (folder, childNode)
+		if not childNode:GetPermissionBlock ():IsAuthorized (self:GetRemoteId (), "View Folder") then
+			self:UnhookNode (childNode)
+		end
+	end
+	
 	self.NodeRenamed = function (folder, childNode, oldName, newName)
 		if not folder:GetPermissionBlock ():IsAuthorized (self:GetRemoteId (), "View Folder") then return end
 	
@@ -49,10 +55,11 @@ function self:HookNode (node)
 	if self.HookedNodes [node] then return end
 	self.HookedNodes [node] = true
 	
-	node:AddEventListener ("NodeCreated", tostring (self), self.NodeCreated)
-	node:AddEventListener ("NodeDeleted", tostring (self), self.NodeDeleted)
-	node:AddEventListener ("NodeRenamed", tostring (self), self.NodeRenamed)
-	node:AddEventListener ("NodeUpdated", tostring (self), self.NodeUpdated)
+	node:AddEventListener ("NodeCreated",            tostring (self), self.NodeCreated)
+	node:AddEventListener ("NodeDeleted",            tostring (self), self.NodeDeleted)
+	node:AddEventListener ("NodePermissionsChanged", tostring (self), self.NodeRenamed)
+	node:AddEventListener ("NodeRenamed",            tostring (self), self.NodeRenamed)
+	node:AddEventListener ("NodeUpdated",            tostring (self), self.NodeUpdated)
 	
 	VFS.Debug ("VFS.EndPoint:HookNode : " .. node:GetPath ())
 end
@@ -66,15 +73,28 @@ end
 function self:UnhookNode (node)
 	self.HookedNodes [node] = nil
 
-	node:RemoveEventListener ("NodeCreated", tostring (self))
-	node:RemoveEventListener ("NodeDeleted", tostring (self))
-	node:RemoveEventListener ("NodeRenamed", tostring (self))
-	node:RemoveEventListener ("NodeUpdated", tostring (self))
+	node:RemoveEventListener ("NodeCreated",            tostring (self))
+	node:RemoveEventListener ("NodeDeleted",            tostring (self))
+	node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
+	node:RemoveEventListener ("NodeRenamed",            tostring (self))
+	node:RemoveEventListener ("NodeUpdated",            tostring (self))
 	
 	VFS.Debug ("VFS.EndPoint:UnhookNode : " .. node:GetPath ())
 end
 
-self.NodeCreated = VFS.NullCallback
-self.NodeDeleted = VFS.NullCallback
-self.NodeRenamed = VFS.NullCallback
-self.NodeUpdated = VFS.NullCallback
+function self:UnhookNodeRecursive (node)
+	if not self:IsNodeHooked (node) then return end
+	
+	self:UnhookNode (node)
+	if node:IsFolder () then
+		for _, childNode in pairs (node:EnumerateChildrenSynchronous ()) do
+			self:UnhookNodeRecursive (childNode)
+		end
+	end
+end
+
+self.NodeCreated            = VFS.NullCallback
+self.NodeDeleted            = VFS.NullCallback
+self.NodePermissionsChanged = VFS.NullCallback
+self.NodeRenamed            = VFS.NullCallback
+self.NodeUpdated            = VFS.NullCallback
