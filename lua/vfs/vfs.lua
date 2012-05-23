@@ -200,6 +200,7 @@ if SERVER then
 				"data/asslog",
 				"data/cadmin/logs",
 				"data/DarkRP_logs",
+				"data/ev_logs",
 				"data/FAdmin_logs",
 				"data/ulx_logs"
 			}
