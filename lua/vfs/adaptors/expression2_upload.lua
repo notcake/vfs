@@ -11,9 +11,10 @@ if SERVER then
 		umsg.End ()
 	end
 
-	concommand.Add ("wire_expression_vfs_upload", function (player, command, args)	
+	concommand.Add ("wire_expression_vfs_upload", function (player, command, args)
 		local id = player:UserID ()
 		local filePath = tostring (args [1] or "")
+		if not concommand.GetTable () ["wire_expression_upload_begin"] then return end
 		
 		local buffer = VFS.FindUpValue (concommand.GetTable () ["wire_expression_upload_begin"], "buffer")
 		if not buffer then updateProgress (player, nil, filePath) return end
@@ -73,17 +74,7 @@ if SERVER then
 	end)
 elseif CLIENT then
 	local uploadFiles = VFS.WeakValueTable ()
-
-	local function oldTransfer (code)
-		local encoded = E2Lib.encode (code)
-		local length = encoded:len ()
-		local chunks = math.ceil (length / 480)
-
-		Expression2SetProgress (0)
-		RunConsoleCommand ("wire_expression_upload_begin", code:len (), chunks)
-
-		timer.Create ("wire_expression_upload", 1 / 60, chunks, transfer_callback, { encoded, 1, chunks })
-	end
+	local oldTransfer = VFS.NullCallback
 
 	local function transfer (code, existingPath)
 		if not VFS.Net.IsChannelOpen ("vfs_new_session") then
@@ -125,22 +116,6 @@ elseif CLIENT then
 			)
 		end
 	end
-
-	function wire_expression2_upload ()
-		if wire_expression2_editor == nil then initE2Editor () end
-
-		if e2_function_data_received then
-			local result = wire_expression2_validate (wire_expression2_editor:GetCode ())
-			if result then
-				WireLib.AddNotify (result, NOTIFY_ERROR, 7, NOTIFYSOUND_DRIP3)
-				return
-			end
-		else
-			WireLib.AddNotify ("The Expression 2 function data has not been transferred to the client yet; uploading the E2 to the server for validation.", NOTIFY_ERROR, 7, NOTIFYSOUND_DRIP3)
-		end
-
-		transfer (wire_expression2_editor:GetCode (), nil)
-	end
 	
 	usermessage.Hook ("vfs_expression2_upload_progress",
 		function (umsg)
@@ -158,4 +133,34 @@ elseif CLIENT then
 			Expression2SetProgress (percentage)
 		end
 	)
+
+	local FirstCheckTime = SysTime ()
+	local function OverrideUpload ()
+		wire_expression2_upload_old = wire_expression2_upload_old or wire_expression2_upload
+		if not wire_expression2_upload_old then
+			if SysTime () - FirstCheckTime < 60 then
+				timer.Simple (1, OverrideUpload)
+			end
+			return
+		end
+		
+		oldTransfer = VFS.FindUpValue (wire_expression2_upload_old, "transfer")
+		
+		function wire_expression2_upload ()
+			if wire_expression2_editor == nil then initE2Editor () end
+
+			if e2_function_data_received then
+				local result = wire_expression2_validate (wire_expression2_editor:GetCode ())
+				if result then
+					WireLib.AddNotify (result, NOTIFY_ERROR, 7, NOTIFYSOUND_DRIP3)
+					return
+				end
+			else
+				WireLib.AddNotify ("The Expression 2 function data has not been transferred to the client yet; uploading the E2 to the server for validation.", NOTIFY_ERROR, 7, NOTIFYSOUND_DRIP3)
+			end
+
+			transfer (wire_expression2_editor:GetCode (), nil)
+		end
+	end
+	timer.Simple (1, OverrideUpload)
 end
