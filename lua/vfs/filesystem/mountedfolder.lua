@@ -64,7 +64,7 @@ function self:CreateDirectNode (authId, name, isFolder, callback)
 
 	local lowercaseName = name:lower ()
 	if self.Children [name] or (self:IsCaseInsensitive () and self.LowercaseChildren [lowercaseName]) then
-		if self.Children [name]:IsFolder () == isFolder then callback (VFS.ReturnCode.Success, self.Children [name])
+		if self.Children [name] and self.Children [name]:IsFolder () == isFolder then callback (VFS.ReturnCode.Success, self.Children [name])
 		elseif self:IsCaseInsensitive () and self.LowercaseChildren [lowercaseName]:IsFolder () == isFolder then callback (VFS.ReturnCode.Success, self.LowercaseChildren [lowercaseName])
 		elseif isFolder then callback (VFS.ReturnCode.NotAFolder)
 		else callback (VFS.ReturnCode.NotAFile) end
