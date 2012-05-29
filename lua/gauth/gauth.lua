@@ -191,6 +191,7 @@ include ("protocol/permissionblock/ownerchangerequest.lua")
 include ("protocol/permissionblock/ownerchangeresponse.lua")
 
 if CLIENT then
+	include ("gooey/sh_init.lua")
 	GAuth.IncludeDirectory ("gauth/ui")
 end
 

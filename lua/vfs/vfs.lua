@@ -81,6 +81,7 @@ include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
 
 if CLIENT then
+	include ("gooey/sh_init.lua")
 	VFS.IncludeDirectory ("vfs/ui")
 end
 	
