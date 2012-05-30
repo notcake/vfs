@@ -53,12 +53,6 @@ function GLib.Net.RegisterChannel (channelName, handler)
 	GLib.Net.ChannelHandlers [channelName] = handler
 
 	if SERVER then
-		datastream.Hook (channelName,
-			function (ply, channelName, _, _, data)
-				handler (ply:SteamID (), GLib.Net.DatastreamInBuffer (data))
-			end
-		)
-		
 		for _, ply in GLib.Net.PlayerMonitor:GetPlayerEnumerator () do
 			umsg.Start ("glib_channel_open", ply)
 				umsg.String (channelName)
