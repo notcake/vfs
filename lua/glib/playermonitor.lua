@@ -4,6 +4,10 @@ GLib.PlayerMonitor = GLib.MakeConstructor (self)
 function self:ctor (systemName)
 	self.SystemName = systemName
 
+	-- Debugging
+	self.InitialPlayerGetAll = {}
+	self.PlayersAddedToQueue = {}
+	
 	self.Players = {}
 	self.EntitiesToUserIds = {}
 	self.QueuedPlayers = {}
@@ -13,6 +17,7 @@ function self:ctor (systemName)
 		if type (ply) == "Player" then
 			self.QueuedPlayers [ply] = true
 		end
+		self.PlayersAddedToQueue [ply] = type (ply) == "Player"
 	end)
 
 	hook.Add ("Think", self.SystemName .. ".PlayerConnected", function ()
@@ -56,6 +61,7 @@ function self:ctor (systemName)
 		end
 	end)
 
+	self.InitialPlayerGetAll = player.GetAll ()
 	for _, ply in ipairs (player.GetAll ()) do
 		self.QueuedPlayers [ply] = true
 	end
