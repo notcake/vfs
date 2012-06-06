@@ -31,7 +31,6 @@ elseif CLIENT then
 	else
 		function GAuth.GetLocalId ()
 			if not LocalPlayer or not LocalPlayer ().SteamID then
-				GAuth.Error ("GAuth.GetLocalId cannot find the local Steam ID!")
 				return "STEAM_0:0:0"
 			end
 			return LocalPlayer ():SteamID ()
