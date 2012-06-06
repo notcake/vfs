@@ -6,6 +6,10 @@ function self:ctor (data)
 	self.NextReadIndex = 1
 end
 
+function self:IsEndOfStream ()
+	return self.NextReadIndex > #self.Data
+end
+
 function self:UInt8 ()
 	self.NextReadIndex = self.NextReadIndex + 1
 	return tonumber (self.Data [self.NextReadIndex - 1]) or 0

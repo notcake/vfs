@@ -5,6 +5,10 @@ function self:ctor (umsg)
 	self.Usermessage = umsg
 end
 
+function self:IsEndOfStream ()
+	return false
+end
+
 function self:UInt8 ()
 	return self.Usermessage:ReadChar () + 128
 end

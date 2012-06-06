@@ -59,6 +59,7 @@ function self:HandleIncomingPacket (sessionId, inBuffer)
 		ErrorNoHalt (self.SystemName .. ".Net.EndPoint." .. self.UniqueId .. ":HandleIncomingPacket : Session " .. sessionId .. " not found!\n")
 		local data = ""
 		for i = 1, 16 do
+			if inBuffer:IsEndOfStream () then break end
 			local byte = inBuffer:Int8 ()
 			if byte < 0 then byte = byte + 256 end
 			if byte < 32 or byte >= 127 then
@@ -67,7 +68,6 @@ function self:HandleIncomingPacket (sessionId, inBuffer)
 				data = data .. string.char (byte)
 			end
 		end
-		PrintTable (inBuffer)
 		ErrorNoHalt ("Data: " .. data .. "\n")
 		return
 	end

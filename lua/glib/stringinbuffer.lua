@@ -6,6 +6,10 @@ function self:ctor (data)
 	self.Position = 1
 end
 
+function self:IsEndOfStream ()
+	return self.Position > self.Data:len ()
+end
+
 function self:UInt8 ()
 	local n = string.byte (self.Data:sub (self.Position, self.Position)) or 0
 	self.Position = self.Position + 1
