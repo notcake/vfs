@@ -12,22 +12,22 @@ function GLib.UTF8.Byte (char, offset)
 			length = 4
 			if string.len (char) < 4 then return -1, length end
 			byte = (byte & 7) * 262144
-			byte = byte + (string.byte (char, offset + 2) & 63) * 4096
-			byte = byte + (string.byte (char, offset + 3) & 63) * 64
-			byte = byte + (string.byte (char, offset + 4) & 63)
+			byte = byte + (string.byte (char, offset + 1) & 63) * 4096
+			byte = byte + (string.byte (char, offset + 2) & 63) * 64
+			byte = byte + (string.byte (char, offset + 3) & 63)
 		elseif byte >= 224 then
 			-- 3 byte sequence
 			length = 3
 			if string.len (char) < 3 then return -1, length end
 			byte = (byte & 15) * 4096
-			byte = byte + (string.byte (char, offset + 2) & 63) * 64
-			byte = byte + (string.byte (char, offset + 3) & 63)
+			byte = byte + (string.byte (char, offset + 1) & 63) * 64
+			byte = byte + (string.byte (char, offset + 2) & 63)
 		elseif byte >= 192 then
 			-- 2 byte sequence
 			length = 2
 			if string.len (char) < 2 then return -1, length end
 			byte = (byte & 31) * 64
-			byte = byte + (string.byte (char, offset + 2) & 63)
+			byte = byte + (string.byte (char, offset + 1) & 63)
 		else
 			-- invalid sequence
 			byte = -1
