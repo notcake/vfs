@@ -1,6 +1,6 @@
 GLib.String = {}
 
-function Glib.String.ConsoleEscape (str)
+function GLib.String.ConsoleEscape (str)
 	if type (str) ~= "string" then
 		ErrorNoHalt ("GLib.String.ConsoleEscape: Expected string, got " .. type (str) .. " instead.\n")
 		return ""
@@ -26,4 +26,15 @@ function GLib.String.Escape (str)
 		:gsub ("\t", "\\t")
 		:gsub ("\"", "\\\"")
 		:gsub ("\'", "\\\'")
+end
+
+function GLib.String.EscapeWhitespace (str)
+	if type (str) ~= "string" then
+		ErrorNoHalt ("GLib.String.EscapeNewlines: Expected string, got " .. type (str) .. " instead.\n")
+		return ""
+	end
+	return str
+		:gsub ("\r", "\\r")
+		:gsub ("\n", "\\n")
+		:gsub ("\t", "\\t")
 end

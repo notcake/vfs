@@ -121,7 +121,7 @@ function GLib.Import (tbl)
 end
 
 function GLib.IncludeDirectory (dir, recursive)
-	for _, file in ipairs (file.FindInLua (dir .. "/*.lua")) do
+	for _, file in ipairs (file.FindInLua (dir .. "/*")) do
 		if file:sub (-4):lower () == ".lua" then
 			include (dir .. "/" .. file)
 		elseif recursive then
