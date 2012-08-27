@@ -8,7 +8,7 @@ function self:HandleInitialPacket (inBuffer)
 	local groupId = inBuffer:String ()
 	local childName = inBuffer:String ()
 	local isGroupTree = inBuffer:Boolean ()
-	local groupTree = GAuth.ResolveGroup (groupId)
+	local groupTree = GAuth.ResolveGroupTree (groupId)
 	
 	if groupTree then
 		(isGroupTree and groupTree.AddGroupTree or groupTree.AddGroup) (groupTree, self:GetRemoteEndPoint ():GetRemoteId (), childName,

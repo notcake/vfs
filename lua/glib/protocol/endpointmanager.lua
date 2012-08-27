@@ -30,11 +30,7 @@ function self:GetEndPoint (remoteId)
 end
 
 function self:GetEndPointEnumerator ()
-	local next, tbl, key = pairs (self.EndPoints)
-	return function ()
-		key = next (tbl, key)
-		return key, tbl [key]
-	end
+	return pairs (self.EndPoints)
 end
 
 function self:GetEndPointConstructor ()

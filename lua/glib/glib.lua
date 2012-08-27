@@ -58,6 +58,10 @@ elseif CLIENT then
 			GLib.Debug (systemName .. "_reload took " .. tostring ((SysTime () - startTime) * 1000) .. " ms.")
 		end)
 	end
+else
+	function GLib.AddCSLuaFolder (folder) end
+	function GLib.AddCSLuaFolderRecursive (folder) end
+	function GLib.AddReloadCommand (includePath, systemName, systemTableName) end
 end
 GLib.AddReloadCommand ("glib/glib.lua", "glib", "GLib")
 

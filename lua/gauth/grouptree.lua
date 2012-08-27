@@ -114,11 +114,7 @@ end
 		Returns: ()->(name, GroupTreeNode childNode)
 ]]
 function self:GetChildEnumerator ()
-	local next, tbl, key = pairs (self.Children)
-	return function ()
-		key = next (tbl, key)
-		return key, tbl [key]
-	end
+	return pairs (self.Children)
 end
 
 function self:IsGroupTree ()
