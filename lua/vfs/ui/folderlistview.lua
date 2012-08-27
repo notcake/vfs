@@ -161,7 +161,7 @@ function self:Init ()
 	
 	self:AddEventListener ("SelectionChanged",
 		function (_, item)
-			local node = item and item.Node
+			local node = item and item.Node or nil
 			self:DispatchEvent ("SelectedNodeChanged", node)
 			self:DispatchEvent ("SelectedFileChanged", node and node:IsFile () and node or nil)
 			self:DispatchEvent ("SelectedFolderChanged", node and node:IsFolder () and node or nil)
@@ -237,6 +237,8 @@ function self:GetSelectedNodes ()
 end
 
 function self:MergeRefresh ()
+	if not self.Folder then return end
+
 	local folder = self.Folder
 	self.Folder:EnumerateChildren (GAuth.GetLocalId (),
 		function (returnCode, node)

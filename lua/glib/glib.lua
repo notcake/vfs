@@ -99,6 +99,21 @@ function GLib.FindUpValue (func, name)
 	end
 end
 
+function GLib.FormatDate (date)
+	local dateTable = os.date ("*t", date)
+	return string.format ("%02d/%02d/%04d %02d:%02d:%02d", dateTable.day, dateTable.month, dateTable.year, dateTable.hour, dateTable.min, dateTable.sec)
+end
+
+local units = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" }
+function GLib.FormatFileSize (size)
+	local unitIndex = 1
+	while size >= 1024 do
+		size = size / 1024
+		unitIndex = unitIndex + 1
+	end
+	return tostring (math.floor (size * 100 + 0.5) / 100) .. " " .. units [unitIndex]
+end
+
 function GLib.GetMetaTable (constructor)
 	local name, basetable = debug.getupvalue (constructor, 1)
 	return basetable
