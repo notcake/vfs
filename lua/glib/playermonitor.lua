@@ -4,69 +4,68 @@ GLib.PlayerMonitor = GLib.MakeConstructor (self)
 function self:ctor (systemName)
 	self.SystemName = systemName
 
-	-- Debugging
-	self.InitialPlayerGetAll = {}
-	self.PlayersAddedToQueue = {}
-	
-	self.Players = {}
-	self.EntitiesToUserIds = {}
-	self.QueuedPlayers = {}
+	self.Players = {}           -- Map of Steam Ids to player data
+	self.EntitiesToUserIds = {} -- Map of Players to Steam Ids
+	self.QueuedPlayers = {}     -- Array of new Players to be processed
 	GLib.EventProvider (self)
 	
 	hook.Add (CLIENT and "OnEntityCreated" or "PlayerInitialSpawn", self.SystemName .. ".PlayerConnected", function (ply)
 		if type (ply) == "Player" then
 			self.QueuedPlayers [ply] = true
 		end
-		self.PlayersAddedToQueue [ply] = type (ply) == "Player"
 	end)
 
 	hook.Add ("Think", self.SystemName .. ".PlayerConnected", function ()
+		-- Check for new players
+		for _, ply in ipairs (player.GetAll ()) do
+			local steamId = self:GetPlayerSteamId (ply)
+			if steamId then
+				if not self.QueuedPlayers [ply] and not self.EntitiesToUserIds [ply] then
+					self.QueuedPlayers [ply] = true
+				end
+			end
+		end
+		
+		-- Process new players
 		for ply, _ in pairs (self.QueuedPlayers) do
-			if ply:IsValid () and
-				ply.SteamID and
-				ply:Name () ~= "unconnected" then
-				local steamID = ply:SteamID ()
-				if steamID ~= "STEAM_ID_PENDING" then
-					self.QueuedPlayers [ply] = nil
-					local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
-					if SinglePlayer () and isLocalPlayer then steamID = "STEAM_0:0:0" end
-					if steamID == "BOT" or steamID == "NULL" then steamID = "BOT" end
-					self.Players [steamID] =
-					{
-						Player = ply,
-						Name = ply:Name ()
-					}
-					self.EntitiesToUserIds [ply] = steamID
-					self:DispatchEvent ("PlayerConnected", ply, steamID, isLocalPlayer)
-					if isLocalPlayer then
-						self:DispatchEvent ("LocalPlayerConnected", ply, steamID)
-					end
+			local steamId = self:GetPlayerSteamId (ply)
+			if steamId and
+			   steamId ~= "STEAM_ID_PENDING" and 
+			   ply:Name () ~= "unconnected" then
+				self.QueuedPlayers [ply] = nil
+				
+				local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
+				self.Players [steamId] =
+				{
+					Player = ply,
+					Name = ply:Name ()
+				}
+				self.EntitiesToUserIds [ply] = steamId
+				self:DispatchEvent ("PlayerConnected", ply, steamId, isLocalPlayer)
+				if isLocalPlayer then
+					self:DispatchEvent ("LocalPlayerConnected", ply, steamId)
 				end
 			end
 		end
 	end)
 
 	hook.Add ("EntityRemoved", self.SystemName .. ".PlayerDisconnected", function (ply)
-		if type (ply) == "Player" and
-			ply:IsValid () then
-			local steamID = ply:SteamID ()
-			local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
-			if SinglePlayer () and isLocalPlayer then steamID = "STEAM_0:0:0" end
-			if steamID == "BOT" or steamID == "NULL" then steamID = "BOT" end
-			if SERVER then
-				self.Players [steamID] = nil
-				self.EntitiesToUserIds [ply] = nil
-			end
-			self:DispatchEvent ("PlayerDisconnected", ply, steamID)
+		local steamId = self:GetPlayerSteamId (ply)
+		if not steamId then return end
+		
+		if SERVER then
+			self.Players [steamId] = nil
+			self.EntitiesToUserIds [ply] = nil
 		end
+		self:DispatchEvent ("PlayerDisconnected", ply, steamId)
 	end)
 
-	self.InitialPlayerGetAll = player.GetAll ()
 	for _, ply in ipairs (player.GetAll ()) do
 		self.QueuedPlayers [ply] = true
 	end
 
-	if type (_G [systemName]) == "table" and type (_G [systemName].AddEventListener) == "function" then
+	if type (_G [systemName]) == "table" and
+	   type (_G [systemName].AddEventListener) == "function" then
 		_G [systemName]:AddEventListener ("Unloaded", function ()
 			self:dtor ()
 		end)
@@ -91,6 +90,22 @@ function self:GetPlayerEnumerator ()
 		key = next (tbl, key)
 		return key, (key and tbl [key].Player:IsValid () and tbl [key].Player or nil)
 	end
+end
+
+function self:GetPlayerSteamId (ply)
+	if self.EntitiesToUserIds [ply] then return self.EntitiesToUserIds [ply] end
+
+	if not ply then return nil end
+	if not ply:IsValid () then return nil end
+	if type (ply.SteamID) ~= "function" then return nil end
+	
+	local steamId = ply:SteamID ()
+	
+	local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
+	if SinglePlayer () and isLocalPlayer then steamId = "STEAM_0:0:0" end
+	if steamId == "NULL" then steamId = "BOT" end
+	
+	return steamId
 end
 
 function self:GetUserEntity (userId)
