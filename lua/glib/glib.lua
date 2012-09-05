@@ -294,12 +294,14 @@ function GLib.WeakValueTable ()
 	return tbl
 end
 
+include ("string.lua")
+include ("utf8.lua")
+include ("colors.lua")
+
 include ("eventprovider.lua")
 include ("playermonitor.lua")
-include ("string.lua")
 include ("stringinbuffer.lua")
 include ("stringoutbuffer.lua")
-include ("utf8.lua")
 
 include ("net/net.lua")
 include ("net/datatype.lua")

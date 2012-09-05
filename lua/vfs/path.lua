@@ -8,6 +8,7 @@ function self:ctor (path)
 	elseif type (path) == "string" then
 		path = path:gsub ("\\", "/")
 		path = path:gsub ("//+", "/")
+		if path:sub (1, 1) == "/" then path = path:sub (2) end
 		if path:sub (-1, -1) == "/" then path = path:sub (1, -2) end
 		
 		self.Path = path

@@ -78,7 +78,7 @@ function self:SetSelectionMode (selectionMode)
 	self.Users:SetSelectionMode (selectionMode)
 end
 
-vgui.Register ("GAuthUserSelectionDialog", self, "DFrame")
+vgui.Register ("GAuthUserSelectionDialog", self, "GFrame")
 
 function GAuth.OpenUserSelectionDialog (callback)
 	local dialog = vgui.Create ("GAuthUserSelectionDialog")

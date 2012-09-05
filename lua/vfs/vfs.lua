@@ -74,7 +74,7 @@ include ("protocol/endpoint.lua")
 include ("protocol/endpointmanager.lua")
 
 if CLIENT then
-	include ("gooey/sh_init.lua")
+	include ("gooey/gooey.lua")
 	VFS.IncludeDirectory ("vfs/ui")
 end
 	
@@ -89,6 +89,16 @@ local nextUniqueName = -1
 function VFS.GetUniqueName ()
 	nextUniqueName = nextUniqueName + 1
 	return string.format ("%08x%02x", os.time (), nextUniqueName % 256)
+end
+
+if SERVER then
+	function VFS.GetLocalHomeDirectory ()
+		return ""
+	end
+else
+	function VFS.GetLocalHomeDirectory ()
+		return GAuth.GetLocalId ()
+	end
 end
 
 function VFS.SanitizeNodeName (segment)
@@ -278,6 +288,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 					"data/e2files",
 					"data/Expression2",
 					"data/ExpressionGate",
+					"data/luapad",
 					"data/GPUChip",
 					"data/SPUChip",
 					"data/Starfall"

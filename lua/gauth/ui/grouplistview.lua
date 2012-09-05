@@ -1,10 +1,9 @@
 local self = {}
 
 --[[
-	Events
-	
-	UserSelected (userId)
-		Fired when a user is selected from the list.
+	Events:
+		UserSelected (userId)
+			Fired when a user is selected from the list.
 ]]
 
 function self:Init ()
@@ -15,15 +14,15 @@ function self:Init ()
 		function (_, targetItem)
 			local targetItem = self:GetSelectedUsers ()
 			self.Menu:SetTargetItem (targetItem)
-			self.Menu:FindItem ("Permissions"):SetDisabled (not self.Group)
+			self.Menu:FindItem ("Permissions"):SetEnabled (self.Group and true or false)
 			
 			if self.Group and self.Group:IsGroup () then
 				local permissionBlock = self.Group:GetPermissionBlock ()
-				self.Menu:FindItem ("Add User"):SetDisabled (not self.Group or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Add User"))
-				self.Menu:FindItem ("Remove User"):SetDisabled (#targetItem == 0 or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Remove User"))
+				self.Menu:FindItem ("Add User")   :SetEnabled (self.Group and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Add User") or false)
+				self.Menu:FindItem ("Remove User"):SetEnabled (#targetItem ~= 0 and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Remove User"))
 			else
-				self.Menu:FindItem ("Add User"):SetDisabled (true)
-				self.Menu:FindItem ("Remove User"):SetDisabled (true)
+				self.Menu:FindItem ("Add User")   :SetEnabled (false)
+				self.Menu:FindItem ("Remove User"):SetEnabled (false)
 			end
 		end
 	)

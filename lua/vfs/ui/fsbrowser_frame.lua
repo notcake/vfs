@@ -62,4 +62,4 @@ function self:SetPath (path)
 	self.FileList:SetPath (path)
 end
 
-vgui.Register ("VFSFileSystemBrowserFrame", self, "DFrame")
+vgui.Register ("VFSFileSystemBrowserFrame", self, "GFrame")

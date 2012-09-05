@@ -1,16 +1,15 @@
 local self = {}
 
 --[[
-	Events
-	
-	SelectedFileChanged (IFile file)
-		Fired when a file is selected from the list.
-	SelectedFolderChanged (IFolder folder)
-		Fired when a folder is selected from the list.
-	NodeOpened (INode node)
-		Fired when a file or folder is double clicked.
-	SelectedNodeChanged (INode node)
-		Fired when a file or folder is selected from the list.
+	Events:
+		SelectedFileChanged (IFile file)
+			Fired when a file is selected from the list.
+		SelectedFolderChanged (IFolder folder)
+			Fired when a folder is selected from the list.
+		NodeOpened (INode node)
+			Fired when a file or folder is double clicked.
+		SelectedNodeChanged (INode node)
+			Fired when a file or folder is selected from the list.
 ]]
 
 function self:Init ()
@@ -52,29 +51,29 @@ function self:Init ()
 		function (_, targetItem)
 			local targetItem = self:GetSelectedNodes ()
 			self.Menu:SetTargetItem (targetItem)
-			self.Menu:FindItem ("Permissions"):SetDisabled (#targetItem == 0)
+			self.Menu:FindItem ("Permissions"):SetEnabled (#targetItem ~= 0)
 			
 			if self.Folder and self.Folder:IsFolder () then
 				local permissionBlock = self.Folder:GetPermissionBlock ()
 				if not permissionBlock then
-					self.Menu:FindItem ("Copy"):SetDisabled (#targetItem == 0)
-					self.Menu:FindItem ("Paste"):SetDisabled (false)
-					self.Menu:FindItem ("Create Folder"):SetDisabled (false)
-					self.Menu:FindItem ("Delete"):SetDisabled (#targetItem == 0 or not targetItem [1]:CanDelete ())
-					self.Menu:FindItem ("Rename"):SetDisabled (#targetItem == 0)
+					self.Menu:FindItem ("Copy")         :SetEnabled (#targetItem ~= 0)
+					self.Menu:FindItem ("Paste")        :SetEnabled (true)
+					self.Menu:FindItem ("Create Folder"):SetEnabled (true)
+					self.Menu:FindItem ("Delete")       :SetEnabled (#targetItem ~= 0 and targetItem [1]:CanDelete ())
+					self.Menu:FindItem ("Rename")       :SetEnabled (#targetItem ~= 0)
 				else
-					self.Menu:FindItem ("Copy"):SetDisabled (#targetItem == 0 or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read") and not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
-					self.Menu:FindItem ("Paste"):SetDisabled (not VFS.Clipboard:CanPaste (self.Folder))
-					self.Menu:FindItem ("Create Folder"):SetDisabled (permissionBlock and not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Folder"))
-					self.Menu:FindItem ("Delete"):SetDisabled (#targetItem == 0 or not targetItem [1]:CanDelete () or targetItem [1]:GetPermissionBlock () and not targetItem [1]:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Delete"))
-					self.Menu:FindItem ("Rename"):SetDisabled (#targetItem == 0 or targetItem [1]:GetPermissionBlock () and not targetItem [1]:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Rename"))
+					self.Menu:FindItem ("Copy")         :SetEnabled (#targetItem ~= 0 and (permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read") or permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder")))
+					self.Menu:FindItem ("Paste")        :SetEnabled (VFS.Clipboard:CanPaste (self.Folder))
+					self.Menu:FindItem ("Create Folder"):SetEnabled (not permissionBlock or permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Folder"))
+					self.Menu:FindItem ("Delete")       :SetEnabled (#targetItem ~= 0 and targetItem [1]:CanDelete () and (not targetItem [1]:GetPermissionBlock () or targetItem [1]:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Delete")))
+					self.Menu:FindItem ("Rename")       :SetEnabled (#targetItem ~= 0 and (not targetItem [1]:GetPermissionBlock () or targetItem [1]:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Rename")))
 				end
 			else
-				self.Menu:FindItem ("Copy"):SetDisabled (true)
-				self.Menu:FindItem ("Paste"):SetDisabled (true)
-				self.Menu:FindItem ("Create Folder"):SetDisabled (true)
-				self.Menu:FindItem ("Delete"):SetDisabled (true)
-				self.Menu:FindItem ("Rename"):SetDisabled (true)
+				self.Menu:FindItem ("Copy")         :SetEnabled (false)
+				self.Menu:FindItem ("Paste")        :SetEnabled (false)
+				self.Menu:FindItem ("Create Folder"):SetEnabled (false)
+				self.Menu:FindItem ("Delete")       :SetEnabled (false)
+				self.Menu:FindItem ("Rename")       :SetEnabled (false)
 			end
 		end
 	)
@@ -271,6 +270,10 @@ function self:MergeRefresh ()
 end
 
 function self:SetFolder (folder)
+	if type (folder) == "string" then
+		VFS.Error ("FolderListView:SetFolder was called with a string. Did you mean SetPath?")
+		self:SetPath (folder)
+	end
 	if self.Folder == folder then return end
 
 	self:Clear ()

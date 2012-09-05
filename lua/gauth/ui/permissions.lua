@@ -95,17 +95,17 @@ function self:Init ()
 	self.Groups.Menu = vgui.Create ("GMenu")
 	self.Groups.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
-			self.Groups.Menu:FindItem ("Add"):SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+			self.Groups.Menu:FindItem ("Add"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 			if not targetItem or not targetItem.GroupId then
-				self.Groups.Menu:FindItem ("Remove"):SetDisabled (true)
+				self.Groups.Menu:FindItem ("Remove"):SetEnabled (false)
 				return
 			end
 			self.Groups.Menu:SetTargetItem (targetItem.GroupId)
 			local targetGroupId = targetItem.GroupId
 			if targetItem.PermissionBlock ~= self.PermissionBlock then
-				self.Groups.Menu:FindItem ("Remove"):SetDisabled (true)
+				self.Groups.Menu:FindItem ("Remove"):SetEnabled (false)
 			else
-				self.Groups.Menu:FindItem ("Remove"):SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+				self.Groups.Menu:FindItem ("Remove"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 			end
 		end
 	)
@@ -359,14 +359,14 @@ function self:AddGroupEntryAdder (permissionBlock, permissionBlockIndex)
 end
 
 function self:CheckPermissions ()
-	self.InheritOwner:SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Set Owner"))
-	self.InheritPermissions:SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
-	self.ChangeOwner:SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Set Owner"))
+	self.InheritOwner      :SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Set Owner"))
+	self.InheritPermissions:SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+	self.ChangeOwner       :SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Set Owner"))
 	
 	if not self.SelectedGroupId or self.SelectedPermissionBlock ~= self.PermissionBlock then
-		self.PermissionList:SetDisabled (true)
+		self.PermissionList:SetEnabled (false)
 	else
-		self.PermissionList:SetDisabled (not self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+		self.PermissionList:SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 	end
 	
 	if self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then
@@ -606,7 +606,7 @@ function self:UpdateOwner ()
 	self.OwnerName:SizeToContents ()
 end
 
-vgui.Register ("GAuthPermissions", self, "DFrame")
+vgui.Register ("GAuthPermissions", self, "GFrame")
 
 function GAuth.OpenPermissions (permissionBlock)
 	local dialog = vgui.Create ("GAuthPermissions")

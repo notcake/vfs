@@ -1,10 +1,9 @@
 local self = {}
 
 --[[
-	Events
-	
-	UserSelected (userId)
-		Fired when a user is selected from the list.
+	Events:
+		UserSelected (userId)
+			Fired when a user is selected from the list.
 ]]
 
 function self:Init ()

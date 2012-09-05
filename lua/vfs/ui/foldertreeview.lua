@@ -1,14 +1,13 @@
 local self = {}
 
 --[[
-	Events
-	
-	FileOpened (IFile file)
-		Fired when the user tries to open a file.
-	SelectedFolderChanged (IFolder folder)
-		Fired when the selected folder is changed.
-	SelectedNodeChanged (INode node)
-		Fired when the selected file or folder is changed.
+	Events:
+		FileOpened (IFile file)
+			Fired when the user tries to open a file.
+		SelectedFolderChanged (IFolder folder)
+			Fired when the selected folder is changed.
+		SelectedNodeChanged (INode node)
+			Fired when the selected file or folder is changed.
 ]]
 
 function self:Init ()
@@ -58,46 +57,46 @@ function self:Init ()
 			end
 			
 			if not targetItem then
-				self.Menu:FindItem ("Open"):SetVisible (false)
-				self.Menu:FindItem ("Browse"):SetVisible (false)
+				self.Menu:FindItem ("Open")         :SetVisible (false)
+				self.Menu:FindItem ("Browse")       :SetVisible (false)
 				self.Menu:FindItem ("OpenSeparator"):SetVisible (false)
-				self.Menu:FindItem ("Copy"):SetDisabled (true)
-				self.Menu:FindItem ("Paste"):SetDisabled (true)
-				self.Menu:FindItem ("Create Folder"):SetDisabled (true)
-				self.Menu:FindItem ("Delete"):SetDisabled (true)
-				self.Menu:FindItem ("Rename"):SetDisabled (true)
-				self.Menu:FindItem ("Permissions"):SetDisabled (true)
+				self.Menu:FindItem ("Copy")         :SetEnabled (false)
+				self.Menu:FindItem ("Paste")        :SetEnabled (false)
+				self.Menu:FindItem ("Create Folder"):SetEnabled (false)
+				self.Menu:FindItem ("Delete")       :SetEnabled (false)
+				self.Menu:FindItem ("Rename")       :SetEnabled (false)
+				self.Menu:FindItem ("Permissions")  :SetEnabled (false)
 				return
 			end
 			
-			self.Menu:FindItem ("Open"):SetVisible (targetItem:IsFile ())
-			self.Menu:FindItem ("Browse"):SetVisible (targetItem:IsFolder () and not targetItem:IsRoot ())
-			self.Menu:FindItem ("Refresh"):SetVisible (targetItem:IsFolder ())
+			self.Menu:FindItem ("Open")         :SetVisible (targetItem:IsFile ())
+			self.Menu:FindItem ("Browse")       :SetVisible (targetItem:IsFolder () and not targetItem:IsRoot ())
+			self.Menu:FindItem ("Refresh")      :SetVisible (targetItem:IsFolder ())
 			self.Menu:FindItem ("OpenSeparator"):SetVisible (not targetItem:IsRoot ())
 			
 			local pasteFolder = targetItem
 			if not pasteFolder:IsFolder () then pasteFolder = pasteFolder:GetParentFolder () end
 			local permissionBlock = targetItem:GetPermissionBlock ()
 			if not permissionBlock then
-				self.Menu:FindItem ("Open"):SetDisabled (not targetItem:IsFile ())
-				self.Menu:FindItem ("Browse"):SetDisabled (not targetItem:IsFolder ())
-				self.Menu:FindItem ("Refresh"):SetDisabled (not targetItem:IsFolder ())
-				self.Menu:FindItem ("Copy"):SetDisabled (false)
-				self.Menu:FindItem ("Paste"):SetDisabled (false)
-				self.Menu:FindItem ("Create Folder"):SetDisabled (not targetItem:IsFolder ())
-				self.Menu:FindItem ("Delete"):SetDisabled (not targetItem:CanDelete ())
-				self.Menu:FindItem ("Rename"):SetDisabled (false)
+				self.Menu:FindItem ("Open")         :SetEnabled (targetItem:IsFile ())
+				self.Menu:FindItem ("Browse")       :SetEnabled (targetItem:IsFolder ())
+				self.Menu:FindItem ("Refresh")      :SetEnabled (targetItem:IsFolder ())
+				self.Menu:FindItem ("Copy")         :SetEnabled (true)
+				self.Menu:FindItem ("Paste")        :SetEnabled (true)
+				self.Menu:FindItem ("Create Folder"):SetEnabled (targetItem:IsFolder ())
+				self.Menu:FindItem ("Delete")       :SetEnabled (targetItem:CanDelete ())
+				self.Menu:FindItem ("Rename")       :SetEnabled (true)
 			else
-				self.Menu:FindItem ("Open"):SetDisabled (not targetItem:IsFile () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read"))
-				self.Menu:FindItem ("Browse"):SetDisabled (not targetItem:IsFolder () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
-				self.Menu:FindItem ("Refresh"):SetDisabled (not targetItem:IsFolder () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
-				self.Menu:FindItem ("Copy"):SetDisabled (not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read") and not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
-				self.Menu:FindItem ("Paste"):SetDisabled (not VFS.Clipboard:CanPaste (pasteFolder))
-				self.Menu:FindItem ("Create Folder"):SetDisabled (not targetItem:IsFolder () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Folder"))
-				self.Menu:FindItem ("Delete"):SetDisabled (not targetItem:CanDelete () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Delete"))
-				self.Menu:FindItem ("Rename"):SetDisabled (not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Rename"))
+				self.Menu:FindItem ("Open")         :SetEnabled (targetItem:IsFile ()    and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read"))
+				self.Menu:FindItem ("Browse")       :SetEnabled (targetItem:IsFolder ()  and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
+				self.Menu:FindItem ("Refresh")      :SetEnabled (targetItem:IsFolder ()  and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
+				self.Menu:FindItem ("Copy")         :SetEnabled (permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Read") or permissionBlock:IsAuthorized (GAuth.GetLocalId (), "View Folder"))
+				self.Menu:FindItem ("Paste")        :SetEnabled (VFS.Clipboard:CanPaste (pasteFolder))
+				self.Menu:FindItem ("Create Folder"):SetEnabled (targetItem:IsFolder ()  and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Folder"))
+				self.Menu:FindItem ("Delete")       :SetEnabled (targetItem:CanDelete () and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Delete"))
+				self.Menu:FindItem ("Rename")       :SetEnabled (permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Rename"))
 			end
-			self.Menu:FindItem ("Permissions"):SetDisabled (not permissionBlock)
+			self.Menu:FindItem ("Permissions"):SetEnabled (permissionBlock and true or false)
 		end
 	)
 	

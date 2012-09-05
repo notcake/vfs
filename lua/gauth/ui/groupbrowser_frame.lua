@@ -38,4 +38,4 @@ function self:SetGroupTree (groupTree)
 	self.Users:SetGroup (groupTree)
 end
 
-vgui.Register ("GAuthGroupBrowserFrame", self, "DFrame")
+vgui.Register ("GAuthGroupBrowserFrame", self, "GFrame")

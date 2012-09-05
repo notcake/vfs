@@ -1,12 +1,11 @@
 local self = {}
 
 --[[
-	Events
-	
-	SelectedGroupChanged (Group group)
-		Fired when the selected group is changed.
-	SelectedGroupTreeNodeChanged (GroupTreeNode groupTreeNode)
-		Fired when the selected group or group tree is changed.
+	Events:
+		SelectedGroupChanged (Group group)
+			Fired when the selected group is changed.
+		SelectedGroupTreeNodeChanged (GroupTreeNode groupTreeNode)
+			Fired when the selected group or group tree is changed.
 ]]
 
 function self:Init ()
@@ -36,20 +35,20 @@ function self:Init ()
 			end
 			
 			if not targetItem then
-				self.Menu:FindItem ("Browse"):SetDisabled (true)
-				self.Menu:FindItem ("Create Group"):SetDisabled (true)
-				self.Menu:FindItem ("Create Group Tree"):SetDisabled (true)
-				self.Menu:FindItem ("Delete"):SetDisabled (true)
-				self.Menu:FindItem ("Permissions"):SetDisabled (true)
+				self.Menu:FindItem ("Browse")           :SetEnabled (false)
+				self.Menu:FindItem ("Create Group")     :SetEnabled (false)
+				self.Menu:FindItem ("Create Group Tree"):SetEnabled (false)
+				self.Menu:FindItem ("Delete")           :SetEnabled (false)
+				self.Menu:FindItem ("Permissions")      :SetEnabled (false)
 				return
 			end
 			
 			local permissionBlock = targetItem:GetPermissionBlock ()
-			self.Menu:FindItem ("Browse"):SetDisabled (false)
-			self.Menu:FindItem ("Create Group"):SetDisabled (not targetItem:IsGroupTree () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Group"))
-			self.Menu:FindItem ("Create Group Tree"):SetDisabled (not targetItem:IsGroupTree () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Group"))
-			self.Menu:FindItem ("Delete"):SetDisabled (not targetItem:CanRemove () or not permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Delete"))
-			self.Menu:FindItem ("Permissions"):SetDisabled (false)
+			self.Menu:FindItem ("Browse")           :SetEnabled (true)
+			self.Menu:FindItem ("Create Group")     :SetEnabled (targetItem:IsGroupTree () and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Group"))
+			self.Menu:FindItem ("Create Group Tree"):SetEnabled (targetItem:IsGroupTree () and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Create Group"))
+			self.Menu:FindItem ("Delete")           :SetEnabled (targetItem:CanRemove ()   and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Delete"))
+			self.Menu:FindItem ("Permissions")      :SetEnabled (true)
 		end
 	)
 	

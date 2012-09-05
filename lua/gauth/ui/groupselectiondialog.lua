@@ -56,7 +56,7 @@ function self:SetCallback (callback)
 	self.Callback = callback or GAuth.NullCallback
 end
 
-vgui.Register ("GAuthGroupSelectionDialog", self, "DFrame")
+vgui.Register ("GAuthGroupSelectionDialog", self, "GFrame")
 
 function GAuth.OpenGroupSelectionDialog (callback)
 	local dialog = vgui.Create ("GAuthGroupSelectionDialog")

@@ -80,9 +80,11 @@ function self:Open (node)
 end
 
 function self:OpenDefault (node)
-	VFS.Editor ():GetFrame ():LoadFile (node)
-	VFS.Editor ():GetFrame ():SetVisible (true)
-	VFS.Editor ():GetFrame ():MoveToFront ()
+	if GCompute then
+		GCompute.Editor:GetFrame ():LoadFile (node)
+		GCompute.Editor:GetFrame ():SetVisible (true)
+		GCompute.Editor:GetFrame ():MoveToFront ()
+	end
 end
 
 VFS.FileTypes = VFS.FileTypes ()
