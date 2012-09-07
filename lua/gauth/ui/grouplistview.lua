@@ -14,15 +14,15 @@ function self:Init ()
 		function (_, targetItem)
 			local targetItem = self:GetSelectedUsers ()
 			self.Menu:SetTargetItem (targetItem)
-			self.Menu:FindItem ("Permissions"):SetEnabled (self.Group and true or false)
+			self.Menu:GetItemById ("Permissions"):SetEnabled (self.Group and true or false)
 			
 			if self.Group and self.Group:IsGroup () then
 				local permissionBlock = self.Group:GetPermissionBlock ()
-				self.Menu:FindItem ("Add User")   :SetEnabled (self.Group and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Add User") or false)
-				self.Menu:FindItem ("Remove User"):SetEnabled (#targetItem ~= 0 and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Remove User"))
+				self.Menu:GetItemById ("Add User")   :SetEnabled (self.Group and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Add User") or false)
+				self.Menu:GetItemById ("Remove User"):SetEnabled (#targetItem ~= 0 and permissionBlock:IsAuthorized (GAuth.GetLocalId (), "Remove User"))
 			else
-				self.Menu:FindItem ("Add User")   :SetEnabled (false)
-				self.Menu:FindItem ("Remove User"):SetEnabled (false)
+				self.Menu:GetItemById ("Add User")   :SetEnabled (false)
+				self.Menu:GetItemById ("Remove User"):SetEnabled (false)
 			end
 		end
 	)

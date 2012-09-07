@@ -102,6 +102,13 @@ function GLib.UTF8.NextChar (str, offset)
 	return str:sub (offset, offset + length - 1), offset + length
 end
 
+function GLib.UTF8.PreviousChar (str, offset)
+	if offset <= 1 then return "", 0 end
+	local startOffset = GLib.UTF8.GetSequenceStart (str, offset - 1)
+	local length = GLib.UTF8.SequenceLength (str, startOffset)
+	return str:sub (startOffsest, startOffset + length - 1), startOffset
+end
+
 function GLib.UTF8.SequenceLength (str, offset)
 	local byte = string.byte (str, offset)
 	if not byte then return 0

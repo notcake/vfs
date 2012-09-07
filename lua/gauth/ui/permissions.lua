@@ -95,17 +95,17 @@ function self:Init ()
 	self.Groups.Menu = vgui.Create ("GMenu")
 	self.Groups.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
-			self.Groups.Menu:FindItem ("Add"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+			self.Groups.Menu:GetItemById ("Add"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 			if not targetItem or not targetItem.GroupId then
-				self.Groups.Menu:FindItem ("Remove"):SetEnabled (false)
+				self.Groups.Menu:GetItemById ("Remove"):SetEnabled (false)
 				return
 			end
 			self.Groups.Menu:SetTargetItem (targetItem.GroupId)
 			local targetGroupId = targetItem.GroupId
 			if targetItem.PermissionBlock ~= self.PermissionBlock then
-				self.Groups.Menu:FindItem ("Remove"):SetEnabled (false)
+				self.Groups.Menu:GetItemById ("Remove"):SetEnabled (false)
 			else
-				self.Groups.Menu:FindItem ("Remove"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
+				self.Groups.Menu:GetItemById ("Remove"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
 			end
 		end
 	)

@@ -62,13 +62,13 @@ function self:Init ()
 							self:SelectAll ()
 							self:ClearError ()
 						else
-							self.Callback (path)
+							self.Callback (path, node)
 							self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
 							self:Remove ()
 						end
 					elseif returnCode == VFS.ReturnCode.NotFound then
 						if not self.FileMustExist then
-							self.Callback (path)
+							self.Callback (path, nil)
 							self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
 							self:Remove ()
 						end
@@ -86,7 +86,7 @@ function self:Init ()
 	self.Cancel:SetText ("Cancel")
 	self.Cancel:AddEventListener ("Click",
 		function (_)
-			self.Callback ()
+			self.Callback (nil, nil)
 			self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
 			self:Remove ()
 		end
@@ -103,7 +103,7 @@ function self:Init ()
 end
 
 function self:Remove ()
-	self.Callback (nil)
+	self.Callback (nil, nil)
 
 	if self.Folders then self.Folders:Remove () end
 	if self.Files then self.Files:Remove () end
@@ -177,7 +177,6 @@ end
 
 function self:SetFileName (name)
 	self.FileName:SetText (name)
-	
 	return self
 end
 
@@ -185,22 +184,23 @@ function self:SetFolder (folder)
 	if not folder:IsFolder () then folder = folder:GetParentFolder () end
 	self.Folders:SetPath (folder:GetPath ())
 	self.Files:SetFolder (folder)
-	
 	return self
 end
 
 function self:SetPath (path)
 	self.Folders:SetPath (path)
 	self.Files:SetPath (path)
-	
 	return self
 end
 
 function self:SetSuggestedName (suggestedName)
 	self.SuggestedName = suggestedName
 	self:SetFileName (suggestedName)
-	
 	return self
+end
+
+function self:SetVerb (verb)
+	self.Done:SetText (verb)
 end
 
 vgui.Register ("VFSFileDialog", self, "GFrame")
