@@ -88,7 +88,7 @@ function GLib.UTF8.Iterator (str, offset)
 		local character = str:sub (offset, offset + length - 1)
 		local lastOffset = offset
 		offset = offset + length
-		return lastOffset, character
+		return character, lastOffset
 	end
 end
 
@@ -98,15 +98,19 @@ function GLib.UTF8.Length (str)
 end
 
 function GLib.UTF8.NextChar (str, offset)
+	offset = offset or 1
+	if offset <= 0 then offset = 1 end
+	
 	local length = GLib.UTF8.SequenceLength (str, offset)
-	return str:sub (offset, offset + length - 1), offset + length
+	return string.sub (str, offset, offset + length - 1), offset + length
 end
 
 function GLib.UTF8.PreviousChar (str, offset)
+	offset = offset or (string.len (str) + 1)
 	if offset <= 1 then return "", 0 end
 	local startOffset = GLib.UTF8.GetSequenceStart (str, offset - 1)
 	local length = GLib.UTF8.SequenceLength (str, startOffset)
-	return str:sub (startOffsest, startOffset + length - 1), startOffset
+	return string.sub (str, startOffset, startOffset + length - 1), startOffset
 end
 
 function GLib.UTF8.SequenceLength (str, offset)
@@ -116,6 +120,19 @@ function GLib.UTF8.SequenceLength (str, offset)
 	elseif byte >= 224 then return 3
 	elseif byte >= 192 then return 2
 	else return 1 end
+end
+
+function GLib.UTF8.SplitAt (str, char)
+	local c, offset = nil, 1
+	local offsetChar = 1 -- character index corresponding to offset
+	while c ~= "" do
+		if offsetChar >= char then
+			return string.sub (str, 1, offset - 1), string.sub (str, offset)
+		end
+		c, offset = GLib.UTF8.NextChar (str, offset)
+		offsetChar = offsetChar + 1
+	end
+	return str
 end
 
 function GLib.UTF8.Sub (str, startCharacter, endCharacter)
@@ -142,7 +159,7 @@ function GLib.UTF8.SubOffset (str, offset, startCharacter, endCharacter)
 		nextCharacter = nextCharacter + 1
 	end
 	
-	local startOffset = iterator ()
+	local _, startOffset = iterator ()
 	if not startOffset then return "" end
 	nextCharacter = nextCharacter + 1
 	if not endCharacter then
@@ -154,7 +171,7 @@ function GLib.UTF8.SubOffset (str, offset, startCharacter, endCharacter)
 		nextCharacter = nextCharacter + 1
 	end
 	
-	local endOffset = iterator ()
+	local _, endOffset = iterator ()
 	if endOffset then
 		return str:sub (startOffset, endOffset - 1)
 	else
