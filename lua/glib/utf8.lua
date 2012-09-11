@@ -82,10 +82,19 @@ function GLib.UTF8.Iterator (str, offset)
 	if offset <= 0 then offset = 1 end
 	
 	return function ()
-		if offset > str:len () then return nil, nil end
+		if offset > string.len (str) then return nil, nil end
 		
-		local length = GLib.UTF8.SequenceLength (str, offset)
-		local character = str:sub (offset, offset + length - 1)
+		local length
+		
+		-- Inline expansion of GLib.UTF8.SequenceLength (str, offset)
+		local byte = string.byte (str, offset)
+		if not byte then length = 0
+		elseif byte >= 240 then length = 4
+		elseif byte >= 224 then length = 3
+		elseif byte >= 192 then length = 2
+		else length = 1 end
+		
+		local character = string.sub (str, offset, offset + length - 1)
 		local lastOffset = offset
 		offset = offset + length
 		return character, lastOffset
