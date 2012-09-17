@@ -17,7 +17,7 @@ function self:Init ()
 	self.Done:AddEventListener ("Click",
 		function (_)
 			self.Callback (self:GetSelectedGroup ())
-			self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
+			self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:OnRemoved ()
 			self:Remove ()
 		end
 	)
@@ -27,14 +27,6 @@ function self:Init ()
 	GAuth:AddEventListener ("Unloaded", tostring (self), function ()
 		self:Remove ()
 	end)
-end
-
-function self:Remove ()
-	self.Callback (nil)
-
-	if self.Groups then self.Groups:Remove () end
-	GAuth:RemoveEventListener ("Unloaded", tostring (self))
-	_R.Panel.Remove (self)
 end
 
 function self:GetSelectedGroup ()
@@ -54,6 +46,13 @@ end
 
 function self:SetCallback (callback)
 	self.Callback = callback or GAuth.NullCallback
+end
+
+function self:OnRemoved ()
+	self.Callback (nil)
+
+	if self.Groups then self.Groups:Remove () end
+	GAuth:RemoveEventListener ("Unloaded", tostring (self))
 end
 
 vgui.Register ("GAuthGroupSelectionDialog", self, "GFrame")

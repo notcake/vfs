@@ -102,15 +102,6 @@ function self:Init ()
 	self:SetPath (VFS.GetLocalHomeDirectory ())
 end
 
-function self:Remove ()
-	self.Callback (nil, nil)
-
-	if self.Folders then self.Folders:Remove () end
-	if self.Files then self.Files:Remove () end
-	VFS:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
-	_R.Panel.Remove (self)
-end
-
 function self:ClearError ()
 	self.ErrorText:SetText ("")
 end
@@ -201,6 +192,15 @@ end
 
 function self:SetVerb (verb)
 	self.Done:SetText (verb)
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	self.Callback (nil, nil)
+
+	if self.Folders then self.Folders:Remove () end
+	if self.Files then self.Files:Remove () end
+	VFS:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
 vgui.Register ("VFSFileDialog", self, "GFrame")

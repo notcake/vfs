@@ -201,7 +201,7 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	GAuth:AddEventListener ("Unloaded", tostring (self), function ()
+	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
 		self:Remove ()
 	end)
 end
@@ -237,18 +237,6 @@ function self:PerformLayout ()
 		self.PermissionList:SetPos (8, y)
 		self.PermissionList:SetSize (self:GetWide () - 16, self:GetTall () - y - 8)
 	end
-end
-
-function self:Remove ()
-	for i = 1, #self.HookedOwnerBlocks do
-		self:UnhookBlockOwner (self.HookedOwnerBlocks [i])
-	end
-	for i = 1, #self.HookedPermissionBlocks do
-		self:UnhookBlockPermissions (self.HookedPermissionBlocks [i])
-	end
-
-	GAuth:RemoveEventListener ("Unloaded", tostring (self))
-	_R.Panel.Remove (self)
 end
 
 function self:Confirm (query, title, yesCallback, noCallback, permissionBlock, testPermissionBlock)
@@ -604,6 +592,18 @@ function self:UpdateOwner ()
 		self.OwnerName:SetText (ownerName)
 	end
 	self.OwnerName:SizeToContents ()
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	for i = 1, #self.HookedOwnerBlocks do
+		self:UnhookBlockOwner (self.HookedOwnerBlocks [i])
+	end
+	for i = 1, #self.HookedPermissionBlocks do
+		self:UnhookBlockPermissions (self.HookedPermissionBlocks [i])
+	end
+
+	GAuth:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
 vgui.Register ("GAuthPermissions", self, "GFrame")

@@ -21,10 +21,6 @@ function self:Init ()
 	self:Sort ()
 end
 
-function self:Remove ()
-	_R.Panel.Remove (self)
-end
-
 function self.DefaultComparator (a, b)
 	if a == b then return false end
 	if a.UserId == "System" then return true end

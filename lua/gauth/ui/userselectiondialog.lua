@@ -34,17 +34,9 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	GAuth:AddEventListener ("Unloaded", tostring (self), function ()
+	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
 		self:Remove ()
 	end)
-end
-
-function self:Remove ()
-	self.Callback (nil)
-
-	if self.Users then self.Users:Remove () end
-	GAuth:RemoveEventListener ("Unloaded", tostring (self))
-	_R.Panel.Remove (self)
 end
 
 function self:GetSelectedUser ()
@@ -76,6 +68,14 @@ end
 
 function self:SetSelectionMode (selectionMode)
 	self.Users:SetSelectionMode (selectionMode)
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	self.Callback (nil)
+
+	if self.Users then self.Users:Remove () end
+	GAuth:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 
 vgui.Register ("GAuthUserSelectionDialog", self, "GFrame")

@@ -12,11 +12,13 @@ function self:Init ()
 	self.SubscribedNodes = {}
 
 	-- Populate root group trees
-	self:SetPopulator (function (node)
-		if node.IsGroupTree then
-			self:Populate (node.Item, node)
+	self:SetPopulator (
+		function (node)
+			if node.IsGroupTree then
+				self:Populate (node.Item, node)
+			end
 		end
-	end)
+	)
 	self:Populate (GAuth.Groups, self)
 	self:AddEventListener ("ItemSelected", self.ItemSelected)
 	
@@ -97,17 +99,6 @@ function self:Init ()
 			GAuth.OpenPermissions (groupTreeNode:GetPermissionBlock ())
 		end
 	):SetIcon ("gui/g_silkicons/key")
-end
-
-function self:Remove ()
-	for _, groupTreeNode in ipairs (self.SubscribedNodes) do
-		groupTreeNode:RemoveEventListener ("NodeAdded", tostring (self))
-		groupTreeNode:RemoveEventListener ("NodeDisplayNameChanged", tostring (self))
-		groupTreeNode:RemoveEventListener ("NodeRemoved", tostring (self))
-	end
-	
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
-	_R.Panel.Remove (self)
 end
 
 function self:GetSelectedGroup ()
@@ -204,6 +195,17 @@ function self:SelectGroup (group)
 	end
 	currentNode:Select ()
 	currentNode:ExpandTo (true)
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	for _, groupTreeNode in ipairs (self.SubscribedNodes) do
+		groupTreeNode:RemoveEventListener ("NodeAdded", tostring (self))
+		groupTreeNode:RemoveEventListener ("NodeDisplayNameChanged", tostring (self))
+		groupTreeNode:RemoveEventListener ("NodeRemoved", tostring (self))
+	end
+	
+	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
 end
 
 -- Events

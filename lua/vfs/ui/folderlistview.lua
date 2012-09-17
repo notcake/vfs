@@ -190,11 +190,6 @@ function self:Init ()
 	end
 end
 
-function self:Remove ()
-	self:SetFolder (nil)
-	_R.Panel.Remove (self)
-end
-
 function self.DefaultComparator (a, b)
 	-- Put folders at the top
 	if a == b then return false end
@@ -386,6 +381,11 @@ function self:UpdateIcon (listViewItem)
 	else
 		listViewItem:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
 	end
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	self:SetFolder (nil)
 end
 
 -- Event handlers

@@ -4,7 +4,8 @@ GLib.EventProvider = GLib.MakeConstructor (self)
 function self:ctor (host, getParentEventProvider)
 	if host then
 		host.AddEventListener = function (host, ...)
-			return self:AddEventListener (...)
+			self:AddEventListener (...)
+			return host
 		end
 		host.DispatchEvent = function (host, eventName, ...)
 			return self:DispatchEvent (eventName, host, ...)

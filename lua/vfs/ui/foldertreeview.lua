@@ -184,19 +184,6 @@ function self:Init ()
 	):SetIcon ("gui/g_silkicons/key")
 end
 
-function self:Remove ()
-	for node, _ in pairs (self.SubscribedNodes) do
-		node:RemoveEventListener ("NodeCreated", tostring (self))
-		node:RemoveEventListener ("NodeDeleted", tostring (self))
-		node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
-		node:RemoveEventListener ("NodeRenamed", tostring (self))
-		node:RemoveEventListener ("NodeUpdated", tostring (self))
-	end
-	
-	self.Menu:Remove ()
-	_R.Panel.Remove (self)
-end
-
 function self:UnhookNode (node)
 	self.SubscribedNodes [node] = nil
 	
@@ -489,6 +476,19 @@ function self:UpdateFileIconsRecursive (treeViewNode)
 			self:UpdateFileIconsRecursive (childNode)
 		end
 	end
+end
+
+-- Event handlers
+function self:OnRemoved ()
+	for node, _ in pairs (self.SubscribedNodes) do
+		node:RemoveEventListener ("NodeCreated", tostring (self))
+		node:RemoveEventListener ("NodeDeleted", tostring (self))
+		node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
+		node:RemoveEventListener ("NodeRenamed", tostring (self))
+		node:RemoveEventListener ("NodeUpdated", tostring (self))
+	end
+	
+	self.Menu:Remove ()
 end
 
 vgui.Register ("VFSFolderTreeView", self, "GTreeView")
