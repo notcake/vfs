@@ -1,7 +1,7 @@
-VFS.UpdateFlags =
-{
-	DisplayName      = 1,
-	Size             = 2,
-	ModificationTime = 4
-}
-VFS.InvertTable (VFS.OpenFlags)
+VFS.UpdateFlags = VFS.Enum (
+	{
+		DisplayName      = 1,
+		Size             = 2,
+		ModificationTime = 4
+	}
+)

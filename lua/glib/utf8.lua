@@ -1,5 +1,4 @@
 GLib.UTF8 = {}
-GLib.UTF8.Characters = {}
 
 local math_floor    = math.floor
 local string_byte   = string.byte
@@ -196,11 +195,3 @@ function GLib.UTF8.SubOffset (str, offset, startCharacter, endCharacter)
 		return string_sub (str, startOffset)
 	end
 end
-
-GLib.UTF8.Characters.LeftToRightMark          = GLib.UTF8.Char (0x200E)
-GLib.UTF8.Characters.RightToLeftMark          = GLib.UTF8.Char (0x200F)
-GLib.UTF8.Characters.LeftToRightEmbedding     = GLib.UTF8.Char (0x202A)
-GLib.UTF8.Characters.RightToLeftEmbedding     = GLib.UTF8.Char (0x202B)
-GLib.UTF8.Characters.PopDirectionalFormatting = GLib.UTF8.Char (0x202C)
-GLib.UTF8.Characters.LeftToRightOverride      = GLib.UTF8.Char (0x202D)
-GLib.UTF8.Characters.RightToLeftOverride      = GLib.UTF8.Char (0x202E)

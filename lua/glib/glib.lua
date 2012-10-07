@@ -69,6 +69,11 @@ function GLib.Debug (message)
 	-- ErrorNoHalt (message .. "\n")
 end
 
+function GLib.Enum (enum)
+	GLib.InvertTable (enum)
+	return enum
+end
+
 function GLib.EnumerateDelayed (tbl, callback, finishCallback)
 	if not callback then return end
 
@@ -296,6 +301,8 @@ end
 
 include ("string.lua")
 include ("utf8.lua")
+include ("unicodecategory.lua")
+include ("unicode.lua")
 include ("colors.lua")
 
 include ("eventprovider.lua")

@@ -1,20 +1,20 @@
-GLib.Net.DataType =
-{
-	UInt8	= 0,
-	UInt16	= 1,
-	UInt32	= 2,
-	UInt64	= 3,
-	Int8	= 4,
-	Int16	= 5,
-	Int32	= 6,
-	Int64	= 7,
-	Float	= 8,
-	Double	= 9,
-	Char    = 10,
-	String	= 11,
-	Boolean	= 12
-}
-GLib.InvertTable (GLib.Net.DataType)
+GLib.Net.DataType = GLib.Enum (
+	{
+		UInt8	= 0,
+		UInt16	= 1,
+		UInt32	= 2,
+		UInt64	= 3,
+		Int8	= 4,
+		Int16	= 5,
+		Int32	= 6,
+		Int64	= 7,
+		Float	= 8,
+		Double	= 9,
+		Char    = 10,
+		String	= 11,
+		Boolean	= 12
+	}
+)
 
 GLib.Net.DataTypeSizes =
 {
