@@ -303,6 +303,7 @@ include ("string.lua")
 include ("utf8.lua")
 include ("unicodecategory.lua")
 include ("unicode.lua")
+include ("unicodecategorytable.lua")
 include ("colors.lua")
 
 include ("eventprovider.lua")

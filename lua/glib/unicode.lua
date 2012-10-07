@@ -1,11 +1,10 @@
 GLib.Unicode = {}
 GLib.Unicode.Characters = {}
 GLib.Unicode.CharacterNames = {}
-GLib.Unicode.CharacterCategories = {}
 
 function GLib.Unicode.GetCharacterCategory (...)
 	local codePoint = GLib.UTF8.Byte (...)
-	return GLib.Unicode.CharacterCategories [codePoint] or GLib.UnicodeCategory.OtherNotAssigned
+	return GLib.Unicode.GetCodePointCategory (codePoint)
 end
 
 function GLib.Unicode.GetCharacterName (...)
@@ -109,50 +108,19 @@ end
 GLib.Unicode.DataLines = nil
 GLib.Unicode.StartTime = SysTime ()
 
-local unicodeCategoryLookup =
-{
-	Lu = GLib.UnicodeCategory.UppercaseLetter,
-	Ll = GLib.UnicodeCategory.LowercaseLetter,
-	Lt = GLib.UnicodeCategory.TitlecaseLetter,
-	Lm = GLib.UnicodeCategory.ModifierLetter,
-	Lo = GLib.UnicodeCategory.OtherLetter,
-	Mn = GLib.UnicodeCategory.NonSpacingMark,
-	Mc = GLib.UnicodeCategory.SpacingCombiningMark,
-	Me = GLib.UnicodeCategory.EnclosingMark,
-	Nd = GLib.UnicodeCategory.DecimalDigitNumber,
-	Nl = GLib.UnicodeCategory.LetterNumber,
-	No = GLib.UnicodeCategory.OtherNumber,
-	Zs = GLib.UnicodeCategory.SpaceSeparator,
-	Zl = GLib.UnicodeCategory.LineSeparator,
-	Zp = GLib.UnicodeCategory.ParagraphSeparator,
-	Cc = GLib.UnicodeCategory.Control,
-	Cf = GLib.UnicodeCategory.Format,
-	Cs = GLib.UnicodeCategory.Surrogate,
-	Co = GLib.UnicodeCategory.PrivateUse,
-	Pc = GLib.UnicodeCategory.ConnectorPunctuation,
-	Pd = GLib.UnicodeCategory.DashPunctuation,
-	Ps = GLib.UnicodeCategory.OpenPunctuation,
-	Pe = GLib.UnicodeCategory.ClosePunctuation,
-	Pi = GLib.UnicodeCategory.InitialQuotePunctuation,
-	Pf = GLib.UnicodeCategory.FinalQuotePunctuation,
-	Po = GLib.UnicodeCategory.OtherPunctuation,
-	Sm = GLib.UnicodeCategory.MathSymbol,
-	Sc = GLib.UnicodeCategory.CurrencySymbol,
-	Sk = GLib.UnicodeCategory.ModifierSymbol,
-	So = GLib.UnicodeCategory.OtherSymbol,
-	Cn = GLib.UnicodeCategory.OtherNotAssigned
-}
-
 GLib.Unicode.DataLines = string.Split (string.Trim (file.Read ("glib_unicodedata.txt") or ""), "\n")
 local i = 1
+local lastCodePoint = 0
 timer.Create ("GLib.Unicode.ParseData", 0.001, 0,
 	function ()
 		local startTime = SysTime ()
 		while SysTime () - startTime < 0.005 do
 			local bits = string.Split (GLib.Unicode.DataLines [i], ";")
 			local codePoint = tonumber ("0x" .. (bits [1] or "0")) or 0
+			
+			lastCodePoint = codePoint
+			
 			GLib.Unicode.CharacterNames [codePoint] = bits [2]
-			GLib.Unicode.CharacterCategories [codePoint] = unicodeCategoryLookup [bits [3]]
 			
 			i = i + 1
 			if i > #GLib.Unicode.DataLines then
