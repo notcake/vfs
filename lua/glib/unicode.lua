@@ -150,7 +150,7 @@ timer.Create ("GLib.Unicode.ParseData", 0.001, 0,
 		local startTime = SysTime ()
 		while SysTime () - startTime < 0.005 do
 			local bits = string.Split (GLib.Unicode.DataLines [i], ";")
-			local codePoint = tonumber ("0x" .. (bits [1] or "0"))
+			local codePoint = tonumber ("0x" .. (bits [1] or "0")) or 0
 			GLib.Unicode.CharacterNames [codePoint] = bits [2]
 			GLib.Unicode.CharacterCategories [codePoint] = unicodeCategoryLookup [bits [3]]
 			
