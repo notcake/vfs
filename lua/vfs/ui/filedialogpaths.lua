@@ -60,4 +60,5 @@ function self:Save ()
 	
 	file.Write ("vfs_filedialog_paths.txt", outBuffer:GetString ())
 end
+
 VFS.FileDialogPaths = VFS.FileDialogPaths ()
