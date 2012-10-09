@@ -198,8 +198,7 @@ Warning: Do not try editing this file without a hex editor.
 	end
 	outBuffer:String ("")
 	
-	local data = outBuffer:GetString ()
-	file.Write ("vfs_" .. (SERVER and "sv" or "cl") .. ".txt", data)
+	file.Write ("vfs_" .. (SERVER and "sv" or "cl") .. ".txt", outBuffer:GetString ())
 end
 
 function self:SaveNode (node, outBuffer)

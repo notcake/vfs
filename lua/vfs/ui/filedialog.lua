@@ -99,6 +99,8 @@ function self:Init ()
 	end)
 	
 	self.FileMustExist = false
+	self.DialogId = nil
+	
 	self:SetPath (VFS.GetLocalHomeDirectory ())
 end
 
@@ -110,6 +112,10 @@ function self:Error (message)
 	self.ErrorText:SetText (message)
 end
 
+function self:GetDialogId ()
+	return self.DialogId
+end
+
 function self:GetFileName ()
 	return self.FileName:GetText ():gsub ("[\r\n\t:*?|<>\"]", "_")
 end
@@ -118,8 +124,22 @@ function self:GetFolder ()
 	return self.Folders:GetSelectedFolder ()
 end
 
+function self:GetFolderPath ()
+	return self:GetFolder ():GetPath ()
+end
+
 function self:GetSuggestedName ()
 	return self.SuggestedName
+end
+
+function self:ImportSavedPath (dialogId)
+	dialogId = dialogId or self.DialogId
+	if not dialogId then return end
+	
+	local path = VFS.FileDialogPaths:GetPath (dialogId)
+	if not path then return end
+	
+	self:SetPath (path)
 end
 
 function self:PerformLayout ()
@@ -162,6 +182,10 @@ function self:SetCallback (callback)
 	self.Callback = callback or VFS.NullCallback
 end
 
+function self:SetDialogId (dialogId)
+	self.DialogId = dialogId
+end
+
 function self:SetFileMustExist (fileMustExist)
 	self.FileMustExist = fileMustExist
 end
@@ -197,6 +221,10 @@ end
 -- Event handlers
 function self:OnRemoved ()
 	self.Callback (nil, nil)
+	
+	if self:GetDialogId () then
+		VFS.FileDialogPaths:SetPath (self:GetDialogId (), self:GetFolderPath ())
+	end
 
 	if self.Folders then self.Folders:Remove () end
 	if self.Files then self.Files:Remove () end

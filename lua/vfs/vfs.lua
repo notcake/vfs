@@ -78,10 +78,10 @@ if CLIENT then
 	VFS.IncludeDirectory ("vfs/ui")
 end
 	
-include ("adaptors/adv_duplicator.lua")
-include ("adaptors/expression2_editor.lua")
+-- include ("adaptors/adv_duplicator.lua")
+-- include ("adaptors/expression2_editor.lua")
 -- include ("adaptors/expression2_files.lua")
-include ("adaptors/expression2_upload.lua")
+-- include ("adaptors/expression2_upload.lua")
 
 VFS.AddReloadCommand ("vfs/vfs.lua", "vfs", "VFS")
 

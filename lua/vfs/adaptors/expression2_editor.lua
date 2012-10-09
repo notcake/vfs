@@ -304,7 +304,7 @@ function Expression2EditorFrame:SaveFile (path, close, saveAs)
 		if self.C ["Browser"].panel:GetSelectedFolder () then
 			path = self.C ["Browser"].panel:GetSelectedFolder ():GetPath ()
 		end
-		VFS.OpenSaveFileDialog (
+		VFS.OpenSaveFileDialog ("Expression2.Editor",
 			function (path)
 				if not path then return end
 				self:SaveFile (path, close)
