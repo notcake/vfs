@@ -61,8 +61,21 @@ function GLib.UTF8.Char (byte)
 	return utf8
 end
 
+function GLib.UTF8.CharacterToOffset (str, char)
+	local offset = 1
+	local iterator = GLib.UTF8.Iterator (str)
+	for i = 1, char - 1 do
+		offset = offset + string_len (iterator ())
+	end
+	return offset
+end
+
 function GLib.UTF8.ContainsSequences (str, offset)
 	return string_find (str, "[\192-\255]", offset) and true or false
+end
+
+function GLib.UTF8.GetGraphemeStart (str, offset)
+	return GLib.UTF8.GetSequenceStart (str, offset)
 end
 
 function GLib.UTF8.GetSequenceStart (str, offset)
@@ -83,6 +96,10 @@ function GLib.UTF8.GetSequenceStart (str, offset)
 		startOffset = startOffset - 1
 	end
 	return startOffset
+end
+
+function GLib.UTF8.GraphemeIterator (str, offset)
+	return GLib.UTF8.Iterator (str, offset)
 end
 
 function GLib.UTF8.Iterator (str, offset)
@@ -128,6 +145,31 @@ function GLib.UTF8.PreviousChar (str, offset)
 	local startOffset = GLib.UTF8.GetSequenceStart (str, offset - 1)
 	local length = GLib.UTF8.SequenceLength (str, startOffset)
 	return string_sub (str, startOffset, startOffset + length - 1), startOffset
+end
+
+function GLib.UTF8.ReverseGraphemeIterator (str, offset)
+	return GLib.UTF8.ReverseIterator (str, offset)
+end
+
+function GLib.UTF8.ReverseIterator (str, offset)
+	offset = offset or (string_len (str) + 1)
+	
+	return function ()
+		if offset <= 1 then return nil, nil end
+		
+		local length
+		offset = GLib.UTF8.GetSequenceStart (str, offset - 1)
+		
+		-- Inline expansion of GLib.UTF8.SequenceLength (str, offset)
+		local byte = string_byte (str, offset)
+		if not byte then length = 0
+		elseif byte >= 240 then length = 4
+		elseif byte >= 224 then length = 3
+		elseif byte >= 192 then length = 2
+		else length = 1 end
+		
+		return string_sub (str, offset, offset + length - 1), offset
+	end
 end
 
 function GLib.UTF8.SequenceLength (str, offset)
