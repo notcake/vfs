@@ -142,7 +142,7 @@ function self:Populate (groupTreeNode, treeViewNode)
 	end
 	
 	self.SubscribedNodes [#self.SubscribedNodes + 1] = groupTreeNode
-	groupTreeNode:AddEventListener ("NodeAdded", tostring (self),
+	groupTreeNode:AddEventListener ("NodeAdded", tostring (self:GetTable ()),
 		function (_, newNode)
 			local childNode = treeViewNode:AddNode (newNode:GetName ())
 			childNode:SetExpandable (newNode:IsGroupTree ())
@@ -154,7 +154,7 @@ function self:Populate (groupTreeNode, treeViewNode)
 		end
 	)
 	
-	groupTreeNode:AddEventListener ("NodeDisplayNameChanged", tostring (self),
+	groupTreeNode:AddEventListener ("NodeDisplayNameChanged", tostring (self:GetTable ()),
 		function (_, childNode, displayName)
 			local node = treeViewNode:FindChild (childNode:GetName ())
 			if not node then return end
@@ -163,11 +163,11 @@ function self:Populate (groupTreeNode, treeViewNode)
 		end
 	)
 	
-	groupTreeNode:AddEventListener ("NodeRemoved", tostring (self),
+	groupTreeNode:AddEventListener ("NodeRemoved", tostring (self:GetTable ()),
 		function (_, deletedNode)
 			local childNode = treeViewNode:FindChild (deletedNode:GetName ())
-			deletedNode:RemoveEventListener ("NodeAdded", tostring (self))
-			deletedNode:RemoveEventListener ("NodeRemoved", tostring (self))
+			deletedNode:RemoveEventListener ("NodeAdded",   tostring (self:GetTable ()))
+			deletedNode:RemoveEventListener ("NodeRemoved", tostring (self:GetTable ()))
 			treeViewNode:RemoveNode (childNode)
 		end
 	)
@@ -200,9 +200,9 @@ end
 -- Event handlers
 function self:OnRemoved ()
 	for _, groupTreeNode in ipairs (self.SubscribedNodes) do
-		groupTreeNode:RemoveEventListener ("NodeAdded", tostring (self))
-		groupTreeNode:RemoveEventListener ("NodeDisplayNameChanged", tostring (self))
-		groupTreeNode:RemoveEventListener ("NodeRemoved", tostring (self))
+		groupTreeNode:RemoveEventListener ("NodeAdded",              tostring (self:GetTable ()))
+		groupTreeNode:RemoveEventListener ("NodeDisplayNameChanged", tostring (self:GetTable ()))
+		groupTreeNode:RemoveEventListener ("NodeRemoved",            tostring (self:GetTable ()))
 	end
 	
 	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end

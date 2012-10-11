@@ -187,11 +187,11 @@ end
 function self:UnhookNode (node)
 	self.SubscribedNodes [node] = nil
 	
-	node:RemoveEventListener ("NodeCreated", tostring (self))
-	node:RemoveEventListener ("NodeDeleted", tostring (self))
-	node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
-	node:RemoveEventListener ("NodeRenamed", tostring (self))
-	node:RemoveEventListener ("NodeUpdated", tostring (self))
+	node:RemoveEventListener ("NodeCreated",            tostring (self:GetTable ()))
+	node:RemoveEventListener ("NodeDeleted",            tostring (self:GetTable ()))
+	node:RemoveEventListener ("NodePermissionsChanged", tostring (self:GetTable ()))
+	node:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
+	node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
 end
 
 function self:UnhookNodeRecursive (treeViewNode)
@@ -263,7 +263,7 @@ function self:Populate (filesystemNode, treeViewNode)
 				treeViewNode:SetIcon ("gui/g_silkicons/folder")
 				self:LayoutNode (treeViewNode)
 	
-				filesystemNode:AddEventListener ("NodeCreated", tostring (self),
+				filesystemNode:AddEventListener ("NodeCreated", tostring (self:GetTable ()),
 					function (_, newNode)
 						self:AddFilesystemNode (treeViewNode, newNode)
 						treeViewNode:SortChildren ()
@@ -272,7 +272,7 @@ function self:Populate (filesystemNode, treeViewNode)
 					end
 				)
 				
-				filesystemNode:AddEventListener ("NodeDeleted", tostring (self),
+				filesystemNode:AddEventListener ("NodeDeleted", tostring (self:GetTable ()),
 					function (_, deletedNode)
 						local childNode = treeViewNode.AddedNodes [deletedNode:GetName ()]
 						self:UnhookNodeRecursive (childNode)
@@ -288,7 +288,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodePermissionsChanged", tostring (self),
+	filesystemNode:AddEventListener ("NodePermissionsChanged", tostring (self:GetTable ()),
 		function (_, node)
 			local childNode = treeViewNode.AddedNodes [node:GetName ()]
 			if not childNode then return end
@@ -328,7 +328,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodeRenamed", tostring (self),
+	filesystemNode:AddEventListener ("NodeRenamed", tostring (self:GetTable ()),
 		function (_, node, oldName, newName)
 			if not treeViewNode.AddedNodes [oldName] then return end
 			treeViewNode.AddedNodes [newName] = treeViewNode.AddedNodes [oldName]
@@ -339,7 +339,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodeUpdated", tostring (self),
+	filesystemNode:AddEventListener ("NodeUpdated", tostring (self:GetTable ()),
 		function (_, updatedNode, updateFlags)
 			if not treeViewNode:IsValid () then return end
 			local childNode = treeViewNode.AddedNodes [updatedNode:GetName ()]
@@ -481,11 +481,11 @@ end
 -- Event handlers
 function self:OnRemoved ()
 	for node, _ in pairs (self.SubscribedNodes) do
-		node:RemoveEventListener ("NodeCreated", tostring (self))
-		node:RemoveEventListener ("NodeDeleted", tostring (self))
-		node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
-		node:RemoveEventListener ("NodeRenamed", tostring (self))
-		node:RemoveEventListener ("NodeUpdated", tostring (self))
+		node:RemoveEventListener ("NodeCreated",            tostring (self:GetTable ()))
+		node:RemoveEventListener ("NodeDeleted",            tostring (self:GetTable ()))
+		node:RemoveEventListener ("NodePermissionsChanged", tostring (self:GetTable ()))
+		node:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
+		node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
 	end
 	
 	self.Menu:Remove ()
