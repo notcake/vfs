@@ -82,7 +82,7 @@ end
 function self:OpenDefault (node)
 	if GCompute then
 		GCompute.Editor:GetFrame ():OpenFile (node,
-			function (success, tab)
+			function (success, file, tab)
 				if tab then tab:Select () end
 				GCompute.Editor:GetFrame ():SetVisible (true)
 				GCompute.Editor:GetFrame ():MoveToFront ()
