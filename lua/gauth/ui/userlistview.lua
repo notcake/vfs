@@ -51,4 +51,4 @@ function self:GetSelectionEnumerator ()
 	end
 end
 
-vgui.Register ("GAuthUserListView", self, "GComboBox")
+vgui.Register ("GAuthUserListView", self, "GListBox")

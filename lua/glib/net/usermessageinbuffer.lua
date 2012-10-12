@@ -22,7 +22,8 @@ function self:UInt32 ()
 end
 
 function self:UInt64 ()
-	return self.Usermessage:ReadLong () + 2147483648 + (self.Usermessage:ReadLong () + 2147483648) * 4294967296
+	local n = self.Usermessage:ReadLong () + 2147483648
+	return (self.Usermessage:ReadLong () + 2147483648) * 4294967296 + n
 end
 
 function self:Int8 ()
@@ -35,6 +36,11 @@ end
 
 function self:Int32 ()
 	return self.Usermessage:ReadLong ()
+end
+
+function self:Int64 ()
+	local n = self.Usermessage:ReadLong () + 2147483648
+	return self.Usermessage:ReadLong () * 4294967296 + n
 end
 
 function self:Char ()

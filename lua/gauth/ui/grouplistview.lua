@@ -78,17 +78,17 @@ function self:SetGroup (group)
 	if not group:IsGroup () then return end
 	self.Group = group
 	for userId in self.Group:GetUserEnumerator () do
-		local comboBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
-		comboBoxItem:SetIcon (GAuth.GetUserIcon (userId))
-		comboBoxItem.UserId = userId
+		local listBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
+		listBoxItem:SetIcon (GAuth.GetUserIcon (userId))
+		listBoxItem.UserId = userId
 	end
 	self:Sort ()
 	
 	self.Group:AddEventListener ("UserAdded", tostring (self:GetTable ()),
 		function (_, userId)
-			local comboBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
-			comboBoxItem:SetIcon (GAuth.GetUserIcon (userId))
-			comboBoxItem.UserId = userId
+			local listBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
+			listBoxItem:SetIcon (GAuth.GetUserIcon (userId))
+			listBoxItem.UserId = userId
 			self:Sort ()
 		end
 	)
@@ -105,4 +105,4 @@ function self:SetGroup (group)
 	)
 end
 
-vgui.Register ("GAuthGroupListView", self, "GComboBox")
+vgui.Register ("GAuthGroupListView", self, "GListBox")

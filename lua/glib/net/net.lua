@@ -121,7 +121,10 @@ if SERVER then
 						ErrorNoHalt ("glib_data : From " .. steamId .. ": No handler for " .. GLib.PrettifyString (channelName) .. "\n")
 						ErrorNoHalt ("Original data: " .. GLib.PrettifyString (GLib.Net.ConCommandBuffers [steamId]):sub (1, 100) .. "\n")
 					end
-					if handler then PCallError (handler, steamId, inBuffer) end
+					if handler then
+						local success, error = pcall (handler, steamId, inBuffer)
+						if not success then ErrorNoHalt (error) end
+					end
 					GLib.Net.ConCommandBuffers [steamId] = ""
 				end
 			end

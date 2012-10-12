@@ -75,7 +75,7 @@ function self:Init ()
 		end
 	)
 	
-	self.Groups = vgui.Create ("GComboBox", self)
+	self.Groups = vgui.Create ("GListBox", self)
 	self.Groups:SetSelectionMode (Gooey.SelectionMode.One)
 	self.Groups:SetComparator (
 		function (a, b)
