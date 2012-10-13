@@ -203,7 +203,7 @@ function self:Init ()
 	self.SplitContainer:SetPanel1 (self.Groups)
 	self.SplitContainer:SetPanel2 (self.PermissionList)
 	self.SplitContainer:SetSplitterFraction (0.5)
-	self.SplitContainer:SetSplitterThickness (8)
+	self.SplitContainer:SetSplitterThickness (7)
 	self.SplitContainer:SetOrientation (Gooey.Orientation.Horizontal)
 	
 	self:PerformLayout ()

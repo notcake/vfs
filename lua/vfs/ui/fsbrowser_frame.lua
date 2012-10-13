@@ -32,7 +32,7 @@ function self:Init ()
 	self.SplitContainer:SetPanel1 (self.FolderTree)
 	self.SplitContainer:SetPanel2 (self.FileList)
 	self.SplitContainer:SetSplitterFraction (0.3)
-	self.SplitContainer:SetSplitterThickness (8)
+	self.SplitContainer:SetSplitterThickness (7)
 	
 	self:SetFolder (VFS.Root)
 	self:PerformLayout ()

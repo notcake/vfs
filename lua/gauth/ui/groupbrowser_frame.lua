@@ -21,7 +21,7 @@ function self:Init ()
 	self.SplitContainer:SetPanel1 (self.Groups)
 	self.SplitContainer:SetPanel2 (self.Users)
 	self.SplitContainer:SetSplitterFraction (0.2)
-	self.SplitContainer:SetSplitterThickness (8)
+	self.SplitContainer:SetSplitterThickness (7)
 	
 	self:PerformLayout ()
 end

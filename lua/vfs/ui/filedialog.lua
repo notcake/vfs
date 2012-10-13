@@ -41,7 +41,7 @@ function self:Init ()
 	self.SplitContainer:SetPanel1 (self.Folders)
 	self.SplitContainer:SetPanel2 (self.Files)
 	self.SplitContainer:SetSplitterFraction (0.3)
-	self.SplitContainer:SetSplitterThickness (8)
+	self.SplitContainer:SetSplitterThickness (7)
 	
 	self.FileName = vgui.Create ("DTextEntry", self)
 	self.FileName.OnEnter = function ()
