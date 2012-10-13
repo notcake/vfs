@@ -28,19 +28,21 @@ function self:Init ()
 		end
 	end)
 	
+	self.SplitContainer = vgui.Create ("GSplitContainer", self)
+	self.SplitContainer:SetPanel1 (self.FolderTree)
+	self.SplitContainer:SetPanel2 (self.FileList)
+	self.SplitContainer:SetSplitterFraction (0.3)
+	self.SplitContainer:SetSplitterThickness (8)
+	
 	self:SetFolder (VFS.Root)
 	self:PerformLayout ()
 end
 
 function self:PerformLayout ()
 	DFrame.PerformLayout (self)
-	if self.FolderTree then
-		self.FolderTree:SetPos (8, 30)
-		self.FolderTree:SetSize (self:GetWide () * 0.3, self:GetTall () - 38)
-	end
-	if self.FileList then
-		self.FileList:SetPos (self:GetWide () * 0.3 + 16, 30)
-		self.FileList:SetSize (self:GetWide () * 0.7 - 24, self:GetTall () - 38)
+	if self.SplitContainer then
+		self.SplitContainer:SetPos (8, 30)
+		self.SplitContainer:SetSize (self:GetWide () - 16, self:GetTall () - 38)
 	end
 end
 

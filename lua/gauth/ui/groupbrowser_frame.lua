@@ -17,18 +17,20 @@ function self:Init ()
 	
 	self.Users = vgui.Create ("GAuthGroupListView", self)
 	
+	self.SplitContainer = vgui.Create ("GSplitContainer", self)
+	self.SplitContainer:SetPanel1 (self.Groups)
+	self.SplitContainer:SetPanel2 (self.Users)
+	self.SplitContainer:SetSplitterFraction (0.2)
+	self.SplitContainer:SetSplitterThickness (8)
+	
 	self:PerformLayout ()
 end
 
 function self:PerformLayout ()
 	DFrame.PerformLayout (self)
-	if self.Groups then
-		self.Groups:SetPos (8, 30)
-		self.Groups:SetSize (self:GetWide () * 0.2, self:GetTall () - 38)
-	end
-	if self.Users then
-		self.Users:SetPos (self:GetWide () * 0.2 + 16, 30)
-		self.Users:SetSize (self:GetWide () - self.Groups:GetWide () - 24, self:GetTall () - 38)
+	if self.SplitContainer then
+		self.SplitContainer:SetPos (8, 30)
+		self.SplitContainer:SetSize (self:GetWide () - 16, self:GetTall () - 38)
 	end
 end
 

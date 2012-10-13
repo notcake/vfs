@@ -199,6 +199,13 @@ function self:Init ()
 		self.PermissionList:SuppressEvents (false)
 	end)
 	
+	self.SplitContainer = vgui.Create ("GSplitContainer", self)
+	self.SplitContainer:SetPanel1 (self.Groups)
+	self.SplitContainer:SetPanel2 (self.PermissionList)
+	self.SplitContainer:SetSplitterFraction (0.5)
+	self.SplitContainer:SetSplitterThickness (8)
+	self.SplitContainer:SetOrientation (Gooey.Orientation.Horizontal)
+	
 	self:PerformLayout ()
 	
 	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
@@ -230,12 +237,8 @@ function self:PerformLayout ()
 		self.OwnerName:SetPos (8 + self.Owner:GetWide () + self.OwnerIcon:GetWide () + 2, y + (self.ChangeOwner:GetTall () - self.OwnerName:GetTall ()) * 0.5)
 		y = y + self.ChangeOwner:GetTall () + 8
 		
-		self.Groups:SetPos (8, y)
-		self.Groups:SetSize (self:GetWide () - 16, self:GetTall () * 0.35)
-		y = y + self.Groups:GetTall () + 8
-		
-		self.PermissionList:SetPos (8, y)
-		self.PermissionList:SetSize (self:GetWide () - 16, self:GetTall () - y - 8)
+		self.SplitContainer:SetPos (8, y)
+		self.SplitContainer:SetSize (self:GetWide () - 16, self:GetTall () - y - 8)
 	end
 end
 

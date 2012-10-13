@@ -37,6 +37,12 @@ function self:Init ()
 		end
 	)
 	
+	self.SplitContainer = vgui.Create ("GSplitContainer", self)
+	self.SplitContainer:SetPanel1 (self.Folders)
+	self.SplitContainer:SetPanel2 (self.Files)
+	self.SplitContainer:SetSplitterFraction (0.3)
+	self.SplitContainer:SetSplitterThickness (8)
+	
 	self.FileName = vgui.Create ("DTextEntry", self)
 	self.FileName.OnEnter = function ()
 		self.Done:DispatchEvent ("Click")
@@ -144,11 +150,15 @@ end
 
 function self:PerformLayout ()
 	DFrame.PerformLayout (self)
-	if self.Folders then
-		local availableWidth = self:GetWide () - 16
+	if self.SplitContainer then
 		self.Cancel:SetSize (80, 24)
-		self.Cancel:SetPos (self:GetWide () - self.Cancel:GetWide () - 8, self:GetTall () - self.Cancel:GetTall () - 8)
 		self.Done:SetSize (80, 24)
+		
+		if self:GetTall () < self.Cancel:GetTall () + self.Done:GetTall () + 44 then
+			self:SetTall (self.Cancel:GetTall () + self.Done:GetTall () + 44)
+		end
+		
+		self.Cancel:SetPos (self:GetWide () - self.Cancel:GetWide () - 8, self:GetTall () - self.Cancel:GetTall () - 8)
 		self.Done:SetPos (self:GetWide () - self.Done:GetWide () - 8, self:GetTall () - self.Cancel:GetTall () - self.Done:GetTall () - 16)
 		
 		self.FileName:SetPos (8, self:GetTall () - self.Cancel:GetTall () - self.Done:GetTall () - 16)
@@ -158,11 +168,8 @@ function self:PerformLayout ()
 		self.ErrorText:SetSize (self:GetWide () - 24 - self.Cancel:GetWide (), self.Cancel:GetTall ())
 		self.ErrorText:SetContentAlignment (4)
 		
-		self.Folders:SetPos (8, 30)
-		self.Folders:SetSize (availableWidth * 0.3, self:GetTall () - 54 - self.Done:GetTall () - self.Cancel:GetTall ())
-		
-		self.Files:SetPos (16 + availableWidth * 0.3, 30)
-		self.Files:SetSize (availableWidth * 0.7 - 8, self:GetTall () - 54 - self.Done:GetTall () - self.Cancel:GetTall ())
+		self.SplitContainer:SetPos (8, 30)
+		self.SplitContainer:SetSize (self:GetWide () - 16, self:GetTall () - 54 - self.Done:GetTall () - self.Cancel:GetTall ())
 	end
 end
 
