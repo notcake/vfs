@@ -185,6 +185,7 @@ if SERVER then
 			
 			local mountPaths =
 			{
+				"crashlogs",
 				"logs",
 				"data/asslog",
 				"data/cadmin/logs",
@@ -284,6 +285,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				local mountPaths =
 				{
 					"data/adv_duplicator",
+					"data/cadmin/client_logs",
 					"data/CPUChip",
 					"data/e2files",
 					"data/Expression2",
