@@ -30,9 +30,9 @@ function self:Flush ()
 		file.Write (self.File:GetPath ():sub (6), self.Contents)
 		self.ContentsChanged = false
 		
-		self.File:DispatchEvent ("Updated", VFS.UpdateFlags.Size | VFS.UpdateFlags.ModificationTime)
+		self.File:DispatchEvent ("Updated", VFS.UpdateFlags.Size + VFS.UpdateFlags.ModificationTime)
 		if self.File:GetParentFolder () then
-			self.File:GetParentFolder ():DispatchEvent ("NodeUpdated", self.File, VFS.UpdateFlags.Size | VFS.UpdateFlags.ModificationTime)
+			self.File:GetParentFolder ():DispatchEvent ("NodeUpdated", self.File, VFS.UpdateFlags.Size + VFS.UpdateFlags.ModificationTime)
 		end
 	end
 end

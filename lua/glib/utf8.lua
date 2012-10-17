@@ -20,23 +20,23 @@ function GLib.UTF8.Byte (char, offset)
 			-- 4 byte sequence
 			length = 4
 			if string_len (char) < 4 then return -1, length end
-			byte = (byte & 7) * 262144
-			byte = byte + (string_byte (char, offset + 1) & 63) * 4096
-			byte = byte + (string_byte (char, offset + 2) & 63) * 64
-			byte = byte + (string_byte (char, offset + 3) & 63)
+			byte = (byte % 8) * 262144
+			byte = byte + (string_byte (char, offset + 1) % 64) * 4096
+			byte = byte + (string_byte (char, offset + 2) % 64) * 64
+			byte = byte + (string_byte (char, offset + 3) % 64)
 		elseif byte >= 224 then
 			-- 3 byte sequence
 			length = 3
 			if string_len (char) < 3 then return -1, length end
-			byte = (byte & 15) * 4096
-			byte = byte + (string_byte (char, offset + 1) & 63) * 64
-			byte = byte + (string_byte (char, offset + 2) & 63)
+			byte = (byte % 16) * 4096
+			byte = byte + (string_byte (char, offset + 1) % 64) * 64
+			byte = byte + (string_byte (char, offset + 2) % 64)
 		elseif byte >= 192 then
 			-- 2 byte sequence
 			length = 2
 			if string_len (char) < 2 then return -1, length end
-			byte = (byte & 31) * 64
-			byte = byte + (string_byte (char, offset + 1) & 63)
+			byte = (byte % 32) * 64
+			byte = byte + (string_byte (char, offset + 1) % 64)
 		else
 			-- invalid sequence
 			byte = -1
@@ -52,11 +52,11 @@ function GLib.UTF8.Char (byte)
 	elseif byte <= 127 then
 		utf8 = string_char (byte)
 	elseif byte < 2048 then
-		utf8 = string_format ("%c%c",     192 + math_floor (byte / 64),     128 + (byte & 63))
+		utf8 = string_format ("%c%c",     192 + math_floor (byte / 64),     128 + (byte % 64))
 	elseif byte < 65536 then
-		utf8 = string_format ("%c%c%c",   224 + math_floor (byte / 4096),   128 + (math_floor (byte / 64) & 63),   128 + (byte & 63))
+		utf8 = string_format ("%c%c%c",   224 + math_floor (byte / 4096),   128 + (math_floor (byte / 64) % 64),   128 + (byte % 64))
 	elseif byte < 2097152 then
-		utf8 = string_format ("%c%c%c%c", 240 + math_floor (byte / 262144), 128 + (math_floor (byte / 4096) & 63), 128 + (math_floor (byte / 64) & 63), 128 + (byte & 63))
+		utf8 = string_format ("%c%c%c%c", 240 + math_floor (byte / 262144), 128 + (math_floor (byte / 4096) % 64), 128 + (math_floor (byte / 64) % 64), 128 + (byte % 64))
 	end
 	return utf8
 end
