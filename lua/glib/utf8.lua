@@ -107,7 +107,7 @@ function GLib.UTF8.Iterator (str, offset)
 	if offset <= 0 then offset = 1 end
 	
 	return function ()
-		if offset > string_len (str) then return nil, nil end
+		if offset > string_len (str) then return nil, string_len (str) + 1 end
 		
 		local length
 		
@@ -139,12 +139,75 @@ function GLib.UTF8.NextChar (str, offset)
 	return string_sub (str, offset, offset + length - 1), offset + length
 end
 
+local lineBreaks =
+{
+	["\r"] = true,
+	["\n"] = true
+}
+local function GetWordType (grapheme)
+	local codePoint = GLib.UTF8.Byte (grapheme)
+	if string_sub (grapheme, 1, 1) == "_" or GLib.Unicode.IsLetterOrDigitCodePoint (codePoint) then
+		return GLib.WordType.Alphanumeric
+	elseif lineBreaks [string_sub (grapheme, 1, 1)] then
+		return GLib.WordType.LineBreak
+	elseif GLib.Unicode.IsWhitespaceCodePoint (codePoint) then
+		return GLib.WordType.Whitespace
+	end
+	return GLib.WordType.Other
+end
+
+function GLib.UTF8.NextWordBoundary (str, offset)
+	local iterator = GLib.UTF8.GraphemeIterator (str, offset)
+	
+	local leftGrapheme, leftOffset = iterator ()
+	local leftWordType = leftGrapheme and GetWordType (leftGrapheme) or GLib.WordType.None
+	local rightGrapheme
+	local rightOffset
+	local rightWordType
+	while true do
+		rightGrapheme, rightOffset = iterator ()
+		if not rightGrapheme then return rightOffset, leftWordType, GLib.WordType.None end
+		rightWordType = GetWordType (rightGrapheme)
+		
+		if leftWordType ~= rightWordType then
+			return rightOffset, leftWordType, rightWordType
+		end
+		
+		leftGrapheme = rightGrapheme
+		leftOffset   = rightOffset
+		leftWordType = rightWordType
+	end
+end
+
 function GLib.UTF8.PreviousChar (str, offset)
 	offset = offset or (string_len (str) + 1)
 	if offset <= 1 then return "", 0 end
 	local startOffset = GLib.UTF8.GetSequenceStart (str, offset - 1)
 	local length = GLib.UTF8.SequenceLength (str, startOffset)
 	return string_sub (str, startOffset, startOffset + length - 1), startOffset
+end
+
+function GLib.UTF8.PreviousWordBoundary (str, offset)
+	local iterator = GLib.UTF8.ReverseGraphemeIterator (str, offset)
+	
+	local rightGrapheme, rightOffset = iterator ()
+	local rightWordType = rightGrapheme and GetWordType (rightGrapheme) or GLib.WordType.None
+	local leftGrapheme
+	local leftOffset
+	local leftWordType
+	while true do
+		leftGrapheme, leftOffset = iterator ()
+		if not leftGrapheme then return rightOffset, GLib.WordType.None, rightWordType end
+		leftWordType = GetWordType (leftGrapheme)
+		
+		if leftWordType ~= rightWordType then
+			return rightOffset, leftWordType, rightWordType
+		end
+		
+		rightGrapheme = leftGrapheme
+		rightOffset   = leftOffset
+		rightWordType = leftWordType
+	end
 end
 
 function GLib.UTF8.ReverseGraphemeIterator (str, offset)
@@ -236,4 +299,18 @@ function GLib.UTF8.SubOffset (str, offset, startCharacter, endCharacter)
 	else
 		return string_sub (str, startOffset)
 	end
+end
+
+function GLib.UTF8.ToLatin1 (str)
+	local latin1 = GLib.StringBuilder ()
+	local codePoint
+	for c in GLib.UTF8.Iterator (str) do
+		codePoint = GLib.UTF8.Byte (c)
+		if codePoint == -1 or codePoint > 255 then
+			latin1 = latin1 .. "?"
+		else
+			latin1 = latin1 .. string.char (codePoint)
+		end
+	end
+	return latin1:ToString ()
 end
