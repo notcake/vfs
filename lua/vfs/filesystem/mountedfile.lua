@@ -13,7 +13,7 @@ function self:Open (authId, openFlags, callback)
 	openFlags = VFS.SanitizeOpenFlags (openFlags)
 	
 	if not self:GetPermissionBlock ():IsAuthorized (authId, "Read") then callback (VFS.ReturnCode.AccessDenied) return end
-	if openFlags & VFS.OpenFlags.Write ~= 0 and not self:GetPermissionBlock ():IsAuthorized (authId, "Write") then callback (VFS.ReturnCode.AccessDenied) return end
+	if bit.band (openFlags, VFS.OpenFlags.Write) ~= 0 and not self:GetPermissionBlock ():IsAuthorized (authId, "Write") then callback (VFS.ReturnCode.AccessDenied) return end
 
 	self.MountedNode:Open (authId, openFlags,
 		function (returnCode, fileStream)

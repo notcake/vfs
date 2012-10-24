@@ -6,10 +6,7 @@ function self:ctor (path, name, parentFolder)
 end
 
 function self:GetSize ()
-	if self:GetPath ():lower ():sub (1, 5) == "data/" then
-		return file.Size (self:GetPath ():sub (6))
-	end
-	return self.Size or -1
+	return file.Size (self:GetPath (), "GAME") or self.Size or -1
 end
 
 function self:Open (authId, openFlags, callback)

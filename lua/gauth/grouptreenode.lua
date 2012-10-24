@@ -95,7 +95,7 @@ function self:GetHost ()
 end
 
 function self:GetIcon ()
-	return self.Icon or "gui/g_silkicons/user"
+	return self.Icon or "icon16/user.png"
 end
 
 function self:GetName ()
@@ -123,7 +123,7 @@ function self:IsHostedLocally ()
 end
 
 function self:IsHostedRemotely ()
-	return self:GetHost () != GAuth.GetLocalId ()
+	return self:GetHost () ~= GAuth.GetLocalId ()
 end
 
 function self:IsPredicted ()

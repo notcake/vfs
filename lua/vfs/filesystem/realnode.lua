@@ -12,10 +12,7 @@ function self:GetName ()
 end
 
 function self:GetModificationTime ()
-	if self:GetPath ():lower ():sub (1, 5) == "data/" then
-		return file.Time (self:GetPath ():sub (6))
-	end
-	return -1
+	return file.Time (self:GetPath (), "GAME") or -1
 end
 
 function self:GetParentFolder ()
@@ -39,9 +36,9 @@ function self:Rename (authId, name, callback)
 	
 	local oldName = self:GetName ()
 	local newPath = self:GetParentFolder ().FolderPath .. name
-	if file.Exists (newPath, true) then callback (VFS.ReturnCode.AlreadyExists) return end
-	file.Write (newPath:sub (6), file.Read (self:GetPath (), true))
-	if not file.Exists (newPath, true) then callback (VFS.ReturnCode.AccessDenied) return end
+	if file.Exists (newPath, "GAME") then callback (VFS.ReturnCode.AlreadyExists) return end
+	file.Write (newPath:sub (6), file.Read (self:GetPath (), "GAME"))
+	if not file.Exists (newPath, "GAME") then callback (VFS.ReturnCode.AccessDenied) return end
 	file.Delete (self:GetPath ():sub (6))
 	self.Name = name
 	

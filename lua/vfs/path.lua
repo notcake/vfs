@@ -64,6 +64,8 @@ function self:IsEmpty ()
 end
 
 function self:RemoveFirstSegment ()
+	if self:IsEmpty () then return end
+	
 	local i = 1
 	local segment = self.Segments [1]
 	self.Path = self.Path:sub (segment:len () + 2)

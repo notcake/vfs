@@ -123,11 +123,11 @@ function self:GetPath ()
 end
 
 function self:IsFile ()
-	return self:GetNodeType () & VFS.NodeType.File ~= 0
+	return bit.band (self:GetNodeType (), VFS.NodeType.File) ~= 0
 end
 
 function self:IsFolder ()
-	return self:GetNodeType () & VFS.NodeType.Folder ~= 0
+	return bit.band (self:GetNodeType (), VFS.NodeType.Folder) ~= 0
 end
 
 function self:IsLocalNode ()

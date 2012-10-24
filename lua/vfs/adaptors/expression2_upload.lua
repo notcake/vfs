@@ -29,7 +29,7 @@ if SERVER then
 		uploadData.chunk = 0
 		uploadData.chunks = 1
 		uploadData.ent:SetOverlayText ("Expression 2\n(transferring)")
-		uploadData.ent:SetColor (0, 255, 0, 255)
+		uploadData.ent:SetColor (GLib.Colors.Lime)
 		uploadData.StartTime = SysTime ()
 		
 		VFS.Root:OpenFile (player:SteamID (), filePath, VFS.OpenFlags.Read,
@@ -55,7 +55,7 @@ if SERVER then
 							elseif uploadData.ent:IsValid () then
 								updateProgress (player, nil, filePath)
 								uploadData.ent:SetOverlayText ("Expression 2\n(transfer error)")
-								uploadData.ent:SetColor (255, 0, 0, 255)
+								uploadData.ent:SetColor (GLib.Colors.Red)
 							else
 								updateProgress (player, nil, filePath)
 							end
@@ -65,7 +65,7 @@ if SERVER then
 				elseif uploadData.ent:IsValid () then
 					updateProgress (player, nil, filePath)
 					uploadData.ent:SetOverlayText ("Expression 2\n(transfer error)")
-					uploadData.ent:SetColor (255, 0, 0, 255)
+					uploadData.ent:SetColor (GLib.Colors.Red)
 				else
 					updateProgress (player, nil, filePath)
 				end

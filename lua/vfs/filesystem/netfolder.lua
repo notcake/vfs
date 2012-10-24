@@ -194,9 +194,9 @@ function self:DeserializeNode (inBuffer)
 		child:ClearPredictedFlag ()
 	else
 		newNode = true
-		if nodeType & VFS.NodeType.Folder ~= 0 then
+		if bit.band (nodeType, VFS.NodeType.Folder) ~= 0 then
 			child = VFS.NetFolder (self.EndPoint, name, self)
-		elseif nodeType & VFS.NodeType.File ~= 0 then
+		elseif bit.band (nodeType, VFS.NodeType.File) ~= 0 then
 			child = VFS.NetFile (self.EndPoint, name, self)
 		end
 		self.Children [name] = child

@@ -22,16 +22,15 @@ if SERVER then
 			return
 		end
 		if packet:GetSize () + channelName:len () > 255 then
-			datastream.StreamToClients (ply, channelName, packet.Data)
+			GLib.Net.NetDispatcher:Dispatch (ply, channelName, packet)
 		else
 			GLib.Net.UsermessageDispatcher:Dispatch (ply, channelName, packet)
 		end
 	end
 elseif CLIENT then
 	function GLib.Net.DispatchPacket (destinationId, channelName, packet)
-		-- datastream time.
 		if GLib.Net.IsChannelOpen (channelName) then
-			GLib.Net.ConCommandDispatcher:Dispatch (destinationId, channelName, packet)
+			GLib.Net.NetDispatcher:Dispatch (destinationId, channelName, packet)
 		else
 			GLib.Debug ("GLib.Net : Channel " .. channelName .. " is not open.\n")
 			GLib.Net.ChannelQueues [channelName] = GLib.Net.ChannelQueues [channelName] or {}
@@ -60,10 +59,18 @@ function GLib.Net.RegisterChannel (channelName, handler)
 		end
 		
 		GLib.Net.OpenChannels [channelName] = true
+		
+		util.AddNetworkString (channelName)
+		
+		net.Receive (channelName,
+			function (_, ply)
+				handler (ply:SteamID (), GLib.Net.NetInBuffer ())
+			end
+		)
 	elseif CLIENT then
-		datastream.Hook (channelName,
-			function (channelName, _, _, data)
-				handler (GAuth.GetServerId (), GLib.Net.DatastreamInBuffer (data))
+		net.Receive (channelName,
+			function (_)
+				handler (GAuth.GetServerId (), GLib.Net.NetInBuffer ())
 			end
 		)
 		

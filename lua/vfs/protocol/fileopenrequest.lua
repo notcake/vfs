@@ -118,7 +118,7 @@ function self:Tick ()
 end
 
 function self:Write (pos, size, data, callback)
-	if self.OpenFlags & VFS.OpenFlags.Write == 0 then callback (VFS.ReturnCode.AccessDenied) return end
+	if bit.band (self.OpenFlags, VFS.OpenFlags.Write) == 0 then callback (VFS.ReturnCode.AccessDenied) return end
 
 	self.SubRequestCallbacks [self.NextSubRequestId] = callback
 	self.SubRequestTypes [self.NextSubRequestId] = VFS.Protocol.FileStreamAction.Write

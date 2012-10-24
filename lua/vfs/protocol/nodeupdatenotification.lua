@@ -11,15 +11,15 @@ end
 function self:GenerateInitialPacket (outBuffer)
 	outBuffer:String (self.Path)
 	outBuffer:UInt8 (self.UpdateFlags)
-	if self.UpdateFlags & VFS.UpdateFlags.DisplayName then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.DisplayName) ~= 0 then
 		outBuffer:String (self.Node:GetDisplayName () or "")
 	end
-	if self.UpdateFlags & VFS.UpdateFlags.Size then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.Size) ~= 0 then
 		local size = self.Node:IsFile () and self.Node:GetSize () or -1
 		if size == -1 then size = 0xFFFFFFFF end
 		outBuffer:UInt32 (size)
 	end
-	if self.UpdateFlags & VFS.UpdateFlags.ModificationTime then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.ModificationTime) ~= 0 then
 		local modificationTime = self.Node:GetModificationTime ()
 		if modificationTime == -1 then modificationTime = 0xFFFFFFFF end
 		outBuffer:UInt32 (modificationTime)
@@ -35,19 +35,19 @@ function self:HandleInitialPacket (inBuffer)
 	if not node then return end
 	if not node:IsNetNode () then return end
 	
-	if self.UpdateFlags & VFS.UpdateFlags.DisplayName then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.DisplayName) ~= 0 then
 		local displayName = inBuffer:String ()
 		if displayName == "" then displayName = nil end
 		node:SetDisplayName (displayName)
 	end
 	
-	if self.UpdateFlags & VFS.UpdateFlags.Size then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.Size) ~= 0 then
 		local size = inBuffer:UInt32 ()
 		if size == 0xFFFFFFFF then size = -1 end
 		if node:IsFile () then node:SetSize (size) end
 	end
 	
-	if self.UpdateFlags & VFS.UpdateFlags.ModificationTime then
+	if bit.band (self.UpdateFlags, VFS.UpdateFlags.ModificationTime) ~= 0 then
 		local modificationTime = inBuffer:UInt32 ()
 		if modificationTime == 0xFFFFFFFF then modificationTime = -1 end
 		node:SetModificationTime (modificationTime)

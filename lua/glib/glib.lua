@@ -2,21 +2,24 @@ if GLib then return end
 GLib = {}
 
 if SERVER then
-	function GLib.AddCSLuaFolder (folder)
-		local files = file.FindInLua (folder .. "/*")
+	function GLib.AddCSLuaFolder (folder, recursive)
+		local files, folders = file.Find (folder .. "/*", "LUA")
 		for _, fileName in pairs (files) do
 			if fileName:sub (-4) == ".lua" then
 				AddCSLuaFile (folder .. "/" .. fileName)
 			end
 		end
+		if recursive then
+			for _, childFolder in pairs (folders) do
+				if childFolder ~= "." and childFolder ~= ".." then
+					GLib.AddCSLuaFolder (folder .. "/" .. childFolder, recursive)
+				end
+			end
+		end
 	end
 
 	function GLib.AddCSLuaFolderRecursive (folder)
-		GLib.AddCSLuaFolder (folder)
-		local folders = file.FindDir ("lua/" .. folder .. "/*", true)
-		for _, childFolder in pairs (folders) do
-			GLib.AddCSLuaFolderRecursive (folder .. "/" .. childFolder)
-		end
+		GLib.AddCSLuaFolder (folder, true)
 	end
 	
 	function GLib.AddReloadCommand (includePath, systemName, systemTableName)
@@ -91,7 +94,6 @@ end
 
 function GLib.Error (message)
 	ErrorNoHalt (message .. "\n")
-	GLib.PrintStackTrace ()
 end
 
 function GLib.FindUpValue (func, name)
@@ -144,13 +146,17 @@ function GLib.Import (tbl)
 	end
 end
 
-function GLib.IncludeDirectory (dir, recursive)
-	for _, file in ipairs (file.FindInLua (dir .. "/*")) do
+function GLib.IncludeDirectory (folder, recursive)
+	local files, folders = file.Find (folder .. "/*", "LUA")
+	for _, file in ipairs (files) do
 		if file:sub (-4):lower () == ".lua" then
-			include (dir .. "/" .. file)
-		elseif recursive then
-			if file ~= "." and file ~= ".." then
-				GLib.IncludeDirectory (dir .. "/" .. file, recursive)
+			include (folder .. "/" .. file)
+		end
+	end
+	if recursive then
+		for _, childFolder in ipairs (folders) do
+			if childFolder ~= "." and childFolder ~= ".." then
+				GLib.IncludeDirectory (folder .. "/" .. childFolder, recursive)
 			end
 		end
 	end
@@ -317,10 +323,10 @@ include ("stringoutbuffer.lua")
 include ("net/net.lua")
 include ("net/datatype.lua")
 include ("net/outbuffer.lua")
-include ("net/concommanddispatcher.lua")
+include ("net/netdispatcher.lua")
 include ("net/usermessagedispatcher.lua")
 include ("net/concommandinbuffer.lua")
-include ("net/datastreaminbuffer.lua")
+include ("net/netinbuffer.lua")
 include ("net/usermessageinbuffer.lua")
 include ("net/stringtable.lua")
 

@@ -228,10 +228,10 @@ end
 function Expression2EditorFrame:OpenOldTabs (callback)
 	callback = callback or VFS.NullCallback
 
-	if not file.Exists (self.Location .. "/_tabs_.txt") then callback (VFS.ReturnCode.Finished) return end
+	if not file.Exists ("data/" .. self.Location .. "/_tabs_.txt", "GAME") then callback (VFS.ReturnCode.Finished) return end
 	
 	-- Read file
-	local tabs = file.Read (self.Location .. "/_tabs_.txt")
+	local tabs = file.Read ("data/" .. self.Location .. "/_tabs_.txt", "GAME")
 	if not tabs or tabs == "" then callback (VFS.ReturnCode.Finished) return end
 	
 	-- Explode around ;
@@ -245,7 +245,7 @@ function Expression2EditorFrame:OpenOldTabs (callback)
 	local tabsDone = 0
 	for _, filePath in ipairs (tabs) do
 		if filePath and filePath ~= "" then
-			if file.Exists (filePath) then
+			if file.Exists ("data/" .. filePath, "GAME") then
 				-- Open it in a new tab
 				self:LoadFile (LocalPlayer ():Name () .. "/" .. filePath, true,
 					function (returnCode)

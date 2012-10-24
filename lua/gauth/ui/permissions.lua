@@ -119,7 +119,7 @@ function self:Init ()
 				end
 			):SetTitle ("Add group...")
 		end
-	):SetIcon ("gui/g_silkicons/group_add")
+	):SetIcon ("icon16/group_add.png")
 	self.Groups.Menu:AddOption ("Remove",
 		function (targetGroupId)
 			if not targetGroupId then return end
@@ -129,7 +129,7 @@ function self:Init ()
 				function (permissionBlock) permissionBlock:RemoveGroupEntry (GAuth.GetLocalId (), targetGroupId) end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/group_delete")
+	):SetIcon ("icon16/group_delete.png")
 	
 	self.Groups:AddEventListener ("Click", tostring (self:GetTable ()),
 		function (_, item)
@@ -219,11 +219,11 @@ function self:PerformLayout ()
 		local y = 30
 		
 		self.InheritOwner:SetPos (8, y)
-		self.InheritOwner:SetSize (self:GetWide () - 16, 14)
+		self.InheritOwner:SetSize (self:GetWide () - 16, 15)
 		y = y + self.InheritOwner:GetTall () + 8
 		
 		self.InheritPermissions:SetPos (8, y)
-		self.InheritPermissions:SetSize (self:GetWide () - 16, 14)
+		self.InheritPermissions:SetSize (self:GetWide () - 16, 15)
 		y = y + self.InheritPermissions:GetTall () + 8
 		
 		self.ChangeOwner:SetSize (80, 24)
@@ -306,7 +306,7 @@ function self:AddGroup (groupId, permissionBlock, permissionBlockIndex)
 
 	local group = GAuth.ResolveGroup (groupId)
 	local item = self.Groups:AddItem (group and group:GetFullDisplayName () or groupId)
-	item:SetIcon (group and group:GetIcon () or "gui/g_silkicons/group")
+	item:SetIcon (group and group:GetIcon () or "icon16/group.png")
 	item:SetIndent (16)
 	item.Group = group
 	item.GroupId = groupId
@@ -322,7 +322,7 @@ function self:AddPermissionBlockHeader (permissionBlock, permissionBlockIndex)
 
 	local item = self.Groups:AddItem (permissionBlock:GetDisplayName ())
 	if item:GetText () == "" then item:SetText ("[root]") end
-	item:SetIcon ("gui/g_silkicons/key")
+	item:SetIcon ("icon16/key.png")
 	item:SetCanSelect (false)
 	item.PermissionBlock = permissionBlock
 	item.PermissionBlockIndex = permissionBlockIndex
@@ -337,7 +337,7 @@ function self:AddGroupEntryAdder (permissionBlock, permissionBlockIndex)
 	if self.AddGroupEntryButton then return end
 
 	local item = self.Groups:AddItem ("Click here to add a group entry...")
-	item:SetIcon ("gui/g_silkicons/group_add")
+	item:SetIcon ("icon16/group_add.png")
 	item:SetIndent (16)
 	item:SetCanSelect (false)
 	item.PermissionBlock = permissionBlock

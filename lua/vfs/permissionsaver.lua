@@ -142,7 +142,7 @@ end
 function self:Load (callback)
 	callback = callback or VFS.NullCallback
 
-	local data = file.Read ("vfs_" .. (SERVER and "sv" or "cl") .. ".txt") or ""
+	local data = file.Read ("data/vfs_" .. (SERVER and "sv" or "cl") .. ".txt", "GAME") or ""
 	if data == "" then callback (VFS.ReturnCode.Success) return end
 	local inBuffer = VFS.StringInBuffer (data)
 	inBuffer:String () -- discard warning

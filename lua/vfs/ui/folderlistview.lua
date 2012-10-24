@@ -85,12 +85,12 @@ function self:Init ()
 				VFS.Clipboard:Add (node)
 			end
 		end
-	):SetIcon ("gui/g_silkicons/page_white_copy")
+	):SetIcon ("icon16/page_white_copy.png")
 	self.Menu:AddOption ("Paste",
 		function ()
 			VFS.Clipboard:Paste (self.Folder)
 		end
-	):SetIcon ("gui/g_silkicons/paste_plain")
+	):SetIcon ("icon16/paste_plain.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Create Folder",
 		function ()
@@ -100,7 +100,7 @@ function self:Init ()
 				folder:CreateFolder (GAuth.GetLocalId (), name)
 			end)
 		end
-	):SetIcon ("gui/g_silkicons/folder_add")
+	):SetIcon ("icon16/folder_add.png")
 	self.Menu:AddOption ("Delete",
 		function (targetNodes)
 			if not self.Folder then return end
@@ -126,7 +126,7 @@ function self:Init ()
 				"No", VFS.NullCallback
 			)
 		end
-	):SetIcon ("gui/g_silkicons/cross")
+	):SetIcon ("icon16/cross.png")
 	self.Menu:AddOption ("Rename",
 		function (targetNodes)
 			if not targetNodes then return end
@@ -139,7 +139,7 @@ function self:Init ()
 				end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/pencil")
+	):SetIcon ("icon16/pencil.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Permissions",
 		function (targetNodes)
@@ -148,7 +148,7 @@ function self:Init ()
 			if #targetNodes == 0 then return end
 			GAuth.OpenPermissions (targetNodes [1]:GetPermissionBlock ())
 		end
-	):SetIcon ("gui/g_silkicons/key")
+	):SetIcon ("icon16/key.png")
 	
 	self:AddEventListener ("DoubleClick",
 		function (_, item)
@@ -312,15 +312,15 @@ function self:SetFolder (folder)
 		function (_, updatedNode, updateFlags)
 			local listViewItem = self.ChildNodes [updatedNode:GetName ()]
 			if not listViewItem then return end
-			if updateFlags & VFS.UpdateFlags.DisplayName ~= 0 then
+			if bit.band (updateFlags, VFS.UpdateFlags.DisplayName) ~= 0 then
 				listViewItem:SetText (updatedNode:GetDisplayName ())
 				self:Sort ()
 			end
-			if updateFlags & VFS.UpdateFlags.Size ~= 0 then
+			if bit.band (updateFlags, VFS.UpdateFlags.Size) ~= 0 then
 				listViewItem.Size = updatedNode:IsFile () and updatedNode:GetSize () or -1
 				listViewItem:SetColumnText (2, listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
 			end
-			if updateFlags & VFS.UpdateFlags.ModificationTime ~= 0 then
+			if bit.band (updateFlags, VFS.UpdateFlags.ModificationTime) ~= 0 then
 				listViewItem.LastModified = updatedNode:GetModificationTime ()
 				listViewItem:SetColumnText (3, listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
 			end
@@ -340,6 +340,7 @@ end
 function self:SetPath (path)
 	VFS.Root:GetChild (GAuth.GetLocalId (), path,
 		function (returnCode, node)
+			if not node then return end
 			if node:IsFolder () then
 				self:SetFolder (node)
 			else
@@ -377,9 +378,9 @@ function self:UpdateIcon (listViewItem)
 	local permissionBlock = node:GetPermissionBlock ()
 	local canView = not permissionBlock or permissionBlock:IsAuthorized (GAuth.GetLocalId (), listViewItem.IsFolder and "View Folder" or "Read")
 	if listViewItem.IsFolder then
-		listViewItem:SetIcon (canView and "gui/g_silkicons/folder" or "gui/g_silkicons/folder_delete")
+		listViewItem:SetIcon (canView and "icon16/folder.png" or "icon16/folder_delete.png")
 	else
-		listViewItem:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
+		listViewItem:SetIcon (canView and "icon16/page.png" or "icon16/page_delete.png")
 	end
 end
 

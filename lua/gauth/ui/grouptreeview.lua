@@ -62,7 +62,7 @@ function self:Init ()
 			GAuth.GroupBrowser ():GetFrame ():MoveToFront ()
 			GAuth.GroupBrowser ():GetFrame ():RequestFocus ()
 		end
-	):SetIcon ("gui/g_silkicons/group_go")
+	):SetIcon ("icon16/group_go.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Create Group",
 		function (groupTreeNode)
@@ -74,7 +74,7 @@ function self:Init ()
 				end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/group_add")
+	):SetIcon ("icon16/group_add.png")
 	self.Menu:AddOption ("Create Group Tree",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
@@ -85,20 +85,20 @@ function self:Init ()
 				end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/folder_add")
+	):SetIcon ("icon16/folder_add.png")
 	self.Menu:AddOption ("Delete",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			groupTreeNode:Remove (GAuth.GetLocalId ())
 		end
-	):SetIcon ("gui/g_silkicons/cross")
+	):SetIcon ("icon16/cross.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Permissions",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			GAuth.OpenPermissions (groupTreeNode:GetPermissionBlock ())
 		end
-	):SetIcon ("gui/g_silkicons/key")
+	):SetIcon ("icon16/key.png")
 end
 
 function self:GetSelectedGroup ()

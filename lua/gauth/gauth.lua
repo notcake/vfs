@@ -24,7 +24,7 @@ if SERVER then
 		return "Server"
 	end
 elseif CLIENT then
-	if SinglePlayer () then
+	if game.SinglePlayer () then
 		function GAuth.GetLocalId ()
 			return "STEAM_0:0:0"
 		end
@@ -55,10 +55,10 @@ function GAuth.GetUserDisplayName (userId)
 end
 
 function GAuth.GetUserIcon (userId)
-	if userId == GAuth.GetSystemId () then return "gui/g_silkicons/cog" end
-	if userId == GAuth.GetServerId () then return "gui/g_silkicons/server" end
-	if userId == GAuth.GetEveryoneId () then return "gui/g_silkicons/world" end
-	return "gui/g_silkicons/user"
+	if userId == GAuth.GetSystemId () then return "icon16/cog.png" end
+	if userId == GAuth.GetServerId () then return "icon16/server.png" end
+	if userId == GAuth.GetEveryoneId () then return "icon16/world.png" end
+	return "icon16/user.png"
 end
 
 function GAuth.IsUserInGroup (groupId, authId, permissionBlock)
@@ -232,7 +232,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Administrators",
 				return ply:IsAdmin ()
 			end
 		)
-		group:SetIcon ("gui/g_silkicons/shield")
+		group:SetIcon ("icon16/shield.png")
 	end
 )
 
@@ -246,7 +246,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Super Administrators",
 				return ply:IsSuperAdmin ()
 			end
 		)
-		group:SetIcon ("gui/g_silkicons/shield")
+		group:SetIcon ("icon16/shield.png")
 	end
 )
 
@@ -258,7 +258,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Everyone",
 				return true
 			end
 		)
-		group:SetIcon ("gui/g_silkicons/world")
+		group:SetIcon ("icon16/world.png")
 	end
 )
 
@@ -271,7 +271,7 @@ GAuth.Groups:AddGroup (GAuth.GetSystemId (), "Owner",
 				return userId == permissionBlock:GetOwner ()
 			end
 		)
-		group:SetIcon ("gui/g_silkicons/user")
+		group:SetIcon ("icon16/user.png")
 	end
 )
 GAuth.Groups:ClearPredictedFlag ()
@@ -300,7 +300,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 						playerGroup:SetHost (userId)
 						playerGroup:MarkPredicted ()
 						playerGroup:AddUser (GAuth.GetSystemId (), userId)
-						playerGroup:SetIcon ("gui/g_silkicons/user")
+						playerGroup:SetIcon ("icon16/user.png")
 						playerGroup:ClearPredictedFlag ()
 					end
 				)

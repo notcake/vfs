@@ -67,9 +67,57 @@ function self:DeleteDirectChild (authId, name, callback)
 end
 
 function self:EnumerateChildren (authId, callback)
-	file.TFind (self.FolderPath .. "*", function (searchPath, folders, files)
-		self:TFindCallbackPCall (searchPath, folders, files, callback)
-	end)
+	local files, folders = file.Find (self.FolderPath .. "*", "GAME")
+	
+	-- 1. Produce map of items and new items
+	-- 2. Check for deleted items
+	-- 2. Check for new folders / files
+	-- 3. Call callback
+	
+	-- 1. Produce item map
+	local items = {}
+	local new = {}
+	for _, name in ipairs (folders) do
+		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.Folder end
+		items [name] = VFS.NodeType.Folder
+	end
+	for _, name in ipairs (files) do
+		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.File end
+		items [name] = VFS.NodeType.File
+	end
+	
+	-- 2. Check for deleted items
+	local deleted = {}
+	for name, _ in pairs (self.Children) do
+		if not items [name] then
+			deleted [name] = true
+		end
+	end
+	for name, _ in pairs (deleted) do
+		local node = self.Children [name]
+		self.Children [name] = nil
+		self.LowercaseChildren [name:lower ()] = nil
+		self:DispatchEvent ("NodeDeleted", node)
+		node:DispatchEvent ("Deleted")
+	end
+	
+	-- 3. Add new children
+	VFS.EnumerateDelayed (new,
+		function (name, nodeType)
+			self.Children [name] = (nodeType == VFS.NodeType.Folder and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
+			self.LowercaseChildren [name:lower ()] = self.Children [name]
+			self:DispatchEvent ("NodeCreated", self.Children [name])
+		end,
+		function ()
+			-- 4. Call callback
+			VFS.EnumerateDelayed (self.Children,
+				function (_, node)
+					callback (VFS.ReturnCode.Success, node)
+				end,
+				function () callback (VFS.ReturnCode.Finished) end
+			)
+		end
+	)
 end
 
 function self:GetDirectChild (authId, name, callback)
@@ -128,8 +176,8 @@ end
 		NodeDeleted is fired.
 ]]
 function self:CheckExists (name)
-	if file.Exists (self.FolderPath .. name, true) then
-		self.Children [name] = (file.IsDir (self.FolderPath .. name, true) and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
+	if file.Exists (self.FolderPath .. name, "GAME") then
+		self.Children [name] = (file.IsDir (self.FolderPath .. name, "GAME") and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
 		self.LowercaseChildren [name:lower ()] = self.Children [name]
 		self:DispatchEvent ("NodeCreated", self.Children [name])
 		return true
@@ -143,62 +191,6 @@ function self:CheckExists (name)
 		end
 		return false
 	end
-end
-
-function self:TFindCallback (searchPath, folders, files, callback)
-	-- 1. Produce map of items and new items
-	-- 2. Check for deleted items
-	-- 2. Check for new folders / files
-	-- 3. Call callback
-	
-	-- 1. Produce item map
-	local items = {}
-	local new = {}
-	for _, name in ipairs (folders) do
-		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.Folder end
-		items [name] = VFS.NodeType.Folder
-	end
-	for _, name in ipairs (files) do
-		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.File end
-		items [name] = VFS.NodeType.File
-	end
-	
-	-- 2. Check for deleted items
-	local deleted = {}
-	for name, _ in pairs (self.Children) do
-		if not items [name] then
-			deleted [name] = true
-		end
-	end
-	for name, _ in pairs (deleted) do
-		local node = self.Children [name]
-		self.Children [name] = nil
-		self.LowercaseChildren [name:lower ()] = nil
-		self:DispatchEvent ("NodeDeleted", node)
-		node:DispatchEvent ("Deleted")
-	end
-	
-	-- 3. Add new children
-	VFS.EnumerateDelayed (new,
-		function (name, nodeType)
-			self.Children [name] = (nodeType == VFS.NodeType.Folder and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
-			self.LowercaseChildren [name:lower ()] = self.Children [name]
-			self:DispatchEvent ("NodeCreated", self.Children [name])
-		end,
-		function ()
-			-- 4. Call callback
-			VFS.EnumerateDelayed (self.Children,
-				function (_, node)
-					callback (VFS.ReturnCode.Success, node)
-				end,
-				function () callback (VFS.ReturnCode.Finished) end
-			)
-		end
-	)
-end
-
-function self:TFindCallbackPCall (searchPath, folders, files, callback)
-	PCallError (self.TFindCallback, self, searchPath, folders, files, callback)
 end
 
 -- Events

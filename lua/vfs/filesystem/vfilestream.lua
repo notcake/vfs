@@ -4,14 +4,14 @@ VFS.VFileStream = VFS.MakeConstructor (self, VFS.IFileStream)
 function self:ctor (vfile, openFlags)
 	self.File = vfile
 	self.OpenFlags = openFlags
-	if self.OpenFlags & VFS.OpenFlags.Overwrite ~= 0 then
+	if bit.band (self.OpenFlags, VFS.OpenFlags.Overwrite) ~= 0 then
 		self.File.Contents = ""
 		self.File:SetSize (0)
 	end
 end
 
 function self:CanWrite ()
-	return self.OpenFlags & VFS.OpenFlags.Write ~= 0
+	return bit.band (self.OpenFlags, VFS.OpenFlags.Write) ~= 0
 end
 
 function self:Close ()

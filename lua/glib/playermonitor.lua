@@ -102,7 +102,7 @@ function self:GetPlayerSteamId (ply)
 	local steamId = ply:SteamID ()
 	
 	local isLocalPlayer = CLIENT and ply == LocalPlayer () or false
-	if SinglePlayer () and isLocalPlayer then steamId = "STEAM_0:0:0" end
+	if game.SinglePlayer () and isLocalPlayer then steamId = "STEAM_0:0:0" end
 	if steamId == "NULL" then steamId = "BOT" end
 	
 	return steamId

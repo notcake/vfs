@@ -25,7 +25,7 @@ GAuth.GroupTree = GAuth.MakeConstructor (self, GAuth.GroupTreeNode)
 function self:ctor (name)
 	self.Children = {}
 	
-	self.Icon = "gui/g_silkicons/folder_user"
+	self.Icon = "icon16/folder_user.png"
 	
 	self:AddEventListener ("NotifyGroupAdded",     self.NotifyGroupAdded)
 	self:AddEventListener ("NotifyGroupTreeAdded", self.NotifyGroupTreeAdded)

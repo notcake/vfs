@@ -39,7 +39,7 @@ function self:Init ()
 				end
 			):SetTitle ("Add user...")
 		end
-	):SetIcon ("gui/g_silkicons/user_add")
+	):SetIcon ("icon16/user_add.png")
 	self.Menu:AddOption ("Remove User",
 		function (targetUserIds)
 			if not self.Group then return end
@@ -49,14 +49,14 @@ function self:Init ()
 				self.Group:RemoveUser (GAuth.GetLocalId (), userId)
 			end
 		end
-	):SetIcon ("gui/g_silkicons/user_delete")
+	):SetIcon ("icon16/user_delete.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Permissions",
 		function ()
 			if not self.Group then return end
 			GAuth.OpenPermissions (self.Group:GetPermissionBlock ())
 		end
-	):SetIcon ("gui/g_silkicons/key")
+	):SetIcon ("icon16/key.png")
 end
 
 function self:GetSelectedUsers ()

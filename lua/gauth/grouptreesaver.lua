@@ -115,7 +115,7 @@ end
 function self:Load (callback)
 	callback = callback or GAuth.NullCallback
 
-	local data = file.Read ("gauth_" .. (SERVER and "sv" or "cl") .. ".txt") or ""
+	local data = file.Read ("data/gauth_" .. (SERVER and "sv" or "cl") .. ".txt", "GAME") or ""
 	if data == "" then callback (GAuth.ReturnCode.Success) return end
 	local inBuffer = GAuth.StringInBuffer (data)
 	inBuffer:String () -- discard warning

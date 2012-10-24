@@ -106,7 +106,7 @@ function self:Init ()
 			if not node:IsFile () then return end
 			self:DispatchEvent ("FileOpened", node)
 		end
-	):SetIcon ("gui/g_silkicons/page_go")
+	):SetIcon ("icon16/page_go.png")
 	self.Menu:AddOption ("Browse",
 		function (node)
 			if not node then return end
@@ -116,14 +116,14 @@ function self:Init ()
 			VFS.FileSystemBrowser ():GetFrame ():MoveToFront ()
 			VFS.FileSystemBrowser ():GetFrame ():RequestFocus ()
 		end
-	):SetIcon ("gui/g_silkicons/folder_go")
+	):SetIcon ("icon16/folder_go.png")
 	self.Menu:AddOption ("Refresh",
 		function (node)
 			if not node then return end
 			if not node:IsFolder () then return end
 			node:EnumerateChildren (GAuth.GetLocalId ())
 		end
-	):SetIcon ("gui/g_silkicons/arrow_refresh")
+	):SetIcon ("icon16/arrow_refresh.png")
 	self.Menu:AddSeparator ("OpenSeparator")
 	self.Menu:AddOption ("Copy",
 		function (node)
@@ -131,7 +131,7 @@ function self:Init ()
 			VFS.Clipboard:Clear ()
 			VFS.Clipboard:Add (node)
 		end
-	):SetIcon ("gui/g_silkicons/page_white_copy")
+	):SetIcon ("icon16/page_white_copy.png")
 	self.Menu:AddOption ("Paste",
 		function (node)
 			if not node then return end
@@ -140,7 +140,7 @@ function self:Init ()
 			
 			VFS.Clipboard:Paste (node)
 		end
-	):SetIcon ("gui/g_silkicons/paste_plain")
+	):SetIcon ("icon16/paste_plain.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Create Folder",
 		function (node)
@@ -152,7 +152,7 @@ function self:Init ()
 				end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/folder_add")
+	):SetIcon ("icon16/folder_add.png")
 	self.Menu:AddOption ("Delete",
 		function (node)
 			if not node then return end
@@ -161,7 +161,7 @@ function self:Init ()
 				"No", VFS.NullCallback
 			)
 		end
-	):SetIcon ("gui/g_silkicons/cross")
+	):SetIcon ("icon16/cross.png")
 	self.Menu:AddOption ("Rename",
 		function (node)
 			if not node then return end
@@ -173,7 +173,7 @@ function self:Init ()
 				end
 			)
 		end
-	):SetIcon ("gui/g_silkicons/pencil")
+	):SetIcon ("icon16/pencil.png")
 	self.Menu:AddSeparator ()
 	self.Menu:AddOption ("Permissions",
 		function (node)
@@ -181,7 +181,7 @@ function self:Init ()
 			if not node:GetPermissionBlock () then return end
 			GAuth.OpenPermissions (node:GetPermissionBlock ())
 		end
-	):SetIcon ("gui/g_silkicons/key")
+	):SetIcon ("icon16/key.png")
 end
 
 function self:UnhookNode (node)
@@ -234,7 +234,7 @@ function self:Populate (filesystemNode, treeViewNode)
 	self.SubscribedNodes [filesystemNode] = true
 	
 	treeViewNode.AddedNodes = treeViewNode.AddedNodes or {}
-	treeViewNode:SetIcon ("gui/g_silkicons/folder_explore")
+	treeViewNode:SetIcon ("icon16/folder_explore.png")
 	treeViewNode:SuppressLayout (true)
 	local lastLayout = SysTime ()
 	filesystemNode:EnumerateChildren (GAuth.GetLocalId (),
@@ -258,9 +258,9 @@ function self:Populate (filesystemNode, treeViewNode)
 			elseif returnCode == VFS.ReturnCode.AccessDenied then
 				treeViewNode.CanView = not treeViewNode.Node:GetPermissionBlock () or treeViewNode.Node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "View Folder")
 				treeViewNode:MarkUnpopulated ()
-				treeViewNode:SetIcon ("gui/g_silkicons/folder_delete")
+				treeViewNode:SetIcon ("icon16/folder_delete.png")
 			elseif returnCode == VFS.ReturnCode.Finished then
-				treeViewNode:SetIcon ("gui/g_silkicons/folder")
+				treeViewNode:SetIcon ("icon16/folder.png")
 				self:LayoutNode (treeViewNode)
 	
 				filesystemNode:AddEventListener ("NodeCreated", tostring (self:GetTable ()),
@@ -344,7 +344,7 @@ function self:Populate (filesystemNode, treeViewNode)
 			if not treeViewNode:IsValid () then return end
 			local childNode = treeViewNode.AddedNodes [updatedNode:GetName ()]
 			if not childNode then return end
-			if updateFlags & VFS.UpdateFlags.DisplayName == 0 then return end
+			if bit.band (updateFlags, VFS.UpdateFlags.DisplayName) == 0 then return end
 			
 			childNode:SetText (updatedNode:GetDisplayName ())
 			self:SortChildren ()
@@ -460,9 +460,9 @@ function self:UpdateIcon (treeViewNode)
 	treeViewNode.CanRead = canRead
 	
 	if treeViewNode.IsFolder and canViewChanged then
-		treeViewNode:SetIcon (canView and "gui/g_silkicons/folder" or "gui/g_silkicons/folder_delete")
+		treeViewNode:SetIcon (canView and "icon16/folder.png" or "icon16/folder_delete.png")
 	elseif treeViewNode.IsFile and canReadChanged then
-		treeViewNode:SetIcon (canView and "gui/g_silkicons/page" or "gui/g_silkicons/page_delete")
+		treeViewNode:SetIcon (canView and "icon16/page.png" or "icon16/page_delete.png")
 	end
 	return canViewChanged, canReadChanged
 end

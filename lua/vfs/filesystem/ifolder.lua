@@ -258,7 +258,7 @@ function self:IsCaseSensitive ()
 end
 
 function self:OpenFile (authId, path, openFlags, callback)
-	local write = openFlags & VFS.OpenFlags.Write != 0
+	local write = bit.band (openFlags, VFS.OpenFlags.Write) ~= 0
 	(write and self.CreateFile or self.GetChild) (self, authId, path,
 		function (returnCode, node)
 			if returnCode == VFS.ReturnCode.Success then

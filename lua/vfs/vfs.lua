@@ -110,7 +110,7 @@ function VFS.SanitizeNodeName (segment)
 end
 
 function VFS.SanitizeOpenFlags (openFlags)
-	if openFlags & VFS.OpenFlags.Overwrite ~= 0 and openFlags & VFS.OpenFlags.Write == 0 then
+	if bit.band (openFlags, VFS.OpenFlags.Overwrite) ~= 0 and bit.band (openFlags, VFS.OpenFlags.Write) == 0 then
 		openFlags = openFlags - VFS.OpenFlags.Overwrite
 	end
 	return openFlags

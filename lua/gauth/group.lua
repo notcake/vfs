@@ -19,7 +19,7 @@ function self:ctor (name)
 	
 	self.MembershipFunction = nil
 	
-	self.Icon = "gui/g_silkicons/group"
+	self.Icon = "icon16/group.png"
 	
 	self:AddEventListener ("NotifyUserAdded",  self.NotifyUserAdded)	
 	self:AddEventListener ("NotifyUserRemoved", self.NotifyUserRemoved)
