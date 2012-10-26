@@ -1,8 +1,6 @@
 local self = {}
 GLib.StringBuilder = GLib.MakeConstructor (self)
 
-local string_len = string.len
-
 function self:ctor ()
 	self.Buffer = { "" }
 	self.Length = 0
@@ -10,11 +8,11 @@ end
 
 function self:Append (str)
 	str = tostring (str)
-	if string_len (self.Buffer [#self.Buffer]) >= 1024 then
+	if #self.Buffer [#self.Buffer] >= 1024 then
 		self.Buffer [#self.Buffer + 1] = ""
 	end
 	self.Buffer [#self.Buffer] = self.Buffer [#self.Buffer] .. str
-	self.Length = self.Length + string_len  (str)
+	self.Length = self.Length + #str
 	
 	return self
 end
@@ -32,5 +30,9 @@ function self:ToString ()
 	return table.concat (self.Buffer)
 end
 
-self.__concat = self.Append
-self.__len    = self.GetLength
+self.__concat   = function (a, b)
+	return tostring (a) .. tostring (b)
+end
+
+self.__len      = self.GetLength
+self.__tostring = self.ToString

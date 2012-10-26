@@ -93,7 +93,7 @@ function GLib.EnumerateDelayed (tbl, callback, finishCallback)
 end
 
 function GLib.Error (message)
-	ErrorNoHalt (message .. "\n")
+	ErrorNoHalt (" \n\t" .. message .. "\n\t\t" .. GLib.StackTrace (nil, 2):gsub ("\n", "\n\t\t") .. "\n")
 end
 
 function GLib.FindUpValue (func, name)
@@ -147,16 +147,25 @@ function GLib.Import (tbl)
 end
 
 function GLib.IncludeDirectory (folder, recursive)
-	local files, folders = file.Find (folder .. "/*", "LUA")
-	for _, file in ipairs (files) do
-		if file:sub (-4):lower () == ".lua" then
-			include (folder .. "/" .. file)
+	local included = {}
+	local paths = { "LUA", SERVER and "LSV" or "LCL" }
+	
+	for _, path in ipairs (paths) do
+		local files, folders = file.Find (folder .. "/*", path)
+		for _, file in ipairs (files) do
+			if file:sub (-4):lower () == ".lua" and
+			   not included [file:lower ()] then
+				include (folder .. "/" .. file)
+				included [file:lower ()] = true
+			end
 		end
-	end
-	if recursive then
-		for _, childFolder in ipairs (folders) do
-			if childFolder ~= "." and childFolder ~= ".." then
-				GLib.IncludeDirectory (folder .. "/" .. childFolder, recursive)
+		if recursive then
+			for _, childFolder in ipairs (folders) do
+				if childFolder ~= "." and childFolder ~= ".." and
+				   not included [childFolder:lower ()] then
+					GLib.IncludeDirectory (folder .. "/" .. childFolder, recursive)
+					included [childFolder:lower ()] = true
+				end
 			end
 		end
 	end
@@ -247,8 +256,14 @@ function GLib.PrettifyString (str)
 	return out
 end
 
-function GLib.PrintStackTrace (levels, offset)
-	local offset = offset or 0
+function GLib.PrintStackTrace ()
+	ErrorNoHalt (GLib.StackTrace (nil, 2))
+end
+
+function GLib.StackTrace (levels, offset)
+	local stringBuilder = GLib.StringBuilder ()
+	
+	local offset = offset or 1
 	local exit = false
 	local i = 0
 	local shown = 0
@@ -263,12 +278,12 @@ function GLib.PrintStackTrace (levels, offset)
 			if i >= offset then
 				shown = shown + 1
 				if name then
-					ErrorNoHalt (tostring (i) .. ": " .. name .. " (" .. src .. ": " .. tostring (t.currentline) .. ")\n")
+					stringBuilder:Append (string.format ("%2d", i) .. ": " .. name .. " (" .. src .. ": " .. tostring (t.currentline) .. ")\n")
 				else
 					if src and t.currentline then
-						ErrorNoHalt (tostring (i) .. ": (" .. src .. ": " .. tostring (t.currentline) .. ")\n")
+						stringBuilder:Append (string.format ("%2d", i) .. ": (" .. src .. ": " .. tostring (t.currentline) .. ")\n")
 					else
-						ErrorNoHalt (tostring (i) .. ":\n")
+						stringBuilder:Append (string.format ("%2d", i) .. ":\n")
 						PrintTable (t)
 					end
 				end
@@ -276,6 +291,7 @@ function GLib.PrintStackTrace (levels, offset)
 		end
 		i = i + 1
 	end
+	return stringBuilder:ToString ()
 end
 
 function GLib.UnloadSystem (systemTableName)
