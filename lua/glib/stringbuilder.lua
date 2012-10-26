@@ -31,6 +31,9 @@ function self:ToString ()
 end
 
 self.__concat   = function (a, b)
+	if type (b) == "string" then
+		return a:Append (b)
+	end
 	return tostring (a) .. tostring (b)
 end
 
