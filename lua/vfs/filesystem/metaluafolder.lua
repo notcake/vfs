@@ -29,6 +29,13 @@ function self:EnumerateChildren (authId, callback)
 	
 	local callbackId = self.NextCallbackId
 	self.NextCallbackId = self.NextCallbackId + 1
+	
+	-- Cached children
+	for name, node in pairs (self.Children) do
+		callback (VFS.ReturnCode.Success, node)
+	end
+	
+	-- Request new listing
 	self:AddEventListener ("ChildrenReceived", tostring (callbackId),
 		function ()
 			self:RemoveEventListener ("ChildrenReceived", tostring (callbackId))
@@ -47,7 +54,6 @@ function self:GetDirectChild (authId, name, callback)
 	
 	self:EnsureChildrenReceived (
 		function ()
-			print ("HAI")
 			local lowercaseName = name:lower ()
 			if self.Children [name] or self.LowercaseChildren [lowercaseName] then callback (VFS.ReturnCode.Success, self.Children [name] or self.LowercaseChildren [lowercaseName]) return end
 			callback (VFS.ReturnCode.NotFound)

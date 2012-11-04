@@ -8,7 +8,7 @@ function self:ctor (realFile, openFlags)
 		self.Length = 0
 		self.Contents = ""
 	else
-		self.Contents = file.Read (self:GetPath (), "GAME") or ""
+		self.Contents = file.Read (self:GetPath (), self.File:GetFileSystemPath ()) or ""
 		self.Length = self.Contents:len ()
 	end
 	self.File:SetSize (self.Length)
@@ -54,7 +54,7 @@ function self:GetPath ()
 end
 
 function self:Read (size, callback)
-	self.Contents = self.Contents or file.Read (self.File:GetPath (), "GAME") or ""
+	self.Contents = self.Contents or file.Read (self.File:GetPath (), self.File:GetFileSystemPath ()) or ""
 	local startPos = self:GetPos ()
 	self:Seek (startPos + size)
 	callback (VFS.ReturnCode.Success, self.Contents:sub (startPos + 1, startPos + size))
@@ -64,7 +64,7 @@ function self:Write (size, data, callback)
 	if not self:CanWrite () then callback (VFS.ReturnCode.AccessDenied) return end
 	if size == 0 then callback (VFS.ReturnCode.Success) return end
 	
-	self.Contents = self.Contents or file.Read (self.File:GetPath (), "GAME") or ""
+	self.Contents = self.Contents or file.Read (self.File:GetPath (), self.File:GetFileSystemPath ()) or ""
 	if data:len () < size then data = data .. string.rep ("\0", size - data:len ()) end
 	if data:len () > size then data = data:sub (1, size) end
 	self.Contents = self.Contents:sub (1, self:GetPos ()) .. data .. self.Contents:sub (self:GetPos () + size + 1)

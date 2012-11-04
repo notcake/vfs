@@ -1,12 +1,12 @@
 local self = {}
 VFS.RealFile = VFS.MakeConstructor (self, VFS.IFile, VFS.RealNode)
 
-function self:ctor (path, name, parentFolder)
+function self:ctor (path, fileSystemPath, name, parentFolder)
 	self.Size = nil
 end
 
 function self:GetSize ()
-	return file.Size (self:GetPath (), "GAME") or self.Size or -1
+	return file.Size (self:GetPath (), self.FileSystemPath) or self.Size or -1
 end
 
 function self:Open (authId, openFlags, callback)

@@ -1,7 +1,7 @@
 local self = {}
 VFS.RealFolder = VFS.MakeConstructor (self, VFS.IFolder, VFS.RealNode)
 
-function self:ctor (path, name, parentFolder)
+function self:ctor (path, fileSystemPath, name, parentFolder)
 	self.FolderPath = self:GetPath () == "" and "" or self:GetPath () .. "/"
 	
 	self.Children = {}
@@ -67,7 +67,7 @@ function self:DeleteDirectChild (authId, name, callback)
 end
 
 function self:EnumerateChildren (authId, callback)
-	local files, folders = file.Find (self.FolderPath .. "*", "GAME")
+	local files, folders = file.Find (self.FolderPath .. "*", self.FileSystemPath)
 	
 	-- 1. Produce map of items and new items
 	-- 2. Check for deleted items
@@ -104,7 +104,7 @@ function self:EnumerateChildren (authId, callback)
 	-- 3. Add new children
 	VFS.EnumerateDelayed (new,
 		function (name, nodeType)
-			self.Children [name] = (nodeType == VFS.NodeType.Folder and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
+			self.Children [name] = (nodeType == VFS.NodeType.Folder and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, self.FileSystemPath, name, self)
 			self.LowercaseChildren [name:lower ()] = self.Children [name]
 			self:DispatchEvent ("NodeCreated", self.Children [name])
 		end,
@@ -176,8 +176,8 @@ end
 		NodeDeleted is fired.
 ]]
 function self:CheckExists (name)
-	if file.Exists (self.FolderPath .. name, "GAME") then
-		self.Children [name] = (file.IsDir (self.FolderPath .. name, "GAME") and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, name, self)
+	if file.Exists (self.FolderPath .. name, self.FileSystemPath) then
+		self.Children [name] = (file.IsDir (self.FolderPath .. name, self.FileSystemPath) and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, self.FileSystemPath, name, self)
 		self.LowercaseChildren [name:lower ()] = self.Children [name]
 		self:DispatchEvent ("NodeCreated", self.Children [name])
 		return true

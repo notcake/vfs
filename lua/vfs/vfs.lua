@@ -136,7 +136,7 @@ end
 			STEAM_X:X:X (NetFolder)
 			STEAM_LOCAL (VFolder)
 ]]
-VFS.RealRoot = VFS.RealFolder ("", "")
+VFS.RealRoot    = VFS.RealFolder ("", "GAME", "")
 if SERVER then
 	VFS.Root = VFS.VFolder ("")
 elseif CLIENT then
@@ -254,6 +254,21 @@ if SERVER then
 			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 		end
 	)
+end
+
+-- Lua
+local luaPaths =
+{
+	["lua"]   = "LUA",
+	["luacl"] = CLIENT and "LCL" or nil
+}
+for folderName, luaPath in pairs (luaPaths) do
+	local folder = VFS.Root:MountLocal (folderName, VFS.RealFolder ("", luaPath:upper (), ""))
+	folder:SetDisplayName (folderName)
+	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
+	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
+	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
+	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 end
 
 -- Metaconstruct lua

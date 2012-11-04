@@ -1,10 +1,17 @@
 local self = {}
 VFS.RealNode = VFS.MakeConstructor (self, VFS.INode)
 
-function self:ctor (path, name, parentFolder)
+function self:ctor (path, fileSystemPath, name, parentFolder)
 	self.Type = "Real" .. (self:IsFolder () and "Folder" or "File")
+	
+	self.FileSystemPath = fileSystemPath
+	
 	self.Name = name
 	self.ParentFolder = parentFolder
+end
+
+function self:GetFileSystemPath ()
+	return self.FileSystemPath
 end
 
 function self:GetName ()
@@ -12,7 +19,7 @@ function self:GetName ()
 end
 
 function self:GetModificationTime ()
-	return file.Time (self:GetPath (), "GAME") or -1
+	return file.Time (self:GetPath (), self.FileSystemPath) or -1
 end
 
 function self:GetParentFolder ()
@@ -36,10 +43,10 @@ function self:Rename (authId, name, callback)
 	
 	local oldName = self:GetName ()
 	local newPath = self:GetParentFolder ().FolderPath .. name
-	if file.Exists (newPath, "GAME") then callback (VFS.ReturnCode.AlreadyExists) return end
-	file.Write (newPath:sub (6), file.Read (self:GetPath (), "GAME"))
-	if not file.Exists (newPath, "GAME") then callback (VFS.ReturnCode.AccessDenied) return end
-	file.Delete (self:GetPath ():sub (6))
+	if file.Exists (newPath, self.FileSystemPath) then callback (VFS.ReturnCode.AlreadyExists) return end
+	file.Write (newPath:sub (6), file.Read (self:GetPath (), self.FileSystemPath))
+	if not file.Exists (newPath, self.FileSystemPath) then callback (VFS.ReturnCode.AccessDenied) return end
+	file.Delete (self:GetPath ():sub (6), self.FileSystemPath)
 	self.Name = name
 	
 	self:GetParentFolder ():RenameChild (authId, oldName, name)
