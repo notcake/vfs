@@ -40,6 +40,12 @@ include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
 include ("filesystem/mountedfilestream.lua")
 
+-- Metastruct Lua
+include ("filesystem/metaluanode.lua")
+include ("filesystem/metaluafile.lua")
+include ("filesystem/metaluafolder.lua")
+include ("filesystem/metaluafilestream.lua")
+
 if CLIENT then
 	include ("filetypes.lua")
 	include ("filetype.lua")
@@ -250,6 +256,14 @@ if SERVER then
 	)
 end
 
+-- Metaconstruct lua
+local folder = VFS.Root:MountLocal ("metalua", VFS.MetaLuaFolder ("", ""))
+folder:SetDisplayName ("metalua")
+folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
+folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
+folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
+folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
+
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 	function (_, ply, userId, isLocalPlayer)
@@ -270,6 +284,8 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 			folder = endPoint:GetRoot ():CreatePredictedFolder (userId)
 			mountedFolder = folder
 		end
+		mountedFolder.PlayerFolder = true
+		
 		folder:SetDeletable (false)
 		folder:MarkPredicted ()
 		folder:SetDisplayName (ply:Nick ())
