@@ -64,8 +64,11 @@ end
 function GLib.UTF8.CharacterToOffset (str, char)
 	local offset = 1
 	local iterator = GLib.UTF8.Iterator (str)
+	local c
 	for i = 1, char - 1 do
-		offset = offset + string_len (iterator ())
+		c = iterator ()
+		if not c then break end
+		offset = offset + string_len (c)
 	end
 	return offset
 end

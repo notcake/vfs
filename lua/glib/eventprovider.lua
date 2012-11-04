@@ -36,9 +36,9 @@ function self:DispatchEvent (eventName, ...)
 	local a, b, c = nil, nil, nil
 	if self.EventListeners [eventName] then
 		for callbackName, callback in pairs (self.EventListeners [eventName]) do
-			local success, r0, r1, r2 = pcall (callback, ...)
+			local success, r0, r1, r2 = xpcall (callback, GLib.Error, ...)
 			if not success then
-				ErrorNoHalt ("Error in hook " .. eventName .. ": " .. tostring (callbackName) .. ": " .. tostring (r0) .. "\n")
+				ErrorNoHalt ("Error in hook " .. eventName .. ": " .. tostring (callbackName) .. "!\n")
 			else
 				a = a or r0
 				b = b or r1
