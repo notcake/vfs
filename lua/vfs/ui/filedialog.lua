@@ -9,7 +9,7 @@ function self:Init ()
 	self:MakePopup ()
 	
 	self.SuggestedName = ""
-	self.Callback = GAuth.NullCallback
+	self.Callback = VFS.NullCallback
 	
 	self.Folders = vgui.Create ("VFSFolderTreeView", self)
 	self.Folders:AddEventListener ("SelectedFolderChanged",
