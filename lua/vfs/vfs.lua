@@ -257,27 +257,29 @@ if SERVER then
 end
 
 -- Lua
-local luaPaths =
-{
-	["lua"]   = "LUA",
-	["luacl"] = CLIENT and "LCL" or nil
-}
-for folderName, luaPath in pairs (luaPaths) do
-	local folder = VFS.Root:MountLocal (folderName, VFS.RealFolder ("", luaPath:upper (), ""))
-	folder:SetDisplayName (folderName)
+if CLIENT then
+	local luaPaths =
+	{
+		["lua"]   = "LUA",
+		["luacl"] = CLIENT and "LCL" or nil
+	}
+	for folderName, luaPath in pairs (luaPaths) do
+		local folder = VFS.Root:MountLocal (folderName, VFS.RealFolder ("", luaPath:upper (), ""))
+		folder:SetDisplayName (folderName)
+		folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
+		folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
+		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
+		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
+	end
+
+	-- Metaconstruct lua
+	local folder = VFS.Root:MountLocal ("metalua", VFS.MetaLuaFolder ("", ""))
+	folder:SetDisplayName ("metalua")
 	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
 	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
 	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
 	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 end
-
--- Metaconstruct lua
-local folder = VFS.Root:MountLocal ("metalua", VFS.MetaLuaFolder ("", ""))
-folder:SetDisplayName ("metalua")
-folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
-folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
