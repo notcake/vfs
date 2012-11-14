@@ -95,6 +95,7 @@ end
 
 function self:RequestChildren ()
 	if self.WaitingForChildren then return end
+	if not potcfileapi then return end
 	
 	self.ChildrenRequested = true
 	self.WaitingForChildren = true
