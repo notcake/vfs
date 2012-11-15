@@ -4,16 +4,17 @@ VFS.RealFileStream = VFS.MakeConstructor (self, VFS.IFileStream)
 function self:ctor (realFile, openFlags)
 	self.File = realFile
 	self.OpenFlags = openFlags
+	self.ContentsChanged = false
+	
 	if bit.band (self.OpenFlags, VFS.OpenFlags.Overwrite) ~= 0 then
-		self.Length = 0
 		self.Contents = ""
+		self.Length = 0
+		self.ContentsChanged = true
 	else
 		self.Contents = file.Read (self:GetPath (), self.File:GetFileSystemPath ()) or ""
 		self.Length = self.Contents:len ()
 	end
 	self.File:SetSize (self.Length)
-	
-	self.ContentsChanged = false
 end
 
 function self:CanWrite ()
