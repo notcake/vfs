@@ -1,21 +1,12 @@
 if GAuth then return end
-if GAuth then
-	if type (GAuth.DispatchEvent) == "function" then
-		GAuth:DispatchEvent ("Unloaded")
-	else
-		ErrorNoHalt ("GAuth: Event dispatcher is missing; unable to fire Unloaded event!")
-	end
-end
-
 GAuth = GAuth or {}
+
 include ("glib/glib.lua")
-GLib.Import (GAuth)
+
+GLib.Initialize ("GAuth", GAuth)
 GAuth.AddCSLuaFolderRecursive ("gauth")
 
-GAuth.EventProvider (GAuth)
 GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
-
-function GAuth.NullCallback () end
 
 GAuth.AddReloadCommand ("gauth/gauth.lua", "gauth", "GAuth")
 

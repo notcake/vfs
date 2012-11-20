@@ -1,15 +1,13 @@
 if VFS then return end
-
 VFS = VFS or {}
+
 include ("glib/glib.lua")
 include ("gauth/gauth.lua")
-GLib.Import (VFS)
+
+GLib.Initialize ("VFS", VFS)
 VFS.AddCSLuaFolderRecursive ("vfs")
 
-VFS.EventProvider (VFS)
 VFS.PlayerMonitor = VFS.PlayerMonitor ("VFS")
-
-function VFS.NullCallback () end
 
 include ("clipboard.lua")
 include ("path.lua")
