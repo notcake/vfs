@@ -10,37 +10,6 @@ GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
 
 GAuth.AddReloadCommand ("gauth/gauth.lua", "gauth", "GAuth")
 
-if SERVER then
-	function GAuth.GetLocalId ()
-		return "Server"
-	end
-elseif CLIENT then
-	if game.SinglePlayer () then
-		function GAuth.GetLocalId ()
-			return "STEAM_0:0:0"
-		end
-	else
-		function GAuth.GetLocalId ()
-			if not LocalPlayer or not LocalPlayer ().SteamID then
-				return "STEAM_0:0:0"
-			end
-			return LocalPlayer ():SteamID ()
-		end
-	end
-end
-
-function GAuth.GetEveryoneId ()
-	return "Everyone"
-end
-
-function GAuth.GetServerId ()
-	return "Server"
-end
-
-function GAuth.GetSystemId ()
-	return "System"
-end
-
 function GAuth.GetUserDisplayName (userId)
 	return GAuth.PlayerMonitor:GetUserName (userId)
 end
