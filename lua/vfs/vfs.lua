@@ -5,7 +5,9 @@ include ("glib/glib.lua")
 include ("gauth/gauth.lua")
 
 GLib.Initialize ("VFS", VFS)
-VFS.AddCSLuaFolderRecursive ("vfs")
+GLib.AddCSLuaPackFile ("autorun/vfs.lua")
+GLib.AddCSLuaPackFolderRecursive ("vfs")
+GLib.AddCSLuaPackSystem ("VFS")
 
 VFS.PlayerMonitor = VFS.PlayerMonitor ("VFS")
 

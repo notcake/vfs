@@ -4,7 +4,9 @@ GAuth = GAuth or {}
 include ("glib/glib.lua")
 
 GLib.Initialize ("GAuth", GAuth)
-GAuth.AddCSLuaFolderRecursive ("gauth")
+GLib.AddCSLuaPackFile ("autorun/gauth.lua")
+GLib.AddCSLuaPackFolderRecursive ("gauth")
+GLib.AddCSLuaPackSystem ("GAuth")
 
 GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
 
