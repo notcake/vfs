@@ -2,6 +2,7 @@ if VFS then return end
 VFS = VFS or {}
 
 include ("glib/glib.lua")
+include ("gooey/gooey.lua")
 include ("gauth/gauth.lua")
 
 GLib.Initialize ("VFS", VFS)

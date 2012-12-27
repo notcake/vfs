@@ -2,6 +2,7 @@ if GAuth then return end
 GAuth = GAuth or {}
 
 include ("glib/glib.lua")
+include ("gooey/gooey.lua")
 
 GLib.Initialize ("GAuth", GAuth)
 GLib.AddCSLuaPackFile ("autorun/gauth.lua")
