@@ -8,7 +8,7 @@ concommand.Add ("vfs_adv_duplicator_open",
 		local tool = ply:GetActiveWeapon ()
 		if not dupeshare.CurrentToolIsDuplicator (tool) then return end
 		
-		VFS.Root:OpenFile (ply:SteamID (), args [1], VFS.OpenFlags.Read,
+		VFS.Root:OpenFile (GLib.GetPlayerId (ply), args [1], VFS.OpenFlags.Read,
 			function (returnCode, fileStream)
 				if returnCode ~= VFS.ReturnCode.Success then return end
 				if not ply:IsValid () then fileStream:Close () return end

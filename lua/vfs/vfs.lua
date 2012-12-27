@@ -16,9 +16,12 @@ include ("clipboard.lua")
 include ("path.lua")
 include ("openflags.lua")
 include ("returncode.lua")
-include ("permissionsaver.lua")
 include ("seektype.lua")
 include ("updateflags.lua")
+
+include ("filesystemwatcher.lua")
+include ("permissionsaver.lua")
+
 include ("filesystem/nodetype.lua")
 include ("filesystem/inode.lua")
 include ("filesystem/ifile.lua")

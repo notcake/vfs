@@ -32,7 +32,7 @@ if SERVER then
 		uploadData.ent:SetColor (GLib.Colors.Lime)
 		uploadData.StartTime = SysTime ()
 		
-		VFS.Root:OpenFile (player:SteamID (), filePath, VFS.OpenFlags.Read,
+		VFS.Root:OpenFile (GLib.GetPlayerId (player), filePath, VFS.OpenFlags.Read,
 			function (returnCode, fileStream)
 				if returnCode == VFS.ReturnCode.Success then
 					fileStream:Read (fileStream:GetLength (),

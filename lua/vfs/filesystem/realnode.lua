@@ -8,6 +8,8 @@ function self:ctor (path, fileSystemPath, name, parentFolder)
 	
 	self.Name = name
 	self.ParentFolder = parentFolder
+	
+	self.ModificationTime = nil
 end
 
 function self:GetFileSystemPath ()
@@ -19,7 +21,8 @@ function self:GetName ()
 end
 
 function self:GetModificationTime ()
-	return file.Time (self:GetPath (), self.FileSystemPath) or -1
+	self:UpdateModificationTime ()
+	return self.ModificationTime
 end
 
 function self:GetParentFolder ()
@@ -52,4 +55,19 @@ function self:Rename (authId, name, callback)
 	self:GetParentFolder ():RenameChild (authId, oldName, name)
 	self:DispatchEvent ("Renamed", oldName, name)
 	callback (VFS.ReturnCode.Success)
+end
+
+function self:UpdateModificationTime (suppressEvent)
+	suppressEvent = suppressEvent or false
+	
+	local modificationTime = file.Time (self:GetPath (), self.FileSystemPath) or -1
+	self.ModificationTime = self.ModificationTime or modificationTime -- Suppress generation of Updated event on first query
+	if self.ModificationTime ~= modificationTime then
+		self.ModificationTime = modificationTime
+		
+		if not suppressEvent then
+			self:DispatchEvent ("Updated", VFS.UpdateFlags.ModificationTime)
+			if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("NodeUpdated", self, VFS.UpdateFlags.ModificationTime) end
+		end
+	end
 end

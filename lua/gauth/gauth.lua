@@ -274,7 +274,7 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 						if isLocalPlayer then
 							for _, ply in ipairs (player.GetAll ()) do
 								if ply:GetFriendStatus () == "friend" then
-									playerGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
+									playerGroup:AddUser (GAuth.GetSystemId (), GLib.GetPlayerId (ply))
 								end
 							end
 						end
@@ -296,9 +296,9 @@ GAuth.PlayerMonitor:AddEventListener ("PlayerConnected",
 			local friendsGroup = GAuth.ResolveGroup (GAuth.GetLocalId () .. "/Friends")
 			if friendsGroup then
 				if ply:GetFriendStatus () == "friend" then
-					friendsGroup:AddUser (GAuth.GetSystemId (), ply:SteamID ())
+					friendsGroup:AddUser (GAuth.GetSystemId (), GLib.GetPlayerId (ply))
 				else
-					friendsGroup:RemoveUser (GAuth.GetSystemId (), ply:SteamID ())
+					friendsGroup:RemoveUser (GAuth.GetSystemId (), GLib.GetPlayerId (ply))
 				end
 			end
 		end

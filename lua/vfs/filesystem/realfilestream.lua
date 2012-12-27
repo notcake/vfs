@@ -11,8 +11,16 @@ function self:ctor (realFile, openFlags)
 		self.Length = 0
 		self.ContentsChanged = true
 	else
-		self.Contents = file.Read (self:GetPath (), self.File:GetFileSystemPath ()) or ""
-		self.Length = self.Contents:len ()
+		local f = file.Open (self:GetPath (), "rb", self.File:GetFileSystemPath ())
+		if f then
+			self.Contents = f:Read (f:Size ())
+			self.Length = #self.Contents
+			f:Close ()
+		else
+			self.Contents = ""
+			self.Length   = 0
+			self.ContentsChanged = true
+		end
 	end
 	self.File:SetSize (self.Length)
 end
@@ -28,8 +36,17 @@ end
 function self:Flush ()
 	if not self.ContentsChanged then return end
 	if self.File:GetPath ():lower ():sub (1, 5) == "data/" then
-		file.Write (self.File:GetPath ():sub (6), self.Contents)
+		local f = file.Open (self.File:GetPath ():sub (6), "wb", "DATA")
+		if not f then return end
+		
+		f:Write (self.Contents)
+		f:Flush ()
+		f:Close ()
+		
 		self.ContentsChanged = false
+		
+		self.File:UpdateModificationTime (true)
+		self.File:UpdateSize (true)
 		
 		self.File:DispatchEvent ("Updated", VFS.UpdateFlags.Size + VFS.UpdateFlags.ModificationTime)
 		if self.File:GetParentFolder () then

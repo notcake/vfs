@@ -20,7 +20,7 @@ function self:ctor (nameOverride, mountedNode, parentFolder)
 	self.MountedNode:AddEventListener ("Updated", tostring (self),
 		function (_, updateFlags)
 			self:DispatchEvent ("Updated", updateFlags)
-			if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("Updated", self, updateFlags) end
+			if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("NodeUpdated", self, updateFlags) end
 		end
 	)
 	

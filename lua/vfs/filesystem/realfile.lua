@@ -6,7 +6,8 @@ function self:ctor (path, fileSystemPath, name, parentFolder)
 end
 
 function self:GetSize ()
-	return file.Size (self:GetPath (), self.FileSystemPath) or self.Size or -1
+	self:UpdateSize ()
+	return self.Size
 end
 
 function self:Open (authId, openFlags, callback)
@@ -15,9 +16,24 @@ function self:Open (authId, openFlags, callback)
 end
 
 function self:SetSize (size)
-	if self:GetSize () == size then return end
+	if self.Size == size then return end
 	self.Size = size
 	
 	self:DispatchEvent ("Updated", VFS.UpdateFlags.Size)
 	if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("NodeUpdated", self, VFS.UpdateFlags.Size) end
+end
+
+function self:UpdateSize (suppressEvent)
+	suppressEvent = suppressEvent or false
+	
+	local size = file.Size (self:GetPath (), self.FileSystemPath) or -1
+	self.Size = self.Size or size -- Suppress generation of Updated event on first query
+	if self.Size ~= size then
+		self.Size = size
+		
+		if not suppressEvent then
+			self:DispatchEvent ("Updated", VFS.UpdateFlags.Size)
+			if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("NodeUpdated", self, VFS.UpdateFlags.Size) end
+		end
+	end
 end
