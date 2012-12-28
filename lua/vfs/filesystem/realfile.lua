@@ -12,6 +12,14 @@ end
 
 function self:Open (authId, openFlags, callback)
 	openFlags = VFS.SanitizeOpenFlags (openFlags)
+	
+	if bit.band (openFlags, VFS.OpenFlags.Write) ~= 0 and
+	   self:GetPath ():lower ():sub (1, 5) ~= "data/" then
+		-- Write access requested, but we cannot provide it
+		callback (VFS.ReturnCode.AccessDenied)
+		return
+	end
+	
 	callback (VFS.ReturnCode.Success, VFS.RealFileStream (self, openFlags))
 end
 
