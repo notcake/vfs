@@ -35,7 +35,8 @@ end
 
 function self:Flush ()
 	if not self.ContentsChanged then return end
-	if self.File:GetPath ():lower ():sub (1, 5) == "data/" then
+	if self.File:GetPath ():lower ():sub (1, 5) == "data/" and
+	   self.File:GetPath ():lower ():sub (-4) == ".txt" then
 		local f = file.Open (self.File:GetPath ():sub (6), "wb", "DATA")
 		if not f then return end
 		

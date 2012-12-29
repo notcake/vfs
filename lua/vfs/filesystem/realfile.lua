@@ -14,7 +14,8 @@ function self:Open (authId, openFlags, callback)
 	openFlags = VFS.SanitizeOpenFlags (openFlags)
 	
 	if bit.band (openFlags, VFS.OpenFlags.Write) ~= 0 and
-	   self:GetPath ():lower ():sub (1, 5) ~= "data/" then
+	   (self:GetPath ():lower ():sub (1, 5) ~= "data/" or
+	    self:GetPath ():lower ():sub (-4) ~= ".txt") then
 		-- Write access requested, but we cannot provide it
 		callback (VFS.ReturnCode.AccessDenied)
 		return
