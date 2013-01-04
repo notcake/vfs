@@ -131,6 +131,7 @@ function self:GetFolder ()
 end
 
 function self:GetFolderPath ()
+	if not self:GetFolder () then return "" end
 	return self:GetFolder ():GetPath ()
 end
 
