@@ -77,11 +77,11 @@ function self:EnumerateChildren (authId, callback)
 	-- 1. Produce item map
 	local items = {}
 	local new = {}
-	for _, name in ipairs (folders) do
+	for _, name in ipairs (folders or {}) do
 		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.Folder end
 		items [name] = VFS.NodeType.Folder
 	end
-	for _, name in ipairs (files) do
+	for _, name in ipairs (files or {}) do
 		if not self.Children [name] and not self.LowercaseChildren [name:lower ()] then new [name] = VFS.NodeType.File end
 		items [name] = VFS.NodeType.File
 	end
