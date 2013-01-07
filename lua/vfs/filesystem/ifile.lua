@@ -4,6 +4,10 @@ VFS.IFile = VFS.MakeConstructor (self, VFS.INode)
 function self:ctor ()
 end
 
+function self:GetExtension ()
+	return string.match (self:GetName (), "%.([^%.]*)$")
+end
+
 function self:GetName ()
 	VFS.Error ("IFile:GetName : Not implemented")
 	return "[File]"

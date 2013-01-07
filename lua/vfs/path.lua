@@ -2,6 +2,8 @@ local self = {}
 VFS.Path = VFS.MakeConstructor (self)
 
 function self:ctor (path)
+	path = path or ""
+	
 	if type (path) == "table" then
 		self.Path = path.Path
 		self.Segments = table.Copy (path.Segments)
