@@ -264,6 +264,7 @@ end
 if CLIENT then
 	local luaPaths =
 	{
+		["game"]  = "GAME",
 		["lua"]   = "LUA",
 		["luacl"] = CLIENT and "LCL" or nil
 	}
@@ -331,7 +332,8 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 					"data/luapad",
 					"data/GPUChip",
 					"data/SPUChip",
-					"data/Starfall"
+					"data/Starfall",
+					"screenshots"
 				}
 				for _, realPath in ipairs (mountPaths) do
 					VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
