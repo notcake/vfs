@@ -170,6 +170,14 @@ VFS.Root:ClearPredictedFlag ()
 
 VFS.PermissionSaver:Load ()
 VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
+	
+local sourceFolders =
+{
+	"GLib",
+	"Gooey",
+	"VFS",
+	"GCompute"
+}
 
 if SERVER then
 	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Public",
@@ -229,35 +237,17 @@ if SERVER then
 		end
 	)
 	
-	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/vfs/lua",
-		function (returnCode, folder)
-			if not folder then return end
-			local folder = VFS.Root:Mount ("Source", folder, "Source")
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-		end
-	)
-	
-	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
-		function (returnCode, folder)
-			if not folder then return end
-			local folder = VFS.Root:Mount ("GCompute Source", folder, "GCompute Source")
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-		end
-	)
-	
-	VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gooey/lua",
-		function (returnCode, folder)
-			if not folder then return end
-			local folder = VFS.Root:Mount ("UI Source", folder, "UI Source")
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-		end
-	)
+	for _, sourceFolder in ipairs (sourceFolders) do
+		VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/" .. string.lower (sourceFolder) .. "/lua",
+			function (returnCode, folder)
+				if not folder then return end
+				local folder = VFS.Root:Mount (sourceFolder .. " Source", folder, sourceFolder .. " Source")
+				folder:SetDeletable (false)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
+			end
+		)
+	end
 end
 
 -- Lua
@@ -344,27 +334,17 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 						end
 					)
 				end
-				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/vfs/lua",
-					function (returnCode, node)
-						if not node then return end
-						folder:Mount ("Source", node, "Source")
-							:SetDeletable (false)
-					end
-				)
-				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gcompute/lua",
-					function (returnCode, node)
-						if not node then return end
-						folder:Mount ("GCompute Source", node, "GCompute Source")
-							:SetDeletable (false)
-					end
-				)
-				VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/gooey/lua",
-					function (returnCode, node)
-						if not node then return end
-						folder:Mount ("UI Source", node, "UI Source")
-							:SetDeletable (false)
-					end
-				)
+				
+				for _, sourceFolder in ipairs (sourceFolders) do
+					VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/" .. string.lower (sourceFolder) .. "/lua",
+						function (returnCode, node)
+							if not node then return end
+							folder:Mount (sourceFolder .. " Source", node, sourceFolder .. " Source")
+								:SetDeletable (false)
+						end
+					)
+				end
+				
 				folder:CreateFolder (GAuth.GetSystemId (), "tmp",
 					function (returnCode, node)
 						if node then node:SetDeletable (false) end
