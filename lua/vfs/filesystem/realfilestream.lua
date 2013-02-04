@@ -76,7 +76,7 @@ function self:Read (size, callback)
 	self.Contents = self.Contents or file.Read (self.File:GetPath (), self.File:GetFileSystemPath ()) or ""
 	local startPos = self:GetPos ()
 	self:Seek (startPos + size)
-	callback (VFS.ReturnCode.Success, self.Contents:sub (startPos + 1, startPos + size))
+	callback (VFS.ReturnCode.Success, string.sub (self.Contents, startPos + 1, startPos + size))
 end
 
 function self:Write (size, data, callback)

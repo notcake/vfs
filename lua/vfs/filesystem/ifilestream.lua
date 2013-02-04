@@ -23,12 +23,12 @@ end
 function self:GetFile ()
 end
 
-function self:GetLength ()
-	return self:GetFile ():GetSize ()
-end
-
 function self:GetDisplayPath ()
 	return self:GetFile ():GetDisplayPath ()
+end
+
+function self:GetLength ()
+	return self:GetFile ():GetSize ()
 end
 
 function self:GetPath ()

@@ -22,23 +22,37 @@ include ("updateflags.lua")
 include ("filesystemwatcher.lua")
 include ("permissionsaver.lua")
 
+-- Resources
+include ("iresource.lua")
+include ("httpresource.lua")
+include ("fileresource.lua")
+
 include ("filesystem/nodetype.lua")
 include ("filesystem/inode.lua")
 include ("filesystem/ifile.lua")
 include ("filesystem/ifolder.lua")
 include ("filesystem/ifilestream.lua")
+include ("filesystem/memoryfilestream.lua")
+
+-- Real
 include ("filesystem/realnode.lua")
 include ("filesystem/realfile.lua")
 include ("filesystem/realfolder.lua")
 include ("filesystem/realfilestream.lua")
+
+-- Networked
 include ("filesystem/netnode.lua")
 include ("filesystem/netfile.lua")
 include ("filesystem/netfolder.lua")
 include ("filesystem/netfilestream.lua")
+
+-- Virtual
 include ("filesystem/vnode.lua")
 include ("filesystem/vfile.lua")
 include ("filesystem/vfolder.lua")
 include ("filesystem/vfilestream.lua")
+
+-- Mounted
 include ("filesystem/mountednode.lua")
 include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
@@ -61,6 +75,7 @@ if CLIENT then
 	include ("filetypes/starfall.lua")
 end
 
+-- Networking
 include ("protocol/protocol.lua")
 include ("protocol/session.lua")
 include ("protocol/nodecreationnotification.lua")

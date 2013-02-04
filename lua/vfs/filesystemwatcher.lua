@@ -8,8 +8,9 @@ VFS.FileSystemWatcher = VFS.MakeConstructor (self)
 ]]
 
 function self:ctor ()
-	self.Files   = {}
-	self.Folders = {}
+	self.Files     = {}
+	self.Folders   = {}
+	self.Resources = {}
 	
 	VFS.EventProvider (self)
 	
@@ -48,6 +49,16 @@ function self:AddFolder (folder)
 	self:HookFolder (folder)
 end
 
+function self:AddResource (resource)
+	if not resource then return end
+	if self.Resources [resource] then return end
+	
+	self.Resources [resource] = true
+	self:HookResource (resource)
+	
+	self:AddFile (resource:GetFile ())
+end
+
 function self:Clear ()
 	for file, _ in pairs (self.Files) do
 		self:UnhookFile (file)
@@ -55,8 +66,12 @@ function self:Clear ()
 	for folder, _ in pairs (self.Folders) do
 		self:UnhookFolder (folder)
 	end
-	self.Files   = {}
-	self.Folders = {}
+	for resource, _ in pairs (self.Resources) do
+		self:UnhookResource (resource)
+	end
+	self.Files     = {}
+	self.Folders   = {}
+	self.Resources = {}
 end
 
 function self:RemoveFile (file)
@@ -71,6 +86,15 @@ function self:RemoveFolder (folder)
 	
 	self.Folders [folder] = nil
 	self:UnhookFolder (folder)
+end
+
+function self:RemoveResource (resource)
+	if not self.Resources [resource] then return end
+	
+	self.Resources [resource] = nil
+	self:UnhookResource (resource)
+	
+	self:RemoveFile (resource:GetFile ())
 end
 
 -- Internal, do not call
@@ -113,4 +137,20 @@ function self:UnhookFolder (folder)
 	if not folder then return end
 	
 	folder:RemoveEventListener ("NodeUpdated", "VFS.FileSystemWatcher." .. tostring (self))
+end
+
+function self:HookResource (resource)
+	if not resource then return end
+	
+	resource:AddEventListener ("FileResolved", "VFS.FileSystemWatcher." .. tostring (self),
+		function (_, file)
+			self:AddFile (file)
+		end
+	)
+end
+
+function self:UnhookResource (resource)
+	if not resource then return end
+	
+	resource:RemoveEventListener ("FileResolved", "VFS.FileSystemWatcher." .. tostring (self))
 end

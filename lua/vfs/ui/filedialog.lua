@@ -58,8 +58,17 @@ function self:Init ()
 	self.Done:SetText ("Save")
 	self.Done:AddEventListener ("Click",
 		function (_)
+			-- Check for http uri
+			local uri = self:GetRawFileName ()
+			if string.find (uri, "^https?://") then
+				self.Callback (uri, VFS.HTTPResource (uri))
+				self.Callback = VFS.NullCallback -- Don't call it again
+				self:Remove ()
+				return
+			end
+			
 			local path = VFS.Path (self:GetFolder ():GetPath () .. "/" .. self:GetFileName ()):GetPath ()
-			VFS.Root:GetChild (GAuth.GetLocalId (), path,
+			VFS.Root:GetChild (GLib.GetLocalId (), path,
 				function (returnCode, node)
 					if returnCode == VFS.ReturnCode.Success then
 						if node:IsFolder () then
@@ -68,14 +77,14 @@ function self:Init ()
 							self:SelectAll ()
 							self:ClearError ()
 						else
-							self.Callback (path, node)
-							self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
+							self.Callback (path, VFS.FileResource (node))
+							self.Callback = VFS.NullCallback -- Don't call it again in PANEL:Remove ()
 							self:Remove ()
 						end
 					elseif returnCode == VFS.ReturnCode.NotFound then
 						if not self.FileMustExist then
 							self.Callback (path, nil)
-							self.Callback = GAuth.NullCallback -- Don't call it again in PANEL:Remove ()
+							self.Callback = VFS.NullCallback -- Don't call it again in PANEL:Remove ()
 							self:Remove ()
 						end
 					elseif returnCode == VFS.ReturnCode.AccessDenied then
@@ -133,6 +142,10 @@ end
 function self:GetFolderPath ()
 	if not self:GetFolder () then return "" end
 	return self:GetFolder ():GetPath ()
+end
+
+function self:GetRawFileName ()
+	return self.FileName:GetText ()
 end
 
 function self:GetSuggestedName ()
