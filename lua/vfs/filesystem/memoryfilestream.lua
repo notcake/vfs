@@ -8,6 +8,9 @@ function self:ctor (data)
 	self.Data = data
 end
 
+function self:Flush ()
+end
+
 function self:GetDisplayPath ()
 	return self.DisplayPath or self:GetPath ()
 end
