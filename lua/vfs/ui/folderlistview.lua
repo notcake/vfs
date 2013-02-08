@@ -234,12 +234,17 @@ function self:MergeRefresh ()
 	if not self.Folder then return end
 
 	local folder = self.Folder
+	local lastLayout = SysTime ()
 	self.Folder:EnumerateChildren (GAuth.GetLocalId (),
 		function (returnCode, node)
 			if self.Folder ~= folder then return end
 			
 			if returnCode == VFS.ReturnCode.Success then
 				self:AddNode (node)
+				if self:GetItemCount () < 10 or SysTime () - lastLayout > 0.2 then
+					self:Sort ()
+					lastLayout = SysTime ()
+				end
 			elseif returnCode == VFS.ReturnCode.EndOfBurst then
 				self:Sort ()
 			elseif returnCode == VFS.ReturnCode.AccessDenied then

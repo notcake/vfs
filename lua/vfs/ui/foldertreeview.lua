@@ -250,6 +250,7 @@ function self:Populate (filesystemNode, treeViewNode)
 				-- excessive framerate drops.
 				if treeViewNode:GetChildCount () < 10 or SysTime () - lastLayout > 0.2 then
 					treeViewNode:SuppressLayout (false)
+					treeViewNode:SortChildren ()
 					lastLayout = SysTime ()
 				else
 					treeViewNode:SuppressLayout (true)
