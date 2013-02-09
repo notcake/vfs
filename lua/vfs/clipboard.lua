@@ -113,7 +113,11 @@ function self:PasteFolder (destContainingFolder, sourceFolder, i, callback)
 			local pasteNextChild
 			local pasteNextChildDelay
 			function pasteNextChildDelay (returnCode)
-				timer.Simple (0, function () pasteNextChild (returnCode) end)
+				GLib.CallDelayed (
+					function ()
+						pasteNextChild (returnCode)
+					end
+				)
 			end
 			function pasteNextChild (returnCode)
 				local child = children [i]

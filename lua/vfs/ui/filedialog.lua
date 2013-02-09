@@ -188,7 +188,7 @@ function self:PerformLayout ()
 end
 
 function self:SelectAll ()
-	timer.Simple (0,
+	GLib.CallDelayed (
 		function ()
 			if not self or not self:IsValid () then return end
 			if not self.FileName or not self.FileName:IsValid () then return end

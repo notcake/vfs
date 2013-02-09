@@ -102,14 +102,18 @@ end
 
 local function InstallFileSystemOverride ()
 	if not usermessage.GetTable () ["wire_expression2_request_file"] then
-		timer.Simple (0, InstallFileSystemOverride)
+		GLib.CallDelayed (InstallFileSystemOverride)
 		return
 	end
 	usermessage.GetTable () ["wire_expression2_request_file"] =
 	{
 		Function = function (umsg)
 			local filePath = umsg:ReadString ()
-			timer.Simple (0, function () wire_expression2_request_file (filePath) end)
+			GLib.CallDelayed (
+				function ()
+					wire_expression2_request_file (filePath)
+				end
+			)
 		end,
 		PreArgs = {}
 	}

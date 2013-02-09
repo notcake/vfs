@@ -39,7 +39,7 @@ function self:Open (node)
 						if fileStream then fileStream:Close () end
 						fileType:Open (node)
 					else
-						timer.Simple (0, tryNextMatch)
+						GLib.CallDelayed (tryNextMatch)
 					end
 				end
 			)

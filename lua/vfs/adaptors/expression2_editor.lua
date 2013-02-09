@@ -39,7 +39,7 @@ local function InstallFileSystemBrowserOverride ()
 		end
 		GetPreferredTitles = VFS.FindUpValue (editor._LoadFile, "getPreferredTitles") or GetPreferredTitles
 	else
-		timer.Simple (0, InstallFileSystemBrowserOverride)
+		GLib.CallDelayed (InstallFileSystemBrowserOverride)
 	end
 end
 
@@ -256,9 +256,11 @@ function Expression2EditorFrame:OpenOldTabs (callback)
 				
 				-- If this is the first loop, close the initial tab.
 				if is_first then
-					timer.Simple (0, function ()
-						self:CloseTab (1)
-					end)
+					GLib.CallDelayed (
+						function ()
+							self:CloseTab (1)
+						end
+					)
 					is_first = false
 				end
 			else
@@ -272,9 +274,11 @@ function Expression2EditorFrame:OpenOldTabs (callback)
 								end
 							)
 							if is_first then
-								timer.Simple (0, function ()
-									self:CloseTab (1)
-								end)
+								GLib.CallDelayed (
+									function ()
+										self:CloseTab (1)
+									end
+								)
 								is_first = false
 							end
 						end
@@ -327,7 +331,11 @@ function Expression2EditorFrame:SaveFile (path, close, saveAs)
 						if returnCode == VFS.ReturnCode.Success then
 							self.C ["Val"].panel:SetBGColor (0, 128, 0, 180)
 							self.C ["Val"].panel:SetFGColor (255, 255, 255, 128)
-							timer.Simple (0, panel.SetText, panel, "   Saved as " .. displayPath)
+							GLib.CallDelayed (
+								function ()
+									panel:SetText ("   Saved as " .. displayPath)
+								end
+							)
 							surface.PlaySound ("ambient/water/drip3.wav")
 							if not self.chip then self:ChosenFile (path, displayPath) end
 							if close then
@@ -337,7 +345,11 @@ function Expression2EditorFrame:SaveFile (path, close, saveAs)
 						else
 							self.C ["Val"].panel:SetBGColor (128, 0, 0, 180)
 							self.C ["Val"].panel:SetFGColor (255, 255, 255, 128)
-							timer.Simple (0, panel.SetText, panel, "   Failed to save to " .. path .. " (" .. VFS.ReturnCode [returnCode] .. ")")
+							GLib.CallDelayed (
+								function ()
+									panel:SetText ("   Failed to save to " .. path .. " (" .. VFS.ReturnCode [returnCode] .. ")")
+								end
+							)
 							surface.PlaySound ("ambient/water/drip3.wav")
 						end
 					end
@@ -345,12 +357,20 @@ function Expression2EditorFrame:SaveFile (path, close, saveAs)
 			elseif returnCode == VFS.ReturnCode.AccessDenied then
 				self.C ["Val"].panel:SetBGColor (128, 0, 0, 180)
 				self.C ["Val"].panel:SetFGColor (255, 255, 255, 128)
-				timer.Simple (0, panel.SetText, panel, "   Failed to save to " .. path .. ": Access denied!")
+				GLib.CallDelayed (
+					function ()
+						panel:SetText ("   Failed to save to " .. path .. ": Access denied!")
+					end
+				)
 				surface.PlaySound ("ambient/water/drip3.wav")
 			else
 				self.C ["Val"].panel:SetBGColor (128, 0, 0, 180)
 				self.C ["Val"].panel:SetFGColor (255, 255, 255, 128)
-				timer.Simple (0, panel.SetText, panel, "   Failed to save to " .. path .. " (" .. VFS.ReturnCode [returnCode] .. ")")
+				GLib.CallDelayed (
+					function ()
+						panel:SetText ("   Failed to save to " .. path .. " (" .. VFS.ReturnCode [returnCode] .. ")")
+					end
+				)
 				surface.PlaySound ("ambient/water/drip3.wav")
 			end
 		end

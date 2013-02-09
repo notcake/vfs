@@ -157,7 +157,11 @@ function self:LoadNextGroup (inBuffer, callback)
 end
 
 function self:LoadNextGroupDelayed (inBuffer, callback)
-	timer.Simple (0, function () self:LoadNextGroup (inBuffer, callback) end)
+	GLib.CallDelayed (
+		function ()
+			self:LoadNextGroup (inBuffer, callback)
+		end
+	)
 end
 
 function self:Save ()
