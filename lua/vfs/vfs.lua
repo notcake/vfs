@@ -26,6 +26,8 @@ include ("permissionsaver.lua")
 include ("iresource.lua")
 include ("httpresource.lua")
 include ("fileresource.lua")
+include ("iresourcelocator.lua")
+include ("defaultresourcelocator.lua")
 
 include ("filesystem/nodetype.lua")
 include ("filesystem/inode.lua")

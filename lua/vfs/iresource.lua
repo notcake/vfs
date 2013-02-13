@@ -49,6 +49,10 @@ function self:GetName ()
 	return ""
 end
 
+function self:GetNameWithoutExtension ()
+	return string.gsub (self:GetName (), "%.[^%.]*$", "")
+end
+
 function self:GetUri ()
 	return ""
 end
