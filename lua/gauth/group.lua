@@ -73,7 +73,7 @@ function self:IsGroup ()
 	return true
 end
 
-function self:RemoveUser (authId, userId)
+function self:RemoveUser (authId, userId, callback)
 	callback = callback or GAuth.NullCallback
 
 	if not self.Users [userId] then callback (GAuth.ReturnCode.Success) return end
