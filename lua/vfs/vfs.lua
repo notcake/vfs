@@ -180,115 +180,9 @@ VFS.Root:ClearPredictedFlag ()
 
 VFS.PermissionSaver:Load ()
 VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
-	
-local sourceFolders =
-{
-	"GLib",
-	"Gooey",
-	"VFS",
-	"GCompute"
-}
 
-if SERVER then
-	-- Public
-	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Public",
-		function (returnCode, folder)
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-			
-			VFS.RealRoot:GetChild (GAuth.GetSystemId (), "data/adv_duplicator/=Public Folder=",
-				function (returnCode, node)
-					folder:Mount ("adv_duplicator", node, "adv_duplicator")
-				end
-			)
-		end
-	)
-	
-	-- Administrators
-	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Admins",
-		function (returnCode, folder)
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "View Folder", GAuth.Access.Allow)
-			
-			local mountPaths =
-			{
-				"crashlogs",
-				"logs",
-				"data/asslog",
-				"data/cadmin/logs",
-				"data/DarkRP_logs",
-				"data/ev_logs",
-				"data/FAdmin_logs",
-				"data/ulx_logs"
-			}
-			local mountNames = {}
-			mountNames [3] = "cadmin_logs"
-			for k, realPath in ipairs (mountPaths) do
-				VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
-					function (returnCode, node)
-						if returnCode ~= VFS.ReturnCode.Success then return end
-						
-						local name = mountNames [k] or ""
-						if name == "" then name = node:GetName () end
-						folder:Mount (name, node, name)
-					end
-				)
-			end
-		end
-	)
-	
-	-- Super Administrators
-	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Super Admins",
-		function (returnCode, folder)
-			folder:SetDeletable (false)
-			folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "Read",        GAuth.Access.Allow)
-			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "View Folder", GAuth.Access.Allow)
-		end
-	)
-	
-	-- Serverside Lua
-	local folder = VFS.Root:Mount ("luasv", VFS.RealFolder ("", "LUA", ""), "luasv")
-	folder:SetDeletable (false)
-	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
-	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "Read",        GAuth.Access.Allow)
-	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "View Folder", GAuth.Access.Allow)
-	
-	for _, sourceFolder in ipairs (sourceFolders) do
-		VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/" .. string.lower (sourceFolder) .. "/lua",
-			function (returnCode, folder)
-				if not folder then return end
-				local folder = VFS.Root:Mount (sourceFolder .. " Source", folder, sourceFolder .. " Source")
-				folder:SetDeletable (false)
-				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-			end
-		)
-	end
-end
-
--- Lua
-if CLIENT then
-	local luaPaths =
-	{
-		["game"]  = "GAME",
-		["lua"]   = "LUA",
-		["luacl"] = CLIENT and "LCL" or nil
-	}
-	for folderName, luaPath in pairs (luaPaths) do
-		local folder = VFS.Root:MountLocal (folderName, VFS.RealFolder ("", luaPath:upper (), ""))
-		folder:SetDisplayName (folderName)
-		folder:SetDeletable (false)
-		folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
-		folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
-	end
-end
+VFS.IncludeDirectory ("vfs/folders")
+VFS.IncludeDirectory ("vfs/folders/" .. SERVER and "server" or "client")
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
@@ -344,16 +238,6 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 						function (returnCode, node)
 							if not node then return end
 							folder:Mount (node:GetName (), node)
-								:SetDeletable (false)
-						end
-					)
-				end
-				
-				for _, sourceFolder in ipairs (sourceFolders) do
-					VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/" .. string.lower (sourceFolder) .. "/lua",
-						function (returnCode, node)
-							if not node then return end
-							folder:Mount (sourceFolder .. " Source", node, sourceFolder .. " Source")
 								:SetDeletable (false)
 						end
 					)
