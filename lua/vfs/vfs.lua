@@ -196,6 +196,7 @@ local sourceFolders =
 }
 
 if SERVER then
+	-- Public
 	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Public",
 		function (returnCode, folder)
 			folder:SetDeletable (false)
@@ -209,7 +210,8 @@ if SERVER then
 			)
 		end
 	)
-
+	
+	-- Administrators
 	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Admins",
 		function (returnCode, folder)
 			folder:SetDeletable (false)
@@ -243,7 +245,8 @@ if SERVER then
 			end
 		end
 	)
-
+	
+	-- Super Administrators
 	VFS.Root:CreateFolder (GAuth.GetSystemId (), "Super Admins",
 		function (returnCode, folder)
 			folder:SetDeletable (false)
@@ -252,6 +255,14 @@ if SERVER then
 			folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "View Folder", GAuth.Access.Allow)
 		end
 	)
+	
+	-- Serverside Lua
+	local folder = VFS.Root:Mount ("luasv", VFS.RealFolder ("", "LUA", ""), "luasv")
+	folder:SetDeletable (false)
+	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
+	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
+	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "Read",        GAuth.Access.Allow)
+	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Super Administrators", "View Folder", GAuth.Access.Allow)
 	
 	for _, sourceFolder in ipairs (sourceFolders) do
 		VFS.RealRoot:GetChild (GAuth.GetSystemId (), "addons/" .. string.lower (sourceFolder) .. "/lua",
@@ -277,6 +288,7 @@ if CLIENT then
 	for folderName, luaPath in pairs (luaPaths) do
 		local folder = VFS.Root:MountLocal (folderName, VFS.RealFolder ("", luaPath:upper (), ""))
 		folder:SetDisplayName (folderName)
+		folder:SetDeletable (false)
 		folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
 		folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
 		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
@@ -286,6 +298,7 @@ if CLIENT then
 	-- Metaconstruct lua
 	local folder = VFS.Root:MountLocal ("metalua", VFS.MetaLuaFolder ("", ""))
 	folder:SetDisplayName ("metalua")
+	folder:SetDeletable (false)
 	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
 	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
 	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
