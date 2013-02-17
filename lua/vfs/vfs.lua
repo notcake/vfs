@@ -60,12 +60,6 @@ include ("filesystem/mountedfile.lua")
 include ("filesystem/mountedfolder.lua")
 include ("filesystem/mountedfilestream.lua")
 
--- Metastruct Lua
-include ("filesystem/metaluanode.lua")
-include ("filesystem/metaluafile.lua")
-include ("filesystem/metaluafolder.lua")
-include ("filesystem/metaluafilestream.lua")
-
 if CLIENT then
 	include ("filetypes.lua")
 	include ("filetype.lua")
@@ -294,15 +288,6 @@ if CLIENT then
 		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
 		folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 	end
-
-	-- Metaconstruct lua
-	local folder = VFS.Root:MountLocal ("metalua", VFS.MetaLuaFolder ("", ""))
-	folder:SetDisplayName ("metalua")
-	folder:SetDeletable (false)
-	folder:SetOwner (GAuth.GetSystemId (), GAuth.GetServerId ())
-	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
-	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
-	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
 end
 
 -- Events
