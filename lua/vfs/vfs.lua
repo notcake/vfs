@@ -182,7 +182,7 @@ VFS.PermissionSaver:Load ()
 VFS.PermissionSaver:HookNodeRecursive (VFS.Root)
 
 VFS.IncludeDirectory ("vfs/folders")
-VFS.IncludeDirectory ("vfs/folders/" .. SERVER and "server" or "client")
+VFS.IncludeDirectory ("vfs/folders/" .. (SERVER and "server" or "client"))
 
 -- Events
 VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
