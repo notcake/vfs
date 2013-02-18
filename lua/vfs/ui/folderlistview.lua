@@ -26,6 +26,12 @@ function self:Init ()
 	self:AddColumn ("Last Modified")
 		:SetMaxWidth (192)
 	
+	self:SetColumnComparator ("Name",
+		function (a, b)
+			return self:DefaultComparator (a, b)
+		end
+	)
+	
 	self:SetColumnComparator ("Size",
 		function (a, b)
 			-- Put folders at the top
@@ -195,7 +201,9 @@ function self.DefaultComparator (a, b)
 	if a == b then return false end
 	if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
 	if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
-	return a:GetText ():lower () < b:GetText ():lower ()
+	if     a.Node.PlayerFolder and not b.Node.PlayerFolder then return false end
+	if not a.Node.PlayerFolder and     b.Node.PlayerFolder then return true  end
+	return string.lower (a:GetText ()) < string.lower (b:GetText ())
 end
 
 function self:GetFolder ()

@@ -203,13 +203,13 @@ function self:UnhookNodeRecursive (treeViewNode)
 end
 
 function self.DefaultComparator (a, b)
-	-- Put group trees at the top
+	-- Put folders at the top
 	if a == b then return false end
 	if a.Node:IsFolder () and not b.Node:IsFolder () then return true  end
 	if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
 	if     a.Node.PlayerFolder and not b.Node.PlayerFolder then return false end
 	if not a.Node.PlayerFolder and     b.Node.PlayerFolder then return true  end
-	return a:GetText ():lower () < b:GetText ():lower ()
+	return string.lower (a:GetText ()) < string.lower (b:GetText ())
 end
 
 function self:GetSelectedFile ()
