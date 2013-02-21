@@ -19,6 +19,9 @@ function self:Init ()
 	self.LastAccess = false
 	self.LastReadAccess = false
 	
+	self.ShowParentFolder = false
+	self.ParentFolderItem = nil
+	
 	self:AddColumn ("Name")
 	self:AddColumn ("Size")
 		:SetAlignment (6)
@@ -199,7 +202,9 @@ end
 function self.DefaultComparator (a, b)
 	-- Put folders at the top
 	if a == b then return false end
-	if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
+	if a.ParentFolder then return true  end
+	if b.ParentFolder then return false end
+	if a.Node:IsFolder () and not b.Node:IsFolder () then return true  end
 	if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
 	if     a.Node.PlayerFolder and not b.Node.PlayerFolder then return false end
 	if not a.Node.PlayerFolder and     b.Node.PlayerFolder then return true  end
@@ -302,6 +307,9 @@ function self:SetFolder (folder)
 	if not folder then return end
 	if not folder:IsFolder () then return end
 	self.Folder = folder
+	if self.ShowParentFolder and self.Folder:GetParentFolder () then
+		self:AddNode (self.Folder:GetParentFolder (), true)
+	end
 	self:MergeRefresh ()
 	
 	self.Folder:AddEventListener ("NodePermissionsChanged", tostring (self:GetTable ()),
@@ -331,11 +339,11 @@ function self:SetFolder (folder)
 			end
 			if bit.band (updateFlags, VFS.UpdateFlags.Size) ~= 0 then
 				listViewItem.Size = updatedNode:IsFile () and updatedNode:GetSize () or -1
-				listViewItem:SetColumnText (2, listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
+				listViewItem:SetColumnText ("Size", listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
 			end
 			if bit.band (updateFlags, VFS.UpdateFlags.ModificationTime) ~= 0 then
 				listViewItem.LastModified = updatedNode:GetModificationTime ()
-				listViewItem:SetColumnText (3, listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
+				listViewItem:SetColumnText ("Last Modified", listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
 			end
 		end
 	)
@@ -364,12 +372,30 @@ function self:SetPath (path)
 	)
 end
 
+function self:SetShowParentFolder (showParentFolder)
+	if self.ShowParentFolder == showParentFolder then return end
+	
+	self.ShowParentFolder = showParentFolder
+	
+	local folder = self:GetFolder () and self:GetFolder ():GetParentFolder ()
+	if not folder then return end
+	
+	if self.ShowParentFolder then
+		self:AddNode (folder, true)
+		self:Sort ()
+	else
+		self.ParentFolderItem:Remove ()
+		self.ParentFolderItem = nil
+	end
+end
+
 -- Internal, do not call
-function self:AddNode (node)
-	if self.ChildNodes [node:GetName ()] then return end
+function self:AddNode (node, parentFolder)
+	if not parentFolder and self.ChildNodes [node:GetName ()] then return end
 	
 	local listViewItem = self:AddLine (node:GetName ())
-	listViewItem:SetText (node:GetDisplayName ())
+	listViewItem:SetText (parentFolder and ".." or node:GetDisplayName ())
+	listViewItem.ParentFolder = parentFolder or false
 	listViewItem.Node = node
 	
 	listViewItem.IsFolder = node:IsFolder ()
@@ -379,10 +405,14 @@ function self:AddNode (node)
 	
 	self:UpdateIcon (listViewItem)
 	
-	listViewItem:SetColumnText (2, listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
-	listViewItem:SetColumnText (3, listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
+	listViewItem:SetColumnText ("Size", listViewItem.Size ~= -1 and VFS.FormatFileSize (listViewItem.Size) or "")
+	listViewItem:SetColumnText ("Last Modified", listViewItem.LastModified ~= -1 and VFS.FormatDate (listViewItem.LastModified) or "")
 	
-	self.ChildNodes [node:GetName ()] = listViewItem
+	if parentFolder then
+		self.ParentFolderItem = listViewItem
+	else
+		self.ChildNodes [node:GetName ()] = listViewItem
+	end
 	return listViewItem
 end
 
