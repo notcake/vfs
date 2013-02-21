@@ -13,7 +13,7 @@ function self:ctor (realFile, openFlags)
 	else
 		local f = file.Open (self:GetPath (), "rb", self.File:GetFileSystemPath ())
 		if f then
-			self.Contents = f:Read (f:Size ())
+			self.Contents = f:Read (f:Size ()) or ""
 			self.Length = #self.Contents
 			f:Close ()
 		else
