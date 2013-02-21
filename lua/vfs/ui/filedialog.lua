@@ -43,7 +43,7 @@ function self:Init ()
 	self.SplitContainer:SetSplitterFraction (0.3)
 	self.SplitContainer:SetSplitterThickness (7)
 	
-	self.FileName = vgui.Create ("DTextEntry", self)
+	self.FileName = vgui.Create ("GTextEntry", self)
 	self.FileName.OnEnter = function ()
 		self.Done:DispatchEvent ("Click")
 		self.FileName:RequestFocus ()
