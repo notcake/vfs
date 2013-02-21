@@ -2,12 +2,14 @@ local self = {}
 
 --[[
 	Events:
+		FolderChanged (IFolder folder)
+			Fired when the selected folder has changed.
+		NodeOpened (INode node)
+			Fired when a file or folder is double clicked.
 		SelectedFileChanged (IFile file)
 			Fired when a file is selected from the list.
 		SelectedFolderChanged (IFolder folder)
 			Fired when a folder is selected from the list.
-		NodeOpened (INode node)
-			Fired when a file or folder is double clicked.
 		SelectedNodeChanged (INode node)
 			Fired when a file or folder is selected from the list.
 ]]
@@ -31,7 +33,7 @@ function self:Init ()
 	
 	self:SetColumnComparator ("Name",
 		function (a, b)
-			return self:DefaultComparator (a, b)
+			return self.DefaultComparator (a, b)
 		end
 	)
 	
@@ -306,7 +308,11 @@ function self:SetFolder (folder)
 	end
 	if not folder then return end
 	if not folder:IsFolder () then return end
+	
+	local oldFolder = self.Folder
 	self.Folder = folder
+	self:DispatchEvent ("FolderChanged", oldFolder, self.Folder)
+	
 	if self.ShowParentFolder and self.Folder:GetParentFolder () then
 		self:AddNode (self.Folder:GetParentFolder (), true)
 	end
