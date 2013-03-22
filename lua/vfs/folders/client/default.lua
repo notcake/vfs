@@ -13,4 +13,5 @@ for folderName, path in pairs (paths) do
 	folder:GetPermissionBlock ():SetInheritPermissions (GAuth.GetSystemId (), false)
 	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Read",        GAuth.Access.Allow)
 	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "View Folder", GAuth.Access.Allow)
+	folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Everyone", "Write",       GAuth.Access.Allow)
 end
