@@ -34,7 +34,12 @@ function self:Open (authId, openFlags, callback)
 		return
 	end
 	
-	http.Fetch (self.Uri,
+	-- Rewrite URI
+	local uri = self.Uri
+	-- pastebin.com/([a-zA-Z0-9]*) to pastebin.com/raw.php?i=%1
+	uri = string.gsub (uri, "pastebin.com/([a-zA-Z0-9]*)$", "pastebin.com/raw.php?i=%1")
+	
+	http.Fetch (uri,
 		function (data)
 			local fileStream = VFS.MemoryFileStream (data)
 			fileStream:SetDisplayPath (self:GetDisplayUri ())
