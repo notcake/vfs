@@ -25,37 +25,34 @@ function self:Init ()
 	self.ParentFolderItem = nil
 	
 	self:AddColumn ("Name")
+		:SetComparator (
+			function (a, b)
+				return self.DefaultComparator (a, b)
+			end
+		)
 	self:AddColumn ("Size")
 		:SetAlignment (6)
-		:SetMaxWidth (128)
+		:SetWidth (80)
+		:SetComparator (
+			function (a, b)
+				-- Put folders at the top
+				if a == b then return false end
+				if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
+				if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
+				return a.Size < b.Size
+			end
+		)
 	self:AddColumn ("Last Modified")
-		:SetMaxWidth (192)
-	
-	self:SetColumnComparator ("Name",
-		function (a, b)
-			return self.DefaultComparator (a, b)
-		end
-	)
-	
-	self:SetColumnComparator ("Size",
-		function (a, b)
-			-- Put folders at the top
-			if a == b then return false end
-			if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
-			if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
-			return a.Size < b.Size
-		end
-	)
-	
-	self:SetColumnComparator ("Last Modified",
-		function (a, b)
-			-- Put folders at the top
-			if a == b then return false end
-			if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
-			if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
-			return a.LastModified < b.LastModified
-		end
-	)
+		:SetWidth (192)
+		:SetComparator (
+			function (a, b)
+				-- Put folders at the top
+				if a == b then return false end
+				if a.Node:IsFolder () and not b.Node:IsFolder () then return true end
+				if b.Node:IsFolder () and not a.Node:IsFolder () then return false end
+				return a.LastModified < b.LastModified
+			end
+		)
 
 	self.Menu = vgui.Create ("GMenu")
 	self.Menu:AddEventListener ("MenuOpening",
@@ -399,7 +396,7 @@ end
 function self:AddNode (node, parentFolder)
 	if not parentFolder and self.ChildNodes [node:GetName ()] then return end
 	
-	local listViewItem = self:AddLine (node:GetName ())
+	local listViewItem = self:AddItem (node:GetName ())
 	listViewItem:SetText (parentFolder and ".." or node:GetDisplayName ())
 	listViewItem.ParentFolder = parentFolder or false
 	listViewItem.Node = node

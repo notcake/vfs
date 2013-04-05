@@ -114,7 +114,7 @@ function self:Init ()
 			VFS.FileSystemBrowser ():GetFrame ():SetFolder (node)
 			VFS.FileSystemBrowser ():GetFrame ():SetVisible (true)
 			VFS.FileSystemBrowser ():GetFrame ():MoveToFront ()
-			VFS.FileSystemBrowser ():GetFrame ():RequestFocus ()
+			VFS.FileSystemBrowser ():GetFrame ():Focus ()
 		end
 	):SetIcon ("icon16/folder_go.png")
 	self.Menu:AddOption ("Refresh",

@@ -60,7 +60,7 @@ function self:Init ()
 			GAuth.GroupBrowser ():GetFrame ():SetGroupTree (groupTreeNode)
 			GAuth.GroupBrowser ():GetFrame ():SetVisible (true)
 			GAuth.GroupBrowser ():GetFrame ():MoveToFront ()
-			GAuth.GroupBrowser ():GetFrame ():RequestFocus ()
+			GAuth.GroupBrowser ():GetFrame ():Focus ()
 		end
 	):SetIcon ("icon16/group_go.png")
 	self.Menu:AddSeparator ()

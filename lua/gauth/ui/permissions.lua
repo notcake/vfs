@@ -158,20 +158,24 @@ function self:Init ()
 	
 	self.PermissionList = vgui.Create ("GListView", self)
 	self.PermissionList:AddColumn ("Name")
-	self.PermissionList:AddColumn ("Allow"):SetType ("Checkbox")
-	self.PermissionList:AddColumn ("Deny"):SetType ("Checkbox")
+	self.PermissionList:AddColumn ("Allow")
+		:SetWidth (64)
+		:SetType (Gooey.ListView.ColumnType.Checkbox)
+	self.PermissionList:AddColumn ("Deny")
+		:SetWidth (64)
+		:SetType (Gooey.ListView.ColumnType.Checkbox)
 	
-	self.PermissionList:AddEventListener ("ItemChecked", function (_, line, i, checked)
+	self.PermissionList:AddEventListener ("ItemChecked", function (_, item, i, checked)
 		if not self.SelectedGroupId then return end
 		if self.SelectedPermissionBlock ~= self.PermissionBlock then return end
 		self.PermissionList:SuppressEvents (true)
 		local newAccess = nil
 		if checked then
 			if i == 2 then
-				line:SetCheckState (3, false)
+				item:SetCheckState ("Deny", false)
 				newAccess = GAuth.Access.Allow
 			elseif i == 3 then
-				line:SetCheckState (2, false)
+				item:SetCheckState ("Allow", false)
 				newAccess = GAuth.Access.Deny
 			end
 		else
@@ -183,14 +187,14 @@ function self:Init ()
 			self:Confirm ("Are you sure?", "Confirm group permission change",
 				function (permissionBlock) permissionBlock:SetGroupPermission (GAuth.GetLocalId (), selectedGroupId, line.ActionId, newAccess) end,
 				function ()
-					if not line:IsValid () then return end
+					if not item:IsValid () then return end
 					self.PermissionList:SuppressEvents (true)
 					if i == 2 then
-						line:SetCheckState (2, not checked)
-						line:SetCheckState (3, checked)
+						item:SetCheckState ("Allow", not checked)
+						item:SetCheckState ("Deny", checked)
 					elseif i == 3 then
-						line:SetCheckState (2, checked)
-						line:SetCheckState (3, not checked)
+						item:SetCheckState ("Allow", checked)
+						item:SetCheckState ("Deny", not checked)
 					end
 					self.PermissionList:SuppressEvents (false)
 				end
@@ -288,8 +292,8 @@ function self:SetPermissionBlock (permissionBlock)
 	self.PermissionList:Clear ()
 	if self.PermissionBlock:GetPermissionDictionary () then
 		for actionId in self.PermissionBlock:GetPermissionDictionary ():GetPermissionEnumerator () do
-			local line = self.PermissionList:AddLine (actionId)
-			line.ActionId = actionId
+			local listViewItem = self.PermissionList:AddItem (actionId)
+			listViewItem.ActionId = actionId
 		end
 		self.PermissionList:Sort ()
 	end
@@ -551,23 +555,23 @@ end
 
 function self:PopulatePermissions ()
 	self.PermissionList:SuppressEvents (true)
-	for _, permissionLine in pairs (self.PermissionList:GetItems ()) do
+	for permissionItem in self.PermissionList:GetItemEnumerator () do
 		if self.SelectedGroupId then
-			local access = self.SelectedPermissionBlock:GetGroupPermission (self.SelectedGroupId, permissionLine.ActionId)
+			local access = self.SelectedPermissionBlock:GetGroupPermission (self.SelectedGroupId, permissionItem.ActionId)
 			if access == GAuth.Access.Allow then
-				permissionLine:SetCheckState (2, true)
-				permissionLine:SetCheckState (3, false)
+				permissionItem:SetCheckState ("Allow", true)
+				permissionItem:SetCheckState ("Deny", false)
 			elseif access == GAuth.Access.Deny then
-				permissionLine:SetCheckState (2, false)
-				permissionLine:SetCheckState (3, true)
+				permissionItem:SetCheckState ("Allow", false)
+				permissionItem:SetCheckState ("Deny", true)
 			else
-				permissionLine:SetCheckState (2, false)
-				permissionLine:SetCheckState (3, false)
+				permissionItem:SetCheckState ("Allow", false)
+				permissionItem:SetCheckState ("Deny", false)
 			end
 		else
 			-- group deselected
-			permissionLine:SetCheckState (2, false)
-			permissionLine:SetCheckState (3, false)
+			permissionItem:SetCheckState ("Allow", false)
+			permissionItem:SetCheckState ("Deny", false)
 		end
 	end
 	self.PermissionList:SuppressEvents (false)

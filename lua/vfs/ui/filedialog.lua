@@ -46,9 +46,9 @@ function self:Init ()
 	self.FileName = vgui.Create ("GTextEntry", self)
 	self.FileName.OnEnter = function ()
 		self.Done:DispatchEvent ("Click")
-		self.FileName:RequestFocus ()
+		self.FileName:Focus ()
 	end
-	self.FileName:RequestFocus ()
+	self.FileName:Focus ()
 	
 	self.ErrorText = vgui.Create ("DLabel", self)
 	self.ErrorText:SetTextColor (Color (255, 128, 128, 255))
