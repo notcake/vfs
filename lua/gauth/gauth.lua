@@ -5,9 +5,9 @@ include ("glib/glib.lua")
 include ("gooey/gooey.lua")
 
 GLib.Initialize ("GAuth", GAuth)
+GLib.AddCSLuaPackSystem ("GAuth")
 GLib.AddCSLuaPackFile ("autorun/gauth.lua")
 GLib.AddCSLuaPackFolderRecursive ("gauth")
-GLib.AddCSLuaPackSystem ("GAuth")
 
 GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
 
