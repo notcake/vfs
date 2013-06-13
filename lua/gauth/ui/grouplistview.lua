@@ -9,7 +9,7 @@ local self = {}
 function self:Init ()
 	self.Group = nil
 
-	self.Menu = vgui.Create ("GMenu")
+	self.Menu = Gooey.Menu ()
 	self.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
 			local targetItem = self:GetSelectedUsers ()
@@ -26,7 +26,7 @@ function self:Init ()
 			end
 		end
 	)
-	self.Menu:AddOption ("Add User",
+	self.Menu:AddItem ("Add User",
 		function ()
 			if not self.Group then return end
 			local group = self.Group
@@ -40,7 +40,7 @@ function self:Init ()
 			):SetTitle ("Add user...")
 		end
 	):SetIcon ("icon16/user_add.png")
-	self.Menu:AddOption ("Remove User",
+	self.Menu:AddItem ("Remove User",
 		function (targetUserIds)
 			if not self.Group then return end
 			if not targetUserIds then return end
@@ -51,7 +51,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/user_delete.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Permissions",
+	self.Menu:AddItem ("Permissions",
 		function ()
 			if not self.Group then return end
 			GAuth.OpenPermissions (self.Group:GetPermissionBlock ())

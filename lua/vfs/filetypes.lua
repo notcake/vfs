@@ -84,8 +84,8 @@ function self:OpenDefault (node)
 		GCompute.IDE:GetInstance ():OpenResource (VFS.Resource (node),
 			function (success, resource, tab)
 				if tab then tab:Select () end
-				GCompute.Editor:GetFrame ():SetVisible (true)
-				GCompute.Editor:GetFrame ():MoveToFront ()
+				GCompute.IDE:GetInstance ():GetFrame ():SetVisible (true)
+				GCompute.IDE:GetInstance ():GetFrame ():MoveToFront ()
 			end
 		)
 	end

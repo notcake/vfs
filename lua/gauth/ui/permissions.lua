@@ -92,7 +92,7 @@ function self:Init ()
 		end
 	)
 	
-	self.Groups.Menu = vgui.Create ("GMenu")
+	self.Groups.Menu = Gooey.Menu ()
 	self.Groups.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
 			self.Groups.Menu:GetItemById ("Add"):SetEnabled (self.PermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions"))
@@ -109,7 +109,7 @@ function self:Init ()
 			end
 		end
 	)
-	self.Groups.Menu:AddOption ("Add",
+	self.Groups.Menu:AddItem ("Add",
 		function ()
 			local permissionBlock = self.PermissionBlock
 			GAuth.OpenGroupSelectionDialog (
@@ -120,7 +120,7 @@ function self:Init ()
 			):SetTitle ("Add group...")
 		end
 	):SetIcon ("icon16/group_add.png")
-	self.Groups.Menu:AddOption ("Remove",
+	self.Groups.Menu:AddItem ("Remove",
 		function (targetGroupId)
 			if not targetGroupId then return end
 			local groupTreeNode = GAuth.ResolveGroupTreeNode (targetGroupId)

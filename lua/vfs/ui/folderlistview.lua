@@ -54,7 +54,7 @@ function self:Init ()
 			end
 		)
 
-	self.Menu = vgui.Create ("GMenu")
+	self.Menu = Gooey.Menu ()
 	self.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
 			local targetItem = self:GetSelectedNodes ()
@@ -85,7 +85,7 @@ function self:Init ()
 			end
 		end
 	)
-	self.Menu:AddOption ("Copy",
+	self.Menu:AddItem ("Copy",
 		function (targetNodes)
 			if #targetNodes == 0 then return end
 			VFS.Clipboard:Clear ()
@@ -94,13 +94,13 @@ function self:Init ()
 			end
 		end
 	):SetIcon ("icon16/page_white_copy.png")
-	self.Menu:AddOption ("Paste",
+	self.Menu:AddItem ("Paste",
 		function ()
 			VFS.Clipboard:Paste (self.Folder)
 		end
 	):SetIcon ("icon16/paste_plain.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Create Folder",
+	self.Menu:AddItem ("Create Folder",
 		function ()
 			if not self.Folder then return end
 			local folder = self.Folder
@@ -109,7 +109,7 @@ function self:Init ()
 			end)
 		end
 	):SetIcon ("icon16/folder_add.png")
-	self.Menu:AddOption ("Delete",
+	self.Menu:AddItem ("Delete",
 		function (targetNodes)
 			if not self.Folder then return end
 			if not targetNodes then return end
@@ -135,7 +135,7 @@ function self:Init ()
 			)
 		end
 	):SetIcon ("icon16/cross.png")
-	self.Menu:AddOption ("Rename",
+	self.Menu:AddItem ("Rename",
 		function (targetNodes)
 			if not targetNodes then return end
 			if #targetNodes == 0 then return end
@@ -149,7 +149,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/pencil.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Permissions",
+	self.Menu:AddItem ("Permissions",
 		function (targetNodes)
 			if not self.Folder then return end
 			if not targetNodes then return end

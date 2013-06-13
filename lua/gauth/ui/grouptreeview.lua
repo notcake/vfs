@@ -23,7 +23,7 @@ function self:Init ()
 	self:AddEventListener ("ItemSelected", self.ItemSelected)
 	
 	-- Menu
-	self.Menu = vgui.Create ("GMenu")
+	self.Menu = Gooey.Menu ()
 	
 	self.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
@@ -54,7 +54,7 @@ function self:Init ()
 		end
 	)
 	
-	self.Menu:AddOption ("Browse",
+	self.Menu:AddItem ("Browse",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			GAuth.GroupBrowser ():GetFrame ():SetGroupTree (groupTreeNode)
@@ -64,7 +64,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/group_go.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Create Group",
+	self.Menu:AddItem ("Create Group",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			if not groupTreeNode:IsGroupTree () then return end
@@ -75,7 +75,7 @@ function self:Init ()
 			)
 		end
 	):SetIcon ("icon16/group_add.png")
-	self.Menu:AddOption ("Create Group Tree",
+	self.Menu:AddItem ("Create Group Tree",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			if not groupTreeNode:IsGroupTree () then return end
@@ -86,14 +86,14 @@ function self:Init ()
 			)
 		end
 	):SetIcon ("icon16/folder_add.png")
-	self.Menu:AddOption ("Delete",
+	self.Menu:AddItem ("Delete",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			groupTreeNode:Remove (GAuth.GetLocalId ())
 		end
 	):SetIcon ("icon16/cross.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Permissions",
+	self.Menu:AddItem ("Permissions",
 		function (groupTreeNode)
 			if not groupTreeNode then return end
 			GAuth.OpenPermissions (groupTreeNode:GetPermissionBlock ())
@@ -205,7 +205,7 @@ function self:OnRemoved ()
 		groupTreeNode:RemoveEventListener ("NodeRemoved",            tostring (self:GetTable ()))
 	end
 	
-	if self.Menu and self.Menu:IsValid () then self.Menu:Remove () end
+	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
 end
 
 -- Events

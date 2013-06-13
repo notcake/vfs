@@ -43,7 +43,7 @@ function self:Init ()
 	)
 	
 	-- Menu
-	self.Menu = vgui.Create ("GMenu")
+	self.Menu = Gooey.Menu ()
 	
 	self.Menu:AddEventListener ("MenuOpening",
 		function (_, targetItem)
@@ -100,14 +100,14 @@ function self:Init ()
 		end
 	)
 	
-	self.Menu:AddOption ("Open",
+	self.Menu:AddItem ("Open",
 		function (node)
 			if not node then return end
 			if not node:IsFile () then return end
 			self:DispatchEvent ("FileOpened", node)
 		end
 	):SetIcon ("icon16/page_go.png")
-	self.Menu:AddOption ("Browse",
+	self.Menu:AddItem ("Browse",
 		function (node)
 			if not node then return end
 			if not node:IsFolder () then return end
@@ -117,7 +117,7 @@ function self:Init ()
 			VFS.FileSystemBrowser ():GetFrame ():Focus ()
 		end
 	):SetIcon ("icon16/folder_go.png")
-	self.Menu:AddOption ("Refresh",
+	self.Menu:AddItem ("Refresh",
 		function (node)
 			if not node then return end
 			if not node:IsFolder () then return end
@@ -125,14 +125,14 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/arrow_refresh.png")
 	self.Menu:AddSeparator ("OpenSeparator")
-	self.Menu:AddOption ("Copy",
+	self.Menu:AddItem ("Copy",
 		function (node)
 			if not node then return end
 			VFS.Clipboard:Clear ()
 			VFS.Clipboard:Add (node)
 		end
 	):SetIcon ("icon16/page_white_copy.png")
-	self.Menu:AddOption ("Paste",
+	self.Menu:AddItem ("Paste",
 		function (node)
 			if not node then return end
 			if not node:IsFolder () then node = node:GetParentFolder () end
@@ -142,7 +142,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/paste_plain.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Create Folder",
+	self.Menu:AddItem ("Create Folder",
 		function (node)
 			if not node then return end
 			if not node:IsFolder () then return end
@@ -153,7 +153,7 @@ function self:Init ()
 			)
 		end
 	):SetIcon ("icon16/folder_add.png")
-	self.Menu:AddOption ("Delete",
+	self.Menu:AddItem ("Delete",
 		function (node)
 			if not node then return end
 			Derma_Query ("Are you sure you want to delete " .. node:GetDisplayPath () .. "?", "Confirm deletion",
@@ -162,7 +162,7 @@ function self:Init ()
 			)
 		end
 	):SetIcon ("icon16/cross.png")
-	self.Menu:AddOption ("Rename",
+	self.Menu:AddItem ("Rename",
 		function (node)
 			if not node then return end
 			Derma_StringRequest ("Rename " .. node:GetName () .. "...", "Enter " .. node:GetName () .. "'s new name:", node:GetName (),
@@ -175,7 +175,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/pencil.png")
 	self.Menu:AddSeparator ()
-	self.Menu:AddOption ("Permissions",
+	self.Menu:AddItem ("Permissions",
 		function (node)
 			if not node then return end
 			if not node:GetPermissionBlock () then return end
@@ -492,7 +492,7 @@ function self:OnRemoved ()
 		node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
 	end
 	
-	self.Menu:Remove ()
+	self.Menu:dtor ()
 end
 
 vgui.Register ("VFSFolderTreeView", self, "GTreeView")
