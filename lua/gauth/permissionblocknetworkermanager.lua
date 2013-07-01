@@ -2,7 +2,7 @@ local self = {}
 GAuth.PermissionBlockNetworkerManager = GAuth.MakeConstructor (self)
 
 function self:ctor ()
-	self.StringTable = GAuth.Net.StringTable ()
+	self.StringTable = GAuth.StringTable ()
 	self.SystemNetworkers = {}
 end
 

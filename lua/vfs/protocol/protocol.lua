@@ -1,5 +1,5 @@
 VFS.Protocol.ResponseTable = {}
-VFS.Protocol.StringTable = VFS.Net.StringTable ()
+VFS.Protocol.StringTable = VFS.StringTable ()
 
 function VFS.Protocol.Register (packetType, class)
 	VFS.Protocol.StringTable:Add (packetType)

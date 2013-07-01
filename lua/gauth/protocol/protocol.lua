@@ -1,6 +1,6 @@
 GAuth.Protocol.PermissionBlock = {}
 GAuth.Protocol.ResponseTable = {}
-GAuth.Protocol.StringTable = GAuth.Net.StringTable ()
+GAuth.Protocol.StringTable = GAuth.StringTable ()
 
 function GAuth.Protocol.Register (packetType, class)
 	GAuth.Protocol.StringTable:Add (packetType)
