@@ -248,7 +248,7 @@ function self:OnRemoved ()
 	end
 
 	if self.Folders then self.Folders:Remove () end
-	if self.Files then self.Files:Remove () end
+	if self.Files   then self.Files:Remove ()   end
 	VFS:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
 end
 

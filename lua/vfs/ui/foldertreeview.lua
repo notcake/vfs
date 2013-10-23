@@ -491,8 +491,6 @@ function self:OnRemoved ()
 		node:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
 		node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
 	end
-	
-	self.Menu:dtor ()
 end
 
 vgui.Register ("VFSFolderTreeView", self, "GTreeView")

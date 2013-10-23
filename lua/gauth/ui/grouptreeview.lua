@@ -204,8 +204,6 @@ function self:OnRemoved ()
 		groupTreeNode:RemoveEventListener ("NodeDisplayNameChanged", tostring (self:GetTable ()))
 		groupTreeNode:RemoveEventListener ("NodeRemoved",            tostring (self:GetTable ()))
 	end
-	
-	if self.Menu and self.Menu:IsValid () then self.Menu:dtor () end
 end
 
 -- Events
