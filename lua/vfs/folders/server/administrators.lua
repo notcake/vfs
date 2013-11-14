@@ -29,5 +29,15 @@ VFS.Root:CreateFolder (GAuth.GetSystemId (), "Admins",
 				end
 			)
 		end
+		
+		folder:CreateFolder (GAuth.GetSystemId (), "shared",
+			function (returnCode, folder)
+				folder:SetDeletable (false)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "Create Folder", GAuth.Access.Allow)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "Delete",        GAuth.Access.Allow)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "Rename",        GAuth.Access.Allow)
+				folder:GetPermissionBlock ():SetGroupPermission (GAuth.GetSystemId (), "Administrators", "Write",         GAuth.Access.Allow)
+			end
+		)
 	end
 )
