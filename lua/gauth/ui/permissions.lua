@@ -165,16 +165,17 @@ function self:Init ()
 		:SetWidth (64)
 		:SetType (Gooey.ListView.ColumnType.Checkbox)
 	
-	self.PermissionList:AddEventListener ("ItemChecked", function (_, item, i, checked)
+	self.PermissionList:AddEventListener ("ItemChecked", function (_, item, columnId, checked)
 		if not self.SelectedGroupId then return end
 		if self.SelectedPermissionBlock ~= self.PermissionBlock then return end
 		self.PermissionList:SuppressEvents (true)
+		
 		local newAccess = nil
 		if checked then
-			if i == 2 then
+			if columnId == "Allow" then
 				item:SetCheckState ("Deny", false)
 				newAccess = GAuth.Access.Allow
-			elseif i == 3 then
+			elseif columnId == "Deny" then
 				item:SetCheckState ("Allow", false)
 				newAccess = GAuth.Access.Deny
 			end
@@ -185,14 +186,14 @@ function self:Init ()
 		local selectedGroupId = self.SelectedGroupId
 		if newAccess then
 			self:Confirm ("Are you sure?", "Confirm group permission change",
-				function (permissionBlock) permissionBlock:SetGroupPermission (GAuth.GetLocalId (), selectedGroupId, line.ActionId, newAccess) end,
+				function (permissionBlock) permissionBlock:SetGroupPermission (GAuth.GetLocalId (), selectedGroupId, item.ActionId, newAccess) end,
 				function ()
 					if not item:IsValid () then return end
 					self.PermissionList:SuppressEvents (true)
-					if i == 2 then
+					if columnId == "Allow" then
 						item:SetCheckState ("Allow", not checked)
 						item:SetCheckState ("Deny", checked)
-					elseif i == 3 then
+					elseif columnId == "Deny" then
 						item:SetCheckState ("Allow", checked)
 						item:SetCheckState ("Deny", not checked)
 					end
