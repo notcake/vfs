@@ -242,6 +242,8 @@ function self:Populate (filesystemNode, treeViewNode)
 	filesystemNode:EnumerateChildren (GAuth.GetLocalId (),
 		function (returnCode, node)
 			if not self:IsValid () then return end
+			if not treeViewNode:IsValid () then return end
+			
 			if returnCode == VFS.ReturnCode.Success then
 				self:AddFilesystemNode (treeViewNode, node)
 				
