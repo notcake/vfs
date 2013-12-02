@@ -131,7 +131,7 @@ function self:Init ()
 		end
 	):SetIcon ("icon16/group_delete.png")
 	
-	self.Groups:AddEventListener ("Click", tostring (self:GetTable ()),
+	self.Groups:AddEventListener ("Click", self:GetHashCode (),
 		function (_, item)
 			if not item then return end
 			if item.IsGroupAdder then
@@ -213,7 +213,7 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
+	GAuth:AddEventListener ("Unloaded", self:GetHashCode (), function ()
 		self:Remove ()
 	end)
 end
@@ -390,7 +390,7 @@ function self:HookBlockOwner (permissionBlock, permissionBlockIndex)
 		self:HookBlockOwner (permissionBlock:GetParent (), permissionBlockIndex + 1)
 	end
 	
-	permissionBlock:AddEventListener ("InheritOwnerChanged", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("InheritOwnerChanged", self:GetHashCode (),
 		function (permissionBlock, inheritOwner)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:SetInheritOwner (GAuth.GetSystemId (), inheritOwner)
@@ -411,7 +411,7 @@ function self:HookBlockOwner (permissionBlock, permissionBlockIndex)
 		end
 	)
 	
-	permissionBlock:AddEventListener ("OwnerChanged", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("OwnerChanged", self:GetHashCode (),
 		function (permissionBlock, ownerId)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:SetOwner (GAuth.GetSystemId (), ownerId)
@@ -431,7 +431,7 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 		self:HookBlockPermissions (permissionBlock:GetParent (), permissionBlockIndex + 1)
 	end
 	
-	permissionBlock:AddEventListener ("GroupEntryAdded", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("GroupEntryAdded", self:GetHashCode (),
 		function (permissionBlock, groupId)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:AddGroupEntry (GAuth.GetSystemId (), groupId)
@@ -442,7 +442,7 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 		end
 	)
 	
-	permissionBlock:AddEventListener ("GroupEntryRemoved", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("GroupEntryRemoved", self:GetHashCode (),
 		function (permissionBlock, groupId)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:RemoveGroupEntry (GAuth.GetSystemId (), groupId)
@@ -469,7 +469,7 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 		end
 	)
 	
-	permissionBlock:AddEventListener ("GroupPermissionChanged", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("GroupPermissionChanged", self:GetHashCode (),
 		function (permissionBlock, groupId, actionId, access)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, access)
@@ -482,7 +482,7 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 		end
 	)
 	
-	permissionBlock:AddEventListener ("InheritPermissionsChanged", tostring (self:GetTable ()),
+	permissionBlock:AddEventListener ("InheritPermissionsChanged", self:GetHashCode (),
 		function (permissionBlock, inheritPermissions)
 			if permissionBlock == self.PermissionBlock then
 				self.TestPermissionBlock:SetInheritPermissions (GAuth.GetSystemId (), inheritPermissions)
@@ -530,17 +530,17 @@ end
 function self:UnhookBlockOwner (permissionBlock)
 	if not permissionBlock then return end
 
-	permissionBlock:RemoveEventListener ("InheritOwnerChanged",       tostring (self:GetTable ()))
-	permissionBlock:RemoveEventListener ("OwnerChanged",              tostring (self:GetTable ()))
+	permissionBlock:RemoveEventListener ("InheritOwnerChanged",       self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("OwnerChanged",              self:GetHashCode ())
 end
 
 function self:UnhookBlockPermissions (permissionBlock)
 	if not permissionBlock then return end
 
-	permissionBlock:RemoveEventListener ("GroupEntryAdded",           tostring (self:GetTable ()))
-	permissionBlock:RemoveEventListener ("GroupEntryRemoved",         tostring (self:GetTable ()))
-	permissionBlock:RemoveEventListener ("GroupPermissionChanged",    tostring (self:GetTable ()))
-	permissionBlock:RemoveEventListener ("InheritPermissionsChanged", tostring (self:GetTable ()))
+	permissionBlock:RemoveEventListener ("GroupEntryAdded",           self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupEntryRemoved",         self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupPermissionChanged",    self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("InheritPermissionsChanged", self:GetHashCode ())
 end
 
 function self:PopulateGroupEntries (permissionBlock, permissionBlockIndex)
@@ -611,7 +611,7 @@ function self:OnRemoved ()
 		self:UnhookBlockPermissions (self.HookedPermissionBlocks [i])
 	end
 
-	GAuth:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	GAuth:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 vgui.Register ("GAuthPermissions", self, "GFrame")

@@ -187,11 +187,11 @@ end
 function self:UnhookNode (node)
 	self.SubscribedNodes [node] = nil
 	
-	node:RemoveEventListener ("NodeCreated",            tostring (self:GetTable ()))
-	node:RemoveEventListener ("NodeDeleted",            tostring (self:GetTable ()))
-	node:RemoveEventListener ("NodePermissionsChanged", tostring (self:GetTable ()))
-	node:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
-	node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
+	node:RemoveEventListener ("NodeCreated",            self:GetHashCode ())
+	node:RemoveEventListener ("NodeDeleted",            self:GetHashCode ())
+	node:RemoveEventListener ("NodePermissionsChanged", self:GetHashCode ())
+	node:RemoveEventListener ("NodeRenamed",            self:GetHashCode ())
+	node:RemoveEventListener ("NodeUpdated",            self:GetHashCode ())
 end
 
 function self:UnhookNodeRecursive (treeViewNode)
@@ -269,7 +269,7 @@ function self:Populate (filesystemNode, treeViewNode)
 				treeViewNode:SetIcon ("icon16/folder.png")
 				self:LayoutNode (treeViewNode)
 	
-				filesystemNode:AddEventListener ("NodeCreated", tostring (self:GetTable ()),
+				filesystemNode:AddEventListener ("NodeCreated", self:GetHashCode (),
 					function (_, newNode)
 						self:AddFilesystemNode (treeViewNode, newNode)
 						treeViewNode:SortChildren ()
@@ -278,7 +278,7 @@ function self:Populate (filesystemNode, treeViewNode)
 					end
 				)
 				
-				filesystemNode:AddEventListener ("NodeDeleted", tostring (self:GetTable ()),
+				filesystemNode:AddEventListener ("NodeDeleted", self:GetHashCode (),
 					function (_, deletedNode)
 						local childNode = treeViewNode.AddedNodes [deletedNode:GetName ()]
 						self:UnhookNodeRecursive (childNode)
@@ -294,7 +294,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodePermissionsChanged", tostring (self:GetTable ()),
+	filesystemNode:AddEventListener ("NodePermissionsChanged", self:GetHashCode (),
 		function (_, node)
 			local childNode = treeViewNode.AddedNodes [node:GetName ()]
 			if not childNode then return end
@@ -334,7 +334,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodeRenamed", tostring (self:GetTable ()),
+	filesystemNode:AddEventListener ("NodeRenamed", self:GetHashCode (),
 		function (_, node, oldName, newName)
 			if not treeViewNode.AddedNodes [oldName] then return end
 			treeViewNode.AddedNodes [newName] = treeViewNode.AddedNodes [oldName]
@@ -345,7 +345,7 @@ function self:Populate (filesystemNode, treeViewNode)
 		end
 	)
 	
-	filesystemNode:AddEventListener ("NodeUpdated", tostring (self:GetTable ()),
+	filesystemNode:AddEventListener ("NodeUpdated", self:GetHashCode (),
 		function (_, updatedNode, updateFlags)
 			if not treeViewNode:IsValid () then return end
 			local childNode = treeViewNode.AddedNodes [updatedNode:GetName ()]
@@ -487,11 +487,11 @@ end
 -- Event handlers
 function self:OnRemoved ()
 	for node, _ in pairs (self.SubscribedNodes) do
-		node:RemoveEventListener ("NodeCreated",            tostring (self:GetTable ()))
-		node:RemoveEventListener ("NodeDeleted",            tostring (self:GetTable ()))
-		node:RemoveEventListener ("NodePermissionsChanged", tostring (self:GetTable ()))
-		node:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
-		node:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
+		node:RemoveEventListener ("NodeCreated",            self:GetHashCode ())
+		node:RemoveEventListener ("NodeDeleted",            self:GetHashCode ())
+		node:RemoveEventListener ("NodePermissionsChanged", self:GetHashCode ())
+		node:RemoveEventListener ("NodeRenamed",            self:GetHashCode ())
+		node:RemoveEventListener ("NodeUpdated",            self:GetHashCode ())
 	end
 end
 

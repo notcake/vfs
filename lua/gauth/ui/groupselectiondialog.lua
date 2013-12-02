@@ -24,7 +24,7 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
+	GAuth:AddEventListener ("Unloaded", self:GetHashCode (), function ()
 		self:Remove ()
 	end)
 end
@@ -52,7 +52,7 @@ function self:OnRemoved ()
 	self.Callback (nil)
 
 	if self.Groups then self.Groups:Remove () end
-	GAuth:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	GAuth:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 vgui.Register ("GAuthGroupSelectionDialog", self, "GFrame")

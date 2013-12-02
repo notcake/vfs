@@ -8,16 +8,16 @@ function self:ctor (nameOverride, mountedNode, parentFolder)
 	self.MountedNode = mountedNode
 	self.ParentFolder = parentFolder
 	
-	self.MountedNode:AddEventListener ("Deleted", tostring (self), function (_) self:DispatchEvent ("Deleted") end)
+	self.MountedNode:AddEventListener ("Deleted", self:GetHashCode (), function (_) self:DispatchEvent ("Deleted") end)
 	self.MountedNode:AddEventListener ("PermissionsChanged", function () self:DispatchEvent ("PermissionsChanged") end)
-	self.MountedNode:AddEventListener ("Renamed", tostring (self),
+	self.MountedNode:AddEventListener ("Renamed", self:GetHashCode (),
 		function (_, oldName, newName)
 			if self.NameOverride then self.NameOverride = newName end
 			self:DispatchEvent ("Renamed", oldName, newName)
 			if self:GetParentFolder () then self:GetParentFolder ():RenameChild (authId, oldName, newName) end
 		end
 	)
-	self.MountedNode:AddEventListener ("Updated", tostring (self),
+	self.MountedNode:AddEventListener ("Updated", self:GetHashCode (),
 		function (_, updateFlags)
 			self:DispatchEvent ("Updated", updateFlags)
 			if self:GetParentFolder () then self:GetParentFolder ():DispatchEvent ("NodeUpdated", self, updateFlags) end

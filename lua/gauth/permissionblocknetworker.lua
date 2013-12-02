@@ -136,23 +136,23 @@ end
 function self:HookBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:HookBlock : " .. permissionBlock:GetName ())
 
-	permissionBlock:AddEventListener ("GroupEntryAdded",           tostring (self), self.GroupEntryAdded)
-	permissionBlock:AddEventListener ("GroupEntryRemoved",         tostring (self), self.GroupEntryRemoved)
-	permissionBlock:AddEventListener ("GroupPermissionChanged",    tostring (self), self.GroupPermissionChanged)
-	permissionBlock:AddEventListener ("InheritOwnerChanged",       tostring (self), self.InheritOwnerChanged)
-	permissionBlock:AddEventListener ("InheritPermissionsChanged", tostring (self), self.InheritPermissionsChanged)
-	permissionBlock:AddEventListener ("OwnerChanged",              tostring (self), self.OwnerChanged)
+	permissionBlock:AddEventListener ("GroupEntryAdded",           self:GetHashCode (), self.GroupEntryAdded)
+	permissionBlock:AddEventListener ("GroupEntryRemoved",         self:GetHashCode (), self.GroupEntryRemoved)
+	permissionBlock:AddEventListener ("GroupPermissionChanged",    self:GetHashCode (), self.GroupPermissionChanged)
+	permissionBlock:AddEventListener ("InheritOwnerChanged",       self:GetHashCode (), self.InheritOwnerChanged)
+	permissionBlock:AddEventListener ("InheritPermissionsChanged", self:GetHashCode (), self.InheritPermissionsChanged)
+	permissionBlock:AddEventListener ("OwnerChanged",              self:GetHashCode (), self.OwnerChanged)
 end
 
 function self:HookRemoteBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:HookRemoteBlock : " .. permissionBlock:GetName ())
 	
-	permissionBlock:AddEventListener ("RequestAddGroupEntry",         tostring (self), self.RequestAddGroupEntry)
-	permissionBlock:AddEventListener ("RequestRemoveGroupEntry",      tostring (self), self.RequestRemoveGroupEntry)
-	permissionBlock:AddEventListener ("RequestSetGroupPermission",    tostring (self), self.RequestSetGroupPermission)
-	permissionBlock:AddEventListener ("RequestSetInheritOwner",       tostring (self), self.RequestSetInheritOwner)
-	permissionBlock:AddEventListener ("RequestSetInheritPermissions", tostring (self), self.RequestSetInheritPermissions)
-	permissionBlock:AddEventListener ("RequestSetOwner",              tostring (self), self.RequestSetOwner)
+	permissionBlock:AddEventListener ("RequestAddGroupEntry",         self:GetHashCode (), self.RequestAddGroupEntry)
+	permissionBlock:AddEventListener ("RequestRemoveGroupEntry",      self:GetHashCode (), self.RequestRemoveGroupEntry)
+	permissionBlock:AddEventListener ("RequestSetGroupPermission",    self:GetHashCode (), self.RequestSetGroupPermission)
+	permissionBlock:AddEventListener ("RequestSetInheritOwner",       self:GetHashCode (), self.RequestSetInheritOwner)
+	permissionBlock:AddEventListener ("RequestSetInheritPermissions", self:GetHashCode (), self.RequestSetInheritPermissions)
+	permissionBlock:AddEventListener ("RequestSetOwner",              self:GetHashCode (), self.RequestSetOwner)
 	
 	if SERVER then self:HookBlock (permissionBlock) end
 end
@@ -160,19 +160,19 @@ end
 function self:UnhookBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:UnhookBlock : " .. permissionBlock:GetName ())
 	
-	permissionBlock:RemoveEventListener ("GroupEntryAdded",              tostring (self))
-	permissionBlock:RemoveEventListener ("GroupEntryRemoved",            tostring (self))
-	permissionBlock:RemoveEventListener ("GroupPermissionChanged",       tostring (self))
-	permissionBlock:RemoveEventListener ("InheritOwnerChanged",          tostring (self))
-	permissionBlock:RemoveEventListener ("InheritPermissionsChanged",    tostring (self))
-	permissionBlock:RemoveEventListener ("OwnerChanged",                 tostring (self))
+	permissionBlock:RemoveEventListener ("GroupEntryAdded",              self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupEntryRemoved",            self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupPermissionChanged",       self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("InheritOwnerChanged",          self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("InheritPermissionsChanged",    self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("OwnerChanged",                 self:GetHashCode ())
 	
-	permissionBlock:RemoveEventListener ("RequestAddGroupEntry",         tostring (self))
-	permissionBlock:RemoveEventListener ("RequestRemoveGroupEntry",      tostring (self))
-	permissionBlock:RemoveEventListener ("RequestSetGroupPermission",    tostring (self))
-	permissionBlock:RemoveEventListener ("RequestSetInheritOwner",       tostring (self))
-	permissionBlock:RemoveEventListener ("RequestSetInheritPermissions", tostring (self))
-	permissionBlock:RemoveEventListener ("RequestSetOwner",              tostring (self))
+	permissionBlock:RemoveEventListener ("RequestAddGroupEntry",         self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestRemoveGroupEntry",      self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetGroupPermission",    self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetInheritOwner",       self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetInheritPermissions", self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetOwner",              self:GetHashCode ())
 end
 
 function self:DispatchNotification (permissionBlock, notification)

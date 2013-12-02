@@ -109,7 +109,7 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	VFS:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
+	VFS:AddEventListener ("Unloaded", self:GetHashCode (), function ()
 		self:Remove ()
 	end)
 	
@@ -249,7 +249,7 @@ function self:OnRemoved ()
 
 	if self.Folders then self.Folders:Remove () end
 	if self.Files   then self.Files:Remove ()   end
-	VFS:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	VFS:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 vgui.Register ("VFSFileDialog", self, "GFrame")

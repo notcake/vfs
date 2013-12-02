@@ -103,10 +103,10 @@ function self:HookNode (node)
 		self.IgnorePermissionsChanged = false
 	end
 	
-	node:AddEventListener ("NodeCreated",            tostring (self), self.NodeCreated)
-	node:AddEventListener ("NodeDeleted",            tostring (self), self.NodeDeleted)
-	node:AddEventListener ("NodePermissionsChanged", tostring (self), self.NodePermissionsChanged)
-	node:AddEventListener ("NodeRenamed",            tostring (self), self.NodeRenamed)
+	node:AddEventListener ("NodeCreated",            self:GetHashCode (), self.NodeCreated)
+	node:AddEventListener ("NodeDeleted",            self:GetHashCode (), self.NodeDeleted)
+	node:AddEventListener ("NodePermissionsChanged", self:GetHashCode (), self.NodePermissionsChanged)
+	node:AddEventListener ("NodeRenamed",            self:GetHashCode (), self.NodeRenamed)
 end
 
 function self:HookNodeRecursive (node)
@@ -129,10 +129,10 @@ function self:UnhookNode (node)
 	self.HookedNodes [node] = nil
 	self.SavableNodes [node] = nil
 	
-	node:RemoveEventListener ("NodeCreated",            tostring (self))
-	node:RemoveEventListener ("NodeDeleted",            tostring (self))
-	node:RemoveEventListener ("NodePermissionsChanged", tostring (self))
-	node:RemoveEventListener ("NodeRenamed",            tostring (self))
+	node:RemoveEventListener ("NodeCreated",            self:GetHashCode ())
+	node:RemoveEventListener ("NodeDeleted",            self:GetHashCode ())
+	node:RemoveEventListener ("NodePermissionsChanged", self:GetHashCode ())
+	node:RemoveEventListener ("NodeRenamed",            self:GetHashCode ())
 end
 
 function self:FlagUnsaved ()

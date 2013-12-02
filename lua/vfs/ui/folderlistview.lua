@@ -261,14 +261,14 @@ function self:MergeRefresh ()
 				self:Sort ()
 			elseif returnCode == VFS.ReturnCode.AccessDenied then
 			elseif returnCode == VFS.ReturnCode.Finished then				
-				self.Folder:AddEventListener ("NodeCreated", tostring (self:GetTable ()),
+				self.Folder:AddEventListener ("NodeCreated", self:GetHashCode (),
 					function (_, newNode)
 						self:AddNode (newNode)
 						self:Sort ()
 					end
 				)
 				
-				self.Folder:AddEventListener ("NodeDeleted", tostring (self:GetTable ()),
+				self.Folder:AddEventListener ("NodeDeleted", self:GetHashCode (),
 					function (_, deletedNode)
 						self:RemoveItem (self.ChildNodes [deletedNode:GetName ()])
 						self.ChildNodes [deletedNode:GetName ()] = nil
@@ -291,14 +291,14 @@ function self:SetFolder (folder)
 	self:Clear ()
 	self.ChildNodes = {}
 	if self.Folder then
-		self.Folder:RemoveEventListener ("NodeCreated",            tostring (self:GetTable ()))
-		self.Folder:RemoveEventListener ("NodeDeleted",            tostring (self:GetTable ()))
-		self.Folder:RemoveEventListener ("NodePermissionsChanged", tostring (self:GetTable ()))
-		self.Folder:RemoveEventListener ("NodeRenamed",            tostring (self:GetTable ()))
-		self.Folder:RemoveEventListener ("NodeUpdated",            tostring (self:GetTable ()))
+		self.Folder:RemoveEventListener ("NodeCreated",            self:GetHashCode ())
+		self.Folder:RemoveEventListener ("NodeDeleted",            self:GetHashCode ())
+		self.Folder:RemoveEventListener ("NodePermissionsChanged", self:GetHashCode ())
+		self.Folder:RemoveEventListener ("NodeRenamed",            self:GetHashCode ())
+		self.Folder:RemoveEventListener ("NodeUpdated",            self:GetHashCode ())
 		
 		for i = #self.HookedNodes, 1, -1 do
-			self.HookedNodes [i]:RemoveEventListener ("PermissionsChanged", tostring (self:GetTable ()))
+			self.HookedNodes [i]:RemoveEventListener ("PermissionsChanged", self:GetHashCode ())
 			self.HookedNodes [i] = nil
 		end
 		self.Folder = nil
@@ -315,14 +315,14 @@ function self:SetFolder (folder)
 	end
 	self:MergeRefresh ()
 	
-	self.Folder:AddEventListener ("NodePermissionsChanged", tostring (self:GetTable ()),
+	self.Folder:AddEventListener ("NodePermissionsChanged", self:GetHashCode (),
 		function (_, node)
 			if not self.ChildNodes [node:GetName ()] then return end
 			self:UpdateIcon (self.ChildNodes [node:GetName ()])
 		end
 	)
 				
-	self.Folder:AddEventListener ("NodeRenamed", tostring (self:GetTable ()),
+	self.Folder:AddEventListener ("NodeRenamed", self:GetHashCode (),
 		function (_, node, oldName, newName)
 			self.ChildNodes [newName] = self.ChildNodes [oldName]
 			self.ChildNodes [newName]:SetText (node:GetDisplayName ())
@@ -332,7 +332,7 @@ function self:SetFolder (folder)
 		end
 	)
 	
-	self.Folder:AddEventListener ("NodeUpdated", tostring (self:GetTable ()),
+	self.Folder:AddEventListener ("NodeUpdated", self:GetHashCode (),
 		function (_, updatedNode, updateFlags)
 			local listViewItem = self.ChildNodes [updatedNode:GetName ()]
 			if not listViewItem then return end
@@ -354,7 +354,7 @@ function self:SetFolder (folder)
 	local parentFolder = self.Folder
 	while parentFolder do
 		self.HookedNodes [#self.HookedNodes + 1] = parentFolder
-		parentFolder:AddEventListener ("PermissionsChanged", tostring (self:GetTable ()), self.PermissionsChanged)
+		parentFolder:AddEventListener ("PermissionsChanged", self:GetHashCode (), self.PermissionsChanged)
 		parentFolder = parentFolder:GetParentFolder ()
 	end
 	

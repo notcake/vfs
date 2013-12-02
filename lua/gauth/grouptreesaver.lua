@@ -39,10 +39,10 @@ function self:ctor ()
 	
 	self.HostChanged = function (groupTreeNode, hostId)
 		if groupTreeNode:GetHost () == GAuth.GetLocalId () then
-			groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", tostring (self), self.PermissionsChanged)
+			groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", self:GetHashCode (), self.PermissionsChanged)
 			self:FlagUnsaved ()
 		else
-			groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", tostring (self))
+			groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", self:GetHashCode ())
 		end
 	end
 	
@@ -70,18 +70,18 @@ end
 
 function self:HookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:AddEventListener ("UserAdded",   tostring (self), self.UserAdded)		
-		groupTreeNode:AddEventListener ("UserRemoved", tostring (self), self.UserRemoved)
+		groupTreeNode:AddEventListener ("UserAdded",   self:GetHashCode (), self.UserAdded)		
+		groupTreeNode:AddEventListener ("UserRemoved", self:GetHashCode (), self.UserRemoved)
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:AddEventListener ("NodeAdded",   tostring (self), self.NodeAdded)
-		groupTreeNode:AddEventListener ("NodeRemoved", tostring (self), self.NodeRemoved)
+		groupTreeNode:AddEventListener ("NodeAdded",   self:GetHashCode (), self.NodeAdded)
+		groupTreeNode:AddEventListener ("NodeRemoved", self:GetHashCode (), self.NodeRemoved)
 	end
 	
-	groupTreeNode:AddEventListener ("HostChanged", tostring (self), self.HostChanged)
-	groupTreeNode:AddEventListener ("Removed",     tostring (self), self.Removed)
+	groupTreeNode:AddEventListener ("HostChanged", self:GetHashCode (), self.HostChanged)
+	groupTreeNode:AddEventListener ("Removed",     self:GetHashCode (), self.Removed)
 	
 	if groupTreeNode:GetHost () == GAuth.GetLocalId () then
-		groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", tostring (self), self.PermissionsChanged)
+		groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", self:GetHashCode (), self.PermissionsChanged)
 	end
 end
 
@@ -95,17 +95,17 @@ end
 
 function self:UnhookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:RemoveEventListener ("UserAdded",   tostring (self))
-		groupTreeNode:RemoveEventListener ("UserRemoved", tostring (self))
+		groupTreeNode:RemoveEventListener ("UserAdded",   self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("UserRemoved", self:GetHashCode ())
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:RemoveEventListener ("NodeAdded",   tostring (self))
-		groupTreeNode:RemoveEventListener ("NodeRemoved", tostring (self))
+		groupTreeNode:RemoveEventListener ("NodeAdded",   self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("NodeRemoved", self:GetHashCode ())
 	end
 	
-	groupTreeNode:RemoveEventListener ("HostChanged", tostring (self))
-	groupTreeNode:RemoveEventListener ("Removed",     tostring (self))
+	groupTreeNode:RemoveEventListener ("HostChanged", self:GetHashCode ())
+	groupTreeNode:RemoveEventListener ("Removed",     self:GetHashCode ())
 	
-	groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", tostring (self))
+	groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", self:GetHashCode ())
 end
 
 function self:FlagUnsaved ()

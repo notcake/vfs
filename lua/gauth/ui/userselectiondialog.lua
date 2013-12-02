@@ -34,7 +34,7 @@ function self:Init ()
 	
 	self:PerformLayout ()
 	
-	GAuth:AddEventListener ("Unloaded", tostring (self:GetTable ()), function ()
+	GAuth:AddEventListener ("Unloaded", self:GetHashCode (), function ()
 		self:Remove ()
 	end)
 end
@@ -75,7 +75,7 @@ function self:OnRemoved ()
 	self.Callback (nil)
 
 	if self.Users then self.Users:Remove () end
-	GAuth:RemoveEventListener ("Unloaded", tostring (self:GetTable ()))
+	GAuth:RemoveEventListener ("Unloaded", self:GetHashCode ())
 end
 
 vgui.Register ("GAuthUserSelectionDialog", self, "GFrame")

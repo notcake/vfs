@@ -70,8 +70,8 @@ end
 function self:SetGroup (group)
 	self:Clear ()
 	if self.Group then
-		self.Group:RemoveEventListener ("UserAdded",   tostring (self:GetTable ()))
-		self.Group:RemoveEventListener ("UserRemoved", tostring (self:GetTable ()))
+		self.Group:RemoveEventListener ("UserAdded",   self:GetHashCode ())
+		self.Group:RemoveEventListener ("UserRemoved", self:GetHashCode ())
 		self.Group = nil
 	end
 	if not group then return end
@@ -84,7 +84,7 @@ function self:SetGroup (group)
 	end
 	self:Sort ()
 	
-	self.Group:AddEventListener ("UserAdded", tostring (self:GetTable ()),
+	self.Group:AddEventListener ("UserAdded", self:GetHashCode (),
 		function (_, userId)
 			local listBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
 			listBoxItem:SetIcon (GAuth.GetUserIcon (userId))
@@ -93,7 +93,7 @@ function self:SetGroup (group)
 		end
 	)
 	
-	self.Group:AddEventListener ("UserRemoved", tostring (self:GetTable ()),
+	self.Group:AddEventListener ("UserRemoved", self:GetHashCode (),
 		function (_, userId)
 			for _, item in pairs (self:GetItems ()) do
 				if item.UserId == userId then

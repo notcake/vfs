@@ -14,12 +14,12 @@ function self:ctor ()
 	
 	VFS.EventProvider (self)
 	
-	VFS:AddEventListener ("Unloaded", "VFS.FileSystemWatcher." .. tostring (self),
+	VFS:AddEventListener ("Unloaded", "VFS.FileSystemWatcher." .. self:GetHashCode (),
 		function ()
 			self:dtor ()
 		end
 	)
-	timer.Create ("VFS.FileSystemWatcher." .. tostring (self), 10, 0,
+	timer.Create ("VFS.FileSystemWatcher." .. self:GetHashCode (), 10, 0,
 		function ()
 			self:CheckFileTimes ()
 		end
@@ -27,8 +27,8 @@ function self:ctor ()
 end
 
 function self:dtor ()
-	VFS:RemoveEventListener ("Unloaded", "VFS.FileSystemWatcher." .. tostring (self))
-	timer.Destroy ("VFS.FileSystemWatcher." .. tostring (self))
+	VFS:RemoveEventListener ("Unloaded", "VFS.FileSystemWatcher." .. self:GetHashCode ())
+	timer.Destroy ("VFS.FileSystemWatcher." .. self:GetHashCode ())
 	
 	self:Clear ()
 end
@@ -110,7 +110,7 @@ end
 function self:HookFile (file)
 	if not file then return end
 	
-	file:AddEventListener ("Updated", "VFS.FileSystemWatcher." .. tostring (self),
+	file:AddEventListener ("Updated", "VFS.FileSystemWatcher." .. self:GetHashCode (),
 		function (node, updateFlags)
 			self:DispatchEvent ("Changed", node)
 		end
@@ -120,13 +120,13 @@ end
 function self:UnhookFile (file)
 	if not file then return end
 	
-	file:RemoveEventListener ("Updated", "VFS.FileSystemWatcher." .. tostring (self))
+	file:RemoveEventListener ("Updated", "VFS.FileSystemWatcher." .. self:GetHashCode ())
 end
 
 function self:HookFolder (folder)
 	if not folder then return end
 	
-	folder:AddEventListener ("NodeUpdated", "VFS.FileSystemWatcher." .. tostring (self),
+	folder:AddEventListener ("NodeUpdated", "VFS.FileSystemWatcher." .. self:GetHashCode (),
 		function (_, node, updateFlags)
 			self:DispatchEvent ("Changed", node)
 		end
@@ -136,13 +136,13 @@ end
 function self:UnhookFolder (folder)
 	if not folder then return end
 	
-	folder:RemoveEventListener ("NodeUpdated", "VFS.FileSystemWatcher." .. tostring (self))
+	folder:RemoveEventListener ("NodeUpdated", "VFS.FileSystemWatcher." .. self:GetHashCode ())
 end
 
 function self:HookResource (resource)
 	if not resource then return end
 	
-	resource:AddEventListener ("FileResolved", "VFS.FileSystemWatcher." .. tostring (self),
+	resource:AddEventListener ("FileResolved", "VFS.FileSystemWatcher." .. self:GetHashCode (),
 		function (_, file)
 			self:AddFile (file)
 		end
@@ -152,5 +152,5 @@ end
 function self:UnhookResource (resource)
 	if not resource then return end
 	
-	resource:RemoveEventListener ("FileResolved", "VFS.FileSystemWatcher." .. tostring (self))
+	resource:RemoveEventListener ("FileResolved", "VFS.FileSystemWatcher." .. self:GetHashCode ())
 end

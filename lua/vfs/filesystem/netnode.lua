@@ -20,7 +20,7 @@ function self:ctor (endPoint, name, parentFolder)
 	)
 	self.PermissionBlock:SetDisplayNameFunction (function () return self:GetDisplayPath () end)
 	self.PermissionBlock:SetNameFunction (function () return self:GetPath () end)
-	self.PermissionBlock:AddEventListener ("PermissionsChanged", tostring (self), function () self:DispatchEvent ("PermissionsChanged") end)
+	self.PermissionBlock:AddEventListener ("PermissionsChanged", self:GetHashCode (), function () self:DispatchEvent ("PermissionsChanged") end)
 	
 	VFS.PermissionBlockNetworker:HookRemoteBlock (self.PermissionBlock)
 	
