@@ -105,7 +105,7 @@ function self:EnumerateChildren (authId, callback)
 	VFS.EnumerateDelayed (new,
 		function (name, nodeType)
 			self.Children [name] = (nodeType == VFS.NodeType.Folder and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, self.FileSystemPath, name, self)
-			self.LowercaseChildren [name:lower ()] = self.Children [name]
+			self.LowercaseChildren [string.lower (name)] = self.Children [name]
 			self:DispatchEvent ("NodeCreated", self.Children [name])
 		end,
 		function ()
@@ -123,8 +123,14 @@ end
 function self:GetDirectChild (authId, name, callback)
 	callback = callback or VFS.NullCallback
 	
-	local lowercaseName = name:lower ()
-	if self.Children [name] or self.LowercaseChildren [lowercaseName] or self:CheckExists (name) then callback (VFS.ReturnCode.Success, self.Children [name] or self.LowercaseChildren [lowercaseName]) return end
+	local lowercaseName = string.lower (name)
+	if self.Children [name] or
+	   self.LowercaseChildren [lowercaseName] or
+	   self:CheckExists (name) then
+		callback (VFS.ReturnCode.Success, self.Children [name] or self.LowercaseChildren [lowercaseName])
+		return
+	end
+	
 	callback (VFS.ReturnCode.NotFound)
 end
 
@@ -177,11 +183,13 @@ end
 ]]
 function self:CheckExists (name)
 	if file.Exists (self.FolderPath .. name, self.FileSystemPath) then
+		-- Add the child
 		self.Children [name] = (file.IsDir (self.FolderPath .. name, self.FileSystemPath) and VFS.RealFolder or VFS.RealFile) (self.FolderPath .. name, self.FileSystemPath, name, self)
 		self.LowercaseChildren [name:lower ()] = self.Children [name]
 		self:DispatchEvent ("NodeCreated", self.Children [name])
 		return true
 	else
+		-- Remove the child if we still have it
 		local node = self.Children [name]
 		if node then
 			self.Children [name] = nil
@@ -189,6 +197,7 @@ function self:CheckExists (name)
 			self:DispatchEvent ("NodeDeleted", node)
 			node:DispatchEvent ("Deleted")
 		end
+		
 		return false
 	end
 end
