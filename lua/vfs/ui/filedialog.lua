@@ -8,6 +8,8 @@ function self:Init ()
 	self:SetDeleteOnClose (true)
 	self:MakePopup ()
 	
+	self:SetKeyboardMap (Gooey.DialogKeyboardMap)
+	
 	self.SuggestedName = ""
 	self.Callback = VFS.NullCallback
 	
@@ -117,6 +119,10 @@ function self:Init ()
 	self.DialogId = nil
 	
 	self:SetPath (VFS.GetLocalHomeDirectory ())
+end
+
+function self:Close ()
+	self:Remove ()
 end
 
 function self:ClearError ()
