@@ -221,6 +221,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 				local mountPaths =
 				{
 					"data/adv_duplicator",
+					"data/advdupe2",
 					"data/cadmin/client_logs",
 					"data/CPUChip",
 					"data/e2files",
@@ -229,6 +230,8 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 					"data/LemonGate",
 					"data/luapad",
 					"data/GPUChip",
+					"data/pac2_outfits",
+					"data/pac3",
 					"data/SPUChip",
 					"data/Starfall",
 					"screenshots"
