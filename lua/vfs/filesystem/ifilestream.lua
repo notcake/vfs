@@ -46,7 +46,7 @@ end
 --[[
 	IFileStream:Read (size, function (returnCode, data))
 	
-		returnCode may be Success, Progress or TimedOut.
+		returnCode may be Success, Progress or Timeout.
 ]]
 function self:Read (size, callback)
 	VFS.Error ("IFileStream:Read : Not implemented")
@@ -61,7 +61,7 @@ end
 --[[
 	IFileStream:Write (size, data, function (returnCode))
 	
-		returnCode may be Success, Progress or TimedOut.
+		returnCode may be Success, Progress or Timeout.
 ]]
 function self:Write (size, data, callback)
 	VFS.Error ("IFileStream:Write : Not implemented")

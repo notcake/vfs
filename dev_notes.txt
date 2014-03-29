@@ -47,7 +47,7 @@ Function list:
 			VFS.ReturnCode.Success : childNode contains a child INode. The same INode may be provided multiple times. INode:GetName () will be unique for every child node in a folder.
 			VFS.ReturnCode.Finished : Indicates that the enumeration is done and the callback will not be called any more.
 			VFS.ReturnCode.AccessDenied : The user identified by authId does not have the View Folder permission for this folder.
-			VFS.ReturnCode.TimedOut : No response from the server / client within a reasonable period of time.
+			VFS.ReturnCode.Timeout : No response from the server / client within a reasonable period of time.
 	IFolder:EnumerateChildrenSynchronous ()
 		Returns: an array of INodes
 	IFolder:GetChild (authId, relativePath, function (returnCode, INode childNode))
@@ -83,7 +83,7 @@ Function list:
 		returnCode can be:
 			VFS.ReturnCode.Progres : data is a number between 0 and 1 indicating the progress of the read operation
 			VFS.ReturnCode.Success : data contains the data read and the callback won't be called any more
-			VFS.ReturnCode.TimedOut
+			VFS.ReturnCode.Timeout
 	IFileStream:Write (sizeInBytes, data, function (returnCode))
 
 	PermissionBlock:AddGroupEntry (authId, groupId, function (returnCode))

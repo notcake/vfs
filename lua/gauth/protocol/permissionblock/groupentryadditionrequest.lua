@@ -18,7 +18,7 @@ function self:HandlePacket (inBuffer)
 end
 
 function self:HandleTimeOut ()
-	self.Callback (GAuth.ReturnCode.TimedOut)
+	self.Callback (GAuth.ReturnCode.Timeout)
 end
 
 function self:ToString ()

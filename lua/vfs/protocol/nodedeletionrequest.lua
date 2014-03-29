@@ -20,5 +20,5 @@ function self:HandlePacket (inBuffer)
 end
 
 function self:HandleTimeOut ()
-	self.Callback (VFS.ReturnCode.TimedOut)
+	self.Callback (VFS.ReturnCode.Timeout)
 end

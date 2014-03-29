@@ -2,7 +2,7 @@ VFS.ReturnCode = VFS.Enum (
 	{
 		Success         = 0,
 		AccessDenied    = 1,
-		TimedOut        = 2,
+		Timeout         = 2,
 		EndOfBurst      = 3,
 		Finished        = 4,
 		NotFound        = 5,
