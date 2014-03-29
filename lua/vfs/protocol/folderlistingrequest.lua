@@ -34,3 +34,8 @@ function self:HandlePacket (inBuffer)
 		end
 	end
 end
+
+function self:HandleTimeOut ()
+	self:DispatchEvent ("RunCallback", VFS.ReturnCode.Timeout)
+	self:DispatchEvent ("RunCallback", VFS.ReturnCode.Finished)
+end

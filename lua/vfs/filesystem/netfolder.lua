@@ -88,12 +88,6 @@ function self:EnumerateChildren (authId, callback)
 				return receivedNode
 			end)
 			
-			self.FolderListingRequest:AddEventListener ("Timeout", function (request)
-				request:DispatchEvent ("RunCallback", VFS.ReturnCode.Timeout)
-				request:DispatchEvent ("RunCallback", VFS.ReturnCode.Finished)
-				self.FolderListingRequest = nil
-			end)
-			
 			local failed = false
 			self.FolderListingRequest:AddEventListener ("RunCallback", function (request, returnCode)
 				if returnCode == VFS.ReturnCode.Success then

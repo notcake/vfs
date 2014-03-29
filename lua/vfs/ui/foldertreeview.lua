@@ -245,17 +245,19 @@ function self:Populate (filesystemNode, treeViewNode)
 			if not treeViewNode:IsValid () then return end
 			
 			if returnCode == VFS.ReturnCode.Success then
-				self:AddFilesystemNode (treeViewNode, node)
+				local childNode = self:AddFilesystemNode (treeViewNode, node)
 				
-				-- Relayout the node at intervals
-				-- if we do this every time a node is added, it creates
-				-- excessive framerate drops.
-				if treeViewNode:GetChildCount () < 10 or SysTime () - lastLayout > 0.2 then
-					treeViewNode:SuppressLayout (false)
-					treeViewNode:SortChildren ()
-					lastLayout = SysTime ()
-				else
-					treeViewNode:SuppressLayout (true)
+				if childNode then
+					-- Relayout the node at intervals
+					-- if we do this every time a node is added, it creates
+					-- excessive framerate drops.
+					if treeViewNode:GetChildCount () < 10 or SysTime () - lastLayout > 0.2 then
+						treeViewNode:SuppressLayout (false)
+						treeViewNode:SortChildren ()
+						lastLayout = SysTime ()
+					else
+						treeViewNode:SuppressLayout (true)
+					end
 				end
 			elseif returnCode == VFS.ReturnCode.EndOfBurst then		
 				self:LayoutNode (treeViewNode)
@@ -379,7 +381,7 @@ end
 
 -- Internal, do not call
 function self:AddFilesystemNode (treeViewNode, filesystemNode)	
-	if filesystemNode:IsFile () and not self.ShowFiles then return end
+	if filesystemNode:IsFile () and not self.ShowFiles then return nil end
 	if treeViewNode.AddedNodes and treeViewNode.AddedNodes [filesystemNode:GetName ()] then
 		return treeViewNode.AddedNodes [filesystemNode:GetName ()]
 	end
