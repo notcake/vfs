@@ -42,11 +42,7 @@ function self:ctor (path)
 end
 
 function self:GetEnumerator ()
-	local i = 0
-	return function ()
-		i = i + 1
-		return self.Segments [i]
-	end
+	return GLib.ArrayEnumerator (self.Segments)
 end
 
 function self:GetPath ()

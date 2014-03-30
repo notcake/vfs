@@ -62,11 +62,7 @@ function self:GetUserEnumerator ()
 		end
 	end
 	
-	local next, tbl, key = pairs (userList)
-	return function ()
-		key = next (tbl, key)
-		return key
-	end
+	return GLib.KeyEnumerator (userList)
 end
 
 function self:IsGroup ()

@@ -14,11 +14,7 @@ function self:AddPermission (actionId)
 end
 
 function self:GetPermissionEnumerator ()
-	local next, tbl, key = pairs (self.Permissions)
-	return function ()
-		key = next (tbl, key)
-		return key
-	end
+	return GLib.KeyEnumerator (self.Permissions)
 end
 
 function self:PermissionExists (actionId)

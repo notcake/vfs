@@ -196,11 +196,7 @@ function self:GetGroupAccess (groupId, actionId, permissionBlock)
 end
 
 function self:GetGroupEntryEnumerator ()
-	local next, tbl, key = pairs (self.GroupEntries)
-	return function ()
-		key = next (tbl, key)
-		return key
-	end
+	return GLib.KeyEnumerator (self.GroupEntries)
 end
 
 function self:GetGroupPermission (groupId, actionId, permissionBlock)

@@ -114,7 +114,7 @@ end
 		Returns: ()->(name, GroupTreeNode childNode)
 ]]
 function self:GetChildEnumerator ()
-	return pairs (self.Children)
+	return GLib.KeyValueEnumerator (self.Children)
 end
 
 function self:IsGroupTree ()
