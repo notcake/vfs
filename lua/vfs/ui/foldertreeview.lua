@@ -195,6 +195,8 @@ function self:UnhookNode (node)
 end
 
 function self:UnhookNodeRecursive (treeViewNode)
+	if not treeViewNode then return end
+	
 	self:UnhookNode (treeViewNode.Node)
 	if not treeViewNode.AddedNodes then return end
 	for _, childNode in pairs (treeViewNode.AddedNodes) do
