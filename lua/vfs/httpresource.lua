@@ -38,6 +38,8 @@ function self:Open (authId, openFlags, callback)
 	local uri = self.Uri
 	-- pastebin.com/([a-zA-Z0-9]*) to pastebin.com/raw.php?i=%1
 	uri = string.gsub (uri, "pastebin.com/([a-zA-Z0-9]*)$", "pastebin.com/raw.php?i=%1")
+	-- github.com/(.*)/(.*)/blob/ to github.com/%1/%2/raw/
+	uri = string.gsub (uri, "github.com/([a-zA-Z0-9_]+)/([a-zA-Z0-9_]+)/blob/", "github.com/%1/%2/raw/")
 	
 	http.Fetch (uri,
 		function (data)
