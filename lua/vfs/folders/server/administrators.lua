@@ -14,6 +14,7 @@ VFS.Root:CreateFolder (GAuth.GetSystemId (), "Admins",
 			"data/DarkRP_logs",
 			"data/ev_logs",
 			"data/FAdmin_logs",
+			"data/sv_logs",
 			"data/ulx_logs"
 		}
 		local mountNames = {}
