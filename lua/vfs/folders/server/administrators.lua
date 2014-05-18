@@ -13,18 +13,20 @@ VFS.Root:CreateFolder (GAuth.GetSystemId (), "Admins",
 			"data/cadmin/logs",
 			"data/DarkRP_logs",
 			"data/ev_logs",
+			"data/exsto/logs",
 			"data/FAdmin_logs",
 			"data/sv_logs",
 			"data/ulx_logs"
 		}
 		local mountNames = {}
-		mountNames [3] = "cadmin_logs"
-		for k, realPath in ipairs (mountPaths) do
+		mountNames ["data/cadmin/logs"] = "cadmin_logs"
+		mountNames ["data/exsto/logs" ] = "exsto_logs"
+		for _, realPath in ipairs (mountPaths) do
 			VFS.RealRoot:GetChild (GAuth.GetSystemId (), realPath,
 				function (returnCode, node)
 					if returnCode ~= VFS.ReturnCode.Success then return end
 					
-					local name = mountNames [k] or ""
+					local name = mountNames [realPath] or ""
 					if name == "" then name = node:GetName () end
 					folder:Mount (name, node, name)
 				end
