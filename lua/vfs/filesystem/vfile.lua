@@ -1,5 +1,5 @@
 local self = {}
-VFS.VFile = VFS.MakeConstructor (self, VFS.IFile, VFS.VNode)
+VFS.VFile = VFS.MakeConstructor (self, VFS.VNode, VFS.IFile)
 
 function self:ctor (name, parentFolder)
 	self.Size = 0

@@ -1,5 +1,5 @@
 local self = {}
-VFS.MountedFile = VFS.MakeConstructor (self, VFS.IFile, VFS.MountedNode)
+VFS.MountedFile = VFS.MakeConstructor (self, VFS.MountedNode, VFS.IFile)
 
 function self:ctor (nameOverride, mountedNode, parentFolder)
 end

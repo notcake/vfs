@@ -1,5 +1,5 @@
 local self = {}
-VFS.NetFolder = VFS.MakeConstructor (self, VFS.IFolder, VFS.NetNode)
+VFS.NetFolder = VFS.MakeConstructor (self, VFS.NetNode, VFS.IFolder)
 
 function self:ctor (endPoint, path, name, parentFolder)
 	self.FolderPath = self:GetPath () == "" and "" or self:GetPath () .. "/"

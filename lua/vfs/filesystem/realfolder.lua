@@ -1,5 +1,5 @@
 local self = {}
-VFS.RealFolder = VFS.MakeConstructor (self, VFS.IFolder, VFS.RealNode)
+VFS.RealFolder = VFS.MakeConstructor (self, VFS.RealNode, VFS.IFolder)
 
 function self:ctor (path, fileSystemPath, name, parentFolder)
 	self.FolderPath = self:GetPath () == "" and "" or self:GetPath () .. "/"

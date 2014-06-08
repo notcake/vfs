@@ -1,5 +1,5 @@
 local self = {}
-VFS.NetFile = VFS.MakeConstructor (self, VFS.IFile, VFS.NetNode)
+VFS.NetFile = VFS.MakeConstructor (self, VFS.NetNode, VFS.IFile)
 
 function self:ctor (endPoint, path, name, parentFolder)
 	self.Size = -1
