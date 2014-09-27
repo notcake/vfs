@@ -78,7 +78,7 @@ function self:SetGroup (group)
 	if not group:IsGroup () then return end
 	self.Group = group
 	for userId in self.Group:GetUserEnumerator () do
-		local listBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
+		local listBoxItem = self:AddItem (userId, GAuth.GetUserDisplayName (userId))
 		listBoxItem:SetIcon (GAuth.GetUserIcon (userId))
 		listBoxItem.UserId = userId
 	end
@@ -86,7 +86,7 @@ function self:SetGroup (group)
 	
 	self.Group:AddEventListener ("UserAdded", self:GetHashCode (),
 		function (_, userId)
-			local listBoxItem = self:AddItem (GAuth.GetUserDisplayName (userId), userId)
+			local listBoxItem = self:AddItem (userId, GAuth.GetUserDisplayName (userId))
 			listBoxItem:SetIcon (GAuth.GetUserIcon (userId))
 			listBoxItem.UserId = userId
 			self:Sort ()
@@ -95,12 +95,7 @@ function self:SetGroup (group)
 	
 	self.Group:AddEventListener ("UserRemoved", self:GetHashCode (),
 		function (_, userId)
-			for _, item in pairs (self:GetItems ()) do
-				if item.UserId == userId then
-					self:RemoveItem (item)
-					return
-				end
-			end
+			self:RemoveItem (userId)
 		end
 	)
 end

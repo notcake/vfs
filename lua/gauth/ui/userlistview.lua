@@ -8,7 +8,7 @@ local self = {}
 
 function self:Init ()
 	for userId in GAuth.PlayerMonitor:GetUserEnumerator () do
-		local item = self:AddItem (GAuth.PlayerMonitor:GetUserName (userId), userId)
+		local item = self:AddItem (userId, GAuth.PlayerMonitor:GetUserName (userId))
 		item:SetIcon (GAuth.GetUserIcon (userId))
 		item.UserId = userId
 	end

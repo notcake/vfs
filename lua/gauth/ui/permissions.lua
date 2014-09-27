@@ -449,11 +449,11 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 			end
 			
 			local groupEntryCount = 0
-			for _, item in pairs (self.Groups:GetItems ()) do
-				if item.PermissionBlockIndex == permissionBlockIndex then
-					if item.GroupId == groupId then
-						self.Groups:RemoveItem (item)
-					elseif item.IsGroup then
+			for listBoxItem in self.Groups:GetItemEnumerator () do
+				if listBoxItem.PermissionBlockIndex == permissionBlockIndex then
+					if listBoxItem.GroupId == groupId then
+						self.Groups:RemoveItem (listBoxItem)
+					elseif listBoxItem.IsGroup then
 						groupEntryCount = groupEntryCount + 1
 					end
 				end
@@ -503,13 +503,13 @@ function self:HookBlockPermissions (permissionBlock, permissionBlockIndex)
 				end
 				
 				-- Remove parent group entries
-				for _, item in pairs (self.Groups:GetItems ()) do
-					if item.PermissionBlockIndex > permissionBlockIndex then
+				for listBoxItem in self.Groups:GetItemEnumerator () do
+					if listBoxItem.PermissionBlockIndex > permissionBlockIndex then
 						-- Unregister permission block header
-						if item.IsPermissionBlock then
-							self.PermissionBlockHeaders [item.PermissionBlockIndex] = nil
+						if listBoxItem.IsPermissionBlock then
+							self.PermissionBlockHeaders [listBoxItem.PermissionBlockIndex] = nil
 						end
-						self.Groups:RemoveItem (item)
+						self.Groups:RemoveItem (listBoxItem)
 					end
 				end
 			end
