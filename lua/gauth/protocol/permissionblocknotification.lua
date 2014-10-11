@@ -27,6 +27,8 @@ function self:GenerateInitialPacket (outBuffer)
 		outBuffer:UInt32 (session:GetTypeId ())
 		session:GenerateInitialPacket (outBuffer)
 	end
+	
+	GAuth.Debug ("PermissionBlockNotification:GenerateInitialPacket : " .. self.PermissionBlock:GetName ())
 end
 
 function self:HandleInitialPacket (inBuffer)

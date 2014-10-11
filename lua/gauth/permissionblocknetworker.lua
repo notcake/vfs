@@ -201,7 +201,11 @@ function self:HandleNotification (remoteEndPoint, permissionBlockId, inBuffer)
 		GAuth.Debug (self:GetSystemName () .. ".PermissionBlockNetworker:HandleNotification : Failed to resolve " .. permissionBlockId .. "\n")
 		return
 	end
-	if not self:ShouldProcessNotification (remoteEndPoint:GetRemoteId (), permissionBlockId, permissionBlock) then return end
+	
+	if not self:ShouldProcessNotification (remoteEndPoint:GetRemoteId (), permissionBlockId, permissionBlock) then
+		GAuth.Debug (self:GetSystemName () .. ".PermissionBlockNetworker:HandleNotification : Ignoring notification from " .. remoteEndPoint:GetRemoteId () .. " for " .. permissionBlockId .. "\n")
+		return
+	end
 	
 	return self:HandleNotificationForBlock (permissionBlock, inBuffer)
 end

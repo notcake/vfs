@@ -105,6 +105,10 @@ end
 
 VFS.AddReloadCommand ("vfs/vfs.lua", "vfs", "VFS")
 
+function VFS.Debug (message)
+	-- print ("[VFS] " .. message)
+end
+
 local nextUniqueName = -1
 function VFS.GetUniqueName ()
 	nextUniqueName = nextUniqueName + 1
@@ -252,6 +256,7 @@ VFS.PlayerMonitor:AddEventListener ("PlayerConnected",
 					end
 				)
 				
+				-- Set up networking
 				VFS.EndPointManager:GetEndPoint ("Server"):HookNode (mountedFolder)
 				VFS.PermissionBlockNetworker:SynchronizeBlock ("Server", mountedFolder:GetPermissionBlock ())
 			end

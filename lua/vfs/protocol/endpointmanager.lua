@@ -52,8 +52,8 @@ VFS.PermissionBlockNetworker:SetRequestFilter (
 		if not node then VFS.Error ("Failed to resolve path " .. path) return false end
 		node = node:GetInner ()
 		
-		if not node.EndPoint then VFS.Error ("Non networked node " .. path) return false end
-		if node:IsPredicted () then VFS.Debug (path .. " is predicted.") return false end
+		if not node.EndPoint then VFS.Error ("Invalid request involving non-networked node " .. path) return false end
+		if node:IsPredicted () then VFS.Debug ("Node " .. path .. " is being predicted, suppressing network request.") return false end
 		
 		VFS.Debug ("Remote: " .. node.EndPoint:GetRemoteId () .. ": " .. path)
 		return true, node.EndPoint:GetRemoteId ()

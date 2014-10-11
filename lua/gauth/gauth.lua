@@ -13,6 +13,10 @@ GAuth.PlayerMonitor = GAuth.PlayerMonitor ("GAuth")
 
 GAuth.AddReloadCommand ("gauth/gauth.lua", "gauth", "GAuth")
 
+function GAuth.Debug (message)
+	-- print ("[GAuth] " .. message)
+end
+
 function GAuth.GetUserDisplayName (userId)
 	return GAuth.PlayerMonitor:GetUserName (userId)
 end

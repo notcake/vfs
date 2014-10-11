@@ -14,6 +14,8 @@ end
 function self:HandleInitialPacket (inBuffer)
 	self.GroupId = inBuffer:String ()
 	
+	GAuth.Debug ("GroupEntryAdditionNotification : " .. self.GroupId .. " added to " .. self.PermissionBlock:GetName () .. "\n")
+	
 	self.PermissionBlock:DispatchEvent ("NotifyGroupEntryAdded", self.GroupId)
 end
 
