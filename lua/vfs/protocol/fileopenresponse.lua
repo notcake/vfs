@@ -75,13 +75,16 @@ function self:HandlePacket (inBuffer)
 end
 
 function self:HandleRead (subRequestId, inBuffer)
-	local pos = inBuffer:UInt32 ()
+	local pos  = inBuffer:UInt32 ()
 	local size = inBuffer:UInt32 ()
 	self.FileStream:Seek (pos)
 	self.FileStream:Read (size,
 		function (returnCode, data)
 			if returnCode == VFS.ReturnCode.Progress then return end
 			if returnCode == VFS.ReturnCode.Success then
+				-- data is the chunk of data we need to send
+				local compressedData = util.Compress (data)
+				
 				local chunkSize = 1024
 				local dataTable = nil
 				dataTable =
@@ -89,15 +92,16 @@ function self:HandleRead (subRequestId, inBuffer)
 					Position = pos,
 					ReadSize = size,
 					SentSize = 0,
-					Data = data,
+					Data = compressedData,
 					Index = 1,
 					
 					TickInterval = 0.05,
 					Tick = function ()
-						local chunk = data:sub (dataTable.SentSize + 1, dataTable.SentSize + chunkSize)
+						local chunk = string.sub (dataTable.Data, dataTable.SentSize + 1, dataTable.SentSize + chunkSize)
 						local outBuffer = self:CreatePacket ()
 						outBuffer:UInt32 (subRequestId)
 						outBuffer:UInt8 (VFS.ReturnCode.Success)
+						outBuffer:UInt32 (#dataTable.Data)
 						outBuffer:UInt16 (dataTable.Index)
 						dataTable.Index = dataTable.Index + 1
 						
@@ -105,7 +109,7 @@ function self:HandleRead (subRequestId, inBuffer)
 						self:QueuePacket (outBuffer)
 						
 						dataTable.SentSize = dataTable.SentSize + chunkSize
-						if dataTable.SentSize >= dataTable.ReadSize then
+						if dataTable.SentSize >= #dataTable.Data then
 							self.SubRequestData [subRequestId] = nil
 						end
 					end

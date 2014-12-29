@@ -83,14 +83,15 @@ function self:Read (pos, size, callback)
 	self.SubRequestTypes [self.NextSubRequestId] = VFS.Protocol.FileStreamAction.Read
 	self.SubRequestData [self.NextSubRequestId] = dataTable
 	self.SubRequestCallbacks [self.NextSubRequestId] = function (returnCode, inBuffer)
-		local index = inBuffer:UInt16 ()
-		local data = inBuffer:String ()
+		local totalLength = inBuffer:UInt32 ()
+		local index       = inBuffer:UInt16 ()
+		local data        = inBuffer:String ()
 		dataTable.Blocks [index] = data
-		dataTable.ReceivedSize = dataTable.ReceivedSize + data:len ()
-		if dataTable.ReceivedSize >= dataTable.ReadSize then
-			callback (VFS.ReturnCode.Success, table.concat (dataTable.Blocks))
+		dataTable.ReceivedSize = dataTable.ReceivedSize + #data
+		if dataTable.ReceivedSize >= totalLength then
+			callback (VFS.ReturnCode.Success, util.Decompress (table.concat (dataTable.Blocks)))
 		else
-			callback (VFS.ReturnCode.Progress, dataTable.ReceivedSize / dataTable.ReadSize)
+			callback (VFS.ReturnCode.Progress, dataTable.ReceivedSize / totalLength)
 		end
 		return true
 	end
