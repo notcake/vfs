@@ -89,7 +89,7 @@ function self:Read (pos, size, callback)
 		dataTable.Blocks [index] = data
 		dataTable.ReceivedSize = dataTable.ReceivedSize + #data
 		if dataTable.ReceivedSize >= totalLength then
-			callback (VFS.ReturnCode.Success, util.Decompress (table.concat (dataTable.Blocks)))
+			callback (VFS.ReturnCode.Success, util.Decompress (table.concat (dataTable.Blocks)) or "")
 		else
 			callback (VFS.ReturnCode.Progress, dataTable.ReceivedSize / totalLength)
 		end

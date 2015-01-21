@@ -83,7 +83,7 @@ function self:HandleRead (subRequestId, inBuffer)
 			if returnCode == VFS.ReturnCode.Progress then return end
 			if returnCode == VFS.ReturnCode.Success then
 				-- data is the chunk of data we need to send
-				local compressedData = util.Compress (data)
+				local compressedData = util.Compress (data) or ""
 				
 				local chunkSize = 1024
 				local dataTable = nil
