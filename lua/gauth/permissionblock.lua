@@ -1,5 +1,5 @@
 local self = {}
-GAuth.PermissionBlock = GAuth.MakeConstructor (self)
+GAuth.PermissionBlock = GAuth.MakeConstructor (self, GAuth.Serialization.ISerializable)
 
 --[[
 	Events:
@@ -49,30 +49,111 @@ GAuth.PermissionBlock = GAuth.MakeConstructor (self)
 function self:ctor ()
 	self.PermissionDictionary = nil
 
-	self.OwnerId = GAuth.GetSystemId ()
-	self.GroupEntries = {}
+	self.OwnerId              = GAuth.GetSystemId ()
+	self.GroupEntries         = {}
 	
-	self.InheritOwner = true
-	self.InheritPermissions = true
+	self.InheritOwner         = true
+	self.InheritPermissions   = true
 	
-	self.Parent = nil
-	self.ParentFunction = nil
+	self.Parent               = nil
+	self.ParentFunction       = nil
 	
-	self.Name = "Unknown"
-	self.NameFunction = nil
-	self.DisplayName = "Unknown"
-	self.DisplayNameFunction = nil
+	self.Name                 = "Unknown"
+	self.NameFunction         = nil
+	self.DisplayName          = "Unknown"
+	self.DisplayNameFunction  = nil
 	
 	GAuth.EventProvider (self)
 	
-	self:AddEventListener ("NotifyGroupEntryAdded",           self.NotifyGroupEntryAdded)
-	self:AddEventListener ("NotifyGroupEntryRemoved",         self.NotifyGroupEntryRemoved)
-	self:AddEventListener ("NotifyGroupPermissionChanged",    self.NotifyGroupPermissionChanged)	
-	self:AddEventListener ("NotifyInheritOwnerChanged",       self.NotifyInheritOwnerChanged)
+	self:AddEventListener ("NotifyGroupEntryAdded",           self.NotifyGroupEntryAdded          )
+	self:AddEventListener ("NotifyGroupEntryRemoved",         self.NotifyGroupEntryRemoved        )
+	self:AddEventListener ("NotifyGroupPermissionChanged",    self.NotifyGroupPermissionChanged   )	
+	self:AddEventListener ("NotifyInheritOwnerChanged",       self.NotifyInheritOwnerChanged      )
 	self:AddEventListener ("NotifyInheritPermissionsChanged", self.NotifyInheritPermissionsChanged)
-	self:AddEventListener ("NotifyOwnerChanged",              self.NotifyOwnerChanged)
+	self:AddEventListener ("NotifyOwnerChanged",              self.NotifyOwnerChanged             )
 end
 
+-- ISerializable
+function self:Serialize (outBuffer)
+	outBuffer = outBuffer or GAuth.StringOutBuffer ()
+	outBuffer:Boolean (self.InheritOwner)
+	outBuffer:Boolean (self.InheritPermissions)
+	outBuffer:StringN8 (self.OwnerId)
+	
+	for groupId, groupEntry in pairs (self.GroupEntries) do
+		outBuffer:StringN8 (groupId)
+		for actionId, access in pairs (groupEntry) do
+			if access ~= GAuth.Access.None then
+				outBuffer:StringN8 (actionId)
+				outBuffer:UInt8 (access)
+			end
+		end
+		outBuffer:StringN8 ("")
+	end
+	outBuffer:StringN8 ("")
+	
+	return outBuffer
+end
+
+function self:Deserialize (inBuffer)
+	if type (inBuffer) == "string" then inBuffer = GAuth.StringInBuffer (inBuffer) end
+
+	self:SetInheritOwner       (GAuth.GetSystemId (), inBuffer:Boolean ())
+	self:SetInheritPermissions (GAuth.GetSystemId (), inBuffer:Boolean ())
+	if not self:InheritsOwner () then
+		self:SetOwner (GAuth.GetSystemId (), inBuffer:StringN8 ())
+	else
+		self.OwnerId = inBuffer:StringN8 ()
+	end
+	
+	local groupId = inBuffer:StringN8 ()
+	while groupId ~= "" do
+		self:AddGroupEntry (GAuth.GetSystemId (), groupId)
+		
+		local actionId = inBuffer:StringN8 ()
+		while actionId ~= "" do
+			self:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, inBuffer:UInt8 ())
+			actionId = inBuffer:StringN8 ()
+		end
+		
+		groupId = inBuffer:StringN8 ()
+	end
+end
+
+function self:Clone (clone)
+	clone = clone or self.__ictor ()
+	
+	clone:Copy (self)
+	
+	return clone
+end
+
+function self:Copy (source)
+	self.OwnerId             = source:GetOwner ()
+	self.GroupEntries        = {}
+	
+	self.InheritOwner        = source:InheritsOwner ()
+	self.InheritPermissions  = source:InheritPermissions ()
+	
+	self.Parent              = source.Parent
+	self.ParentFunction      = source.ParentFunction
+	
+	self.Name                = source.Name
+	self.NameFunction        = source.NameFunction
+	self.DisplayName         = source.DisplayName
+	self.DisplayNameFunction = source.DisplayNameFunction
+	
+	for groupId, groupEntry in pairs (source.GroupEntries) do
+		self.GroupEntries [groupId] = {}
+		for actionId, access in pairs (groupEntry) do
+			self.GroupEntries [groupId] [actionId] = access
+		end
+	end
+	
+	return self
+end
+
+-- PermissionBlock
 function self:AddGroupEntry (authId, groupId, callback)
 	callback = callback or GAuth.NullCallback
 
@@ -86,53 +167,6 @@ function self:AddGroupEntry (authId, groupId, callback)
 	self:DispatchEvent ("PermissionsChanged")
 	
 	callback (GAuth.ReturnCode.Success)
-end
-
-function self:CopyFrom (permissionBlock)
-	self.OwnerId = permissionBlock.OwnerId
-	self.GroupEntries = {}
-	
-	self.InheritOwner = permissionBlock.InheritOwner
-	self.InheritPermissions = permissionBlock.InheritPermissions
-	
-	self.Parent = permissionBlock.Parent
-	self.ParentFunction = permissionBlock.ParentFunction
-	
-	self.Name = permissionBlock.Name
-	self.NameFunction = permissionBlock.NameFunction
-	self.DisplayName = permissionBlock.DisplayName
-	self.DisplayNameFunction = permissionBlock.DisplayNameFunction
-	
-	for groupId, groupEntry in pairs (permissionBlock.GroupEntries) do
-		self.GroupEntries [groupId] = {}
-		for actionId, access in pairs (groupEntry) do
-			self.GroupEntries [groupId] [actionId] = access
-		end
-	end
-end
-
-function self:Deserialize (inBuffer)
-	if type (inBuffer) == "string" then inBuffer = GAuth.StringInBuffer (inBuffer) end
-
-	self:SetInheritOwner (GAuth.GetSystemId (), inBuffer:Boolean ())
-	self:SetInheritPermissions (GAuth.GetSystemId (), inBuffer:Boolean ())
-	if not self:InheritsOwner () then
-		self:SetOwner (GAuth.GetSystemId (), inBuffer:String ())
-	else
-		self.OwnerId = inBuffer:String ()
-	end
-	
-	local groupId = inBuffer:String ()
-	while groupId ~= "" do
-		self:AddGroupEntry (GAuth.GetSystemId (), groupId)
-		
-		local actionId = inBuffer:String ()
-		while actionId ~= "" do
-			self:SetGroupPermission (GAuth.GetSystemId (), groupId, actionId, inBuffer:UInt8 ())
-			actionId = inBuffer:String ()
-		end
-		groupId = inBuffer:String ()
-	end
 end
 
 function self:GetAccess (authId, actionId, permissionBlock)
@@ -268,25 +302,6 @@ function self:RemoveGroupEntry (authId, groupId, callback)
 	self:DispatchEvent ("PermissionsChanged")
 	
 	callback (GAuth.ReturnCode.Success)
-end
-
-function self:Serialize (outBuffer)
-	outBuffer = outBuffer or GAuth.StringOutBuffer ()
-	outBuffer:Boolean (self.InheritOwner)
-	outBuffer:Boolean (self.InheritPermissions)
-	outBuffer:String (self.OwnerId)
-	for groupId, groupEntry in pairs (self.GroupEntries) do
-		outBuffer:String (groupId)
-		for actionId, access in pairs (groupEntry) do
-			if access ~= GAuth.Access.None then
-				outBuffer:String (actionId)
-				outBuffer:UInt8 (access)
-			end
-		end
-		outBuffer:String ("")
-	end
-	outBuffer:String ("")
-	return outBuffer
 end
 
 function self:SetGroupPermission (authId, groupId, actionId, access, callback)

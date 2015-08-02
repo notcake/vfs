@@ -260,7 +260,7 @@ function self:Confirm (query, title, yesCallback, noCallback, permissionBlock, t
 	else
 		Derma_Query ("This will lock you out of this permission block.\n\n" .. query, title,
 			"Yes", function () yesCallback (permissionBlock) end,
-			"No", function () testPermissionBlock:CopyFrom (permissionBlock) noCallback () end
+			"No",  function () testPermissionBlock:Copy (permissionBlock) noCallback () end
 		)
 	end
 end
@@ -270,7 +270,7 @@ function self:SetPermissionBlock (permissionBlock)
 
 	self.PermissionBlock = permissionBlock
 	self.TestPermissionBlock = GAuth.PermissionBlock ()
-	self.TestPermissionBlock:CopyFrom (self.PermissionBlock)
+	self.TestPermissionBlock:Copy (self.PermissionBlock)
 	self.TestAccess = self.TestPermissionBlock:IsAuthorized (GAuth.GetLocalId (), "Modify Permissions")
 	self:SetTitle ("Permissions - " .. permissionBlock:GetDisplayName ())
 	
