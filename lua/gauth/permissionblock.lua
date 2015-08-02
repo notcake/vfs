@@ -1,5 +1,5 @@
 local self = {}
-GAuth.PermissionBlock = GAuth.MakeConstructor (self, GAuth.Serialization.ISerializable)
+GAuth.PermissionBlock = GAuth.MakeConstructor (self, GLib.Serialization.ISerializable)
 
 --[[
 	Events:
@@ -75,7 +75,6 @@ end
 
 -- ISerializable
 function self:Serialize (outBuffer)
-	outBuffer = outBuffer or GAuth.StringOutBuffer ()
 	outBuffer:Boolean (self.InheritOwner)
 	outBuffer:Boolean (self.InheritPermissions)
 	outBuffer:StringN8 (self.OwnerId)
@@ -96,8 +95,6 @@ function self:Serialize (outBuffer)
 end
 
 function self:Deserialize (inBuffer)
-	if type (inBuffer) == "string" then inBuffer = GAuth.StringInBuffer (inBuffer) end
-
 	self:SetInheritOwner       (GAuth.GetSystemId (), inBuffer:Boolean ())
 	self:SetInheritPermissions (GAuth.GetSystemId (), inBuffer:Boolean ())
 	if not self:InheritsOwner () then

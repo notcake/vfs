@@ -141,7 +141,8 @@ function self:LoadNextGroup (inBuffer, callback)
 	GAuth.Groups:AddGroupTreeNodeRecursive (GAuth.GetSystemId (), groupId, isGroupTree,
 		function (returnCode, groupTreeNode)
 			if returnCode == GAuth.ReturnCode.Success then
-				groupTreeNode:GetPermissionBlock ():Deserialize (inBuffer:String ())
+				local subInBuffer = GAuth.StringInBuffer (inBuffer:String ())
+				groupTreeNode:GetPermissionBlock ():Deserialize (subInBuffer)
 				if not isGroupTree then
 					local userId = inBuffer:String ()
 					while userId ~= "" do
@@ -196,7 +197,10 @@ function self:SaveNode (groupTreeNode, outBuffer)
 	if save then
 		outBuffer:String (groupTreeNode:GetFullName ())
 		outBuffer:Boolean (groupTreeNode:IsGroupTree ())
-		outBuffer:String (groupTreeNode:GetPermissionBlock ():Serialize ():GetString ())
+		
+		local subOutBuffer = GAuth.StringOutBuffer ()
+		groupTreeNode:GetPermissionBlock ():Serialize (subOutBuffer)
+		outBuffer:String (subOutBuffer:GetString ())
 	end
 	if groupTreeNode:IsGroup () then
 		if save then
