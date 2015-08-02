@@ -29,7 +29,9 @@ function self:ctor ()
 			end
 			if childNode:IsLocalNode () and self.SavedBlocks [childNode:GetPath ()] then
 				self.IgnorePermissionsChanged = true
-				childNode:GetPermissionBlock ():Deserialize (self.SavedBlocks [childNode:GetPath ()])
+				
+				local subInBuffer = VFS.StringInBuffer (self.SavedBlocks [childNode:GetPath ()])
+				childNode:GetPermissionBlock ():Deserialize (subInBuffer)
 				self.IgnorePermissionsChanged = false
 			end
 		end
@@ -99,7 +101,9 @@ function self:HookNode (node)
 	
 	if node:IsLocalNode () and self.SavedBlocks [node:GetPath ()] then
 		self.IgnorePermissionsChanged = true
-		node:GetPermissionBlock ():Deserialize (self.SavedBlocks [node:GetPath ()])
+		
+		local subInBuffer = VFS.StringInBuffer (self.SavedBlocks [node:GetPath ()])
+		node:GetPermissionBlock ():Deserialize (subInBuffer)
 		self.IgnorePermissionsChanged = false
 	end
 	
@@ -160,7 +164,8 @@ function self:Load (callback)
 		
 		local node = VFS.Root:GetChildSynchronous (path)
 		if node then
-			node:GetPermissionBlock ():Deserialize (permissionBlockData)
+			local subInBuffer = VFS.StringInBuffer (permissionBlockData)
+			node:GetPermissionBlock ():Deserialize (subInBuffer)
 		end
 		
 		inBuffer:Char () -- discard newline
@@ -188,7 +193,9 @@ Warning: Do not try editing this file without a hex editor.
 		if node:GetPermissionBlock ():IsDefault () then
 			self.SavedBlocks [node:GetPath ()] = nil
 		elseif node:GetPermissionBlock ():IsAuthorized (GAuth.GetLocalId (), "Modify Permissions") then
-			self.SavedBlocks [node:GetPath ()] = node:GetPermissionBlock ():Serialize ():GetString ()
+			local subOutBuffer = VFS.StringOutBuffer ()
+			node:GetPermissionBlock ():Serialize (subOutBuffer)
+			self.SavedBlocks [node:GetPath ()] = subOutBuffer:GetString ()
 		end
 	end
 	for path, permissionBlockData in pairs (self.SavedBlocks) do
@@ -203,7 +210,10 @@ end
 
 function self:SaveNode (node, outBuffer)
 	outBuffer:String (node:GetPath ())
-	outBuffer:String (node:GetPermissionBlock ():Serialize ())
+	
+	local subOutBuffer = VFS.StringOutBuffer ()
+	node:GetPermissionBlock ():Serialize (subOutBuffer)
+	outBuffer:String (subOutBuffer:GetString ())
 end
 
 self.NodeCreated            = VFS.NullCallback
