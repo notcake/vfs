@@ -115,6 +115,8 @@ function self:Deserialize (inBuffer)
 		
 		groupId = inBuffer:StringN8 ()
 	end
+	
+	return self
 end
 
 function self:Clone (clone)
