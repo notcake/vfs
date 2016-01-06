@@ -55,11 +55,11 @@ function self:HookNode (node)
 	if self.HookedNodes [node] then return end
 	self.HookedNodes [node] = true
 	
-	node:AddEventListener ("NodeCreated",            self:GetHashCode (), self.NodeCreated)
-	node:AddEventListener ("NodeDeleted",            self:GetHashCode (), self.NodeDeleted)
-	node:AddEventListener ("NodePermissionsChanged", self:GetHashCode (), self.NodePermissionsChanged)
-	node:AddEventListener ("NodeRenamed",            self:GetHashCode (), self.NodeRenamed)
-	node:AddEventListener ("NodeUpdated",            self:GetHashCode (), self.NodeUpdated)
+	node:AddEventListener ("NodeCreated",            self.UniqueId .. "." .. self:GetHashCode (), self.NodeCreated)
+	node:AddEventListener ("NodeDeleted",            self.UniqueId .. "." .. self:GetHashCode (), self.NodeDeleted)
+	node:AddEventListener ("NodePermissionsChanged", self.UniqueId .. "." .. self:GetHashCode (), self.NodePermissionsChanged)
+	node:AddEventListener ("NodeRenamed",            self.UniqueId .. "." .. self:GetHashCode (), self.NodeRenamed)
+	node:AddEventListener ("NodeUpdated",            self.UniqueId .. "." .. self:GetHashCode (), self.NodeUpdated)
 	
 	VFS.Debug ("VFS.EndPoint:HookNode : " .. node:GetPath ())
 end
@@ -73,11 +73,11 @@ end
 function self:UnhookNode (node)
 	self.HookedNodes [node] = nil
 
-	node:RemoveEventListener ("NodeCreated",            self:GetHashCode ())
-	node:RemoveEventListener ("NodeDeleted",            self:GetHashCode ())
-	node:RemoveEventListener ("NodePermissionsChanged", self:GetHashCode ())
-	node:RemoveEventListener ("NodeRenamed",            self:GetHashCode ())
-	node:RemoveEventListener ("NodeUpdated",            self:GetHashCode ())
+	node:RemoveEventListener ("NodeCreated",            self.UniqueId .. "." .. self:GetHashCode ())
+	node:RemoveEventListener ("NodeDeleted",            self.UniqueId .. "." .. self:GetHashCode ())
+	node:RemoveEventListener ("NodePermissionsChanged", self.UniqueId .. "." .. self:GetHashCode ())
+	node:RemoveEventListener ("NodeRenamed",            self.UniqueId .. "." .. self:GetHashCode ())
+	node:RemoveEventListener ("NodeUpdated",            self.UniqueId .. "." .. self:GetHashCode ())
 	
 	VFS.Debug ("VFS.EndPoint:UnhookNode : " .. node:GetPath ())
 end
