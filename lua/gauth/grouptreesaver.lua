@@ -39,10 +39,10 @@ function self:ctor ()
 	
 	self.HostChanged = function (groupTreeNode, hostId)
 		if groupTreeNode:GetHost () == GAuth.GetLocalId () then
-			groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", self:GetHashCode (), self.PermissionsChanged)
+			groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", "GroupTreeSaver." .. self:GetHashCode (), self.PermissionsChanged)
 			self:FlagUnsaved ()
 		else
-			groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", self:GetHashCode ())
+			groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", "GroupTreeSaver." .. self:GetHashCode ())
 		end
 	end
 	
@@ -70,18 +70,18 @@ end
 
 function self:HookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:AddEventListener ("UserAdded",   self:GetHashCode (), self.UserAdded)		
-		groupTreeNode:AddEventListener ("UserRemoved", self:GetHashCode (), self.UserRemoved)
+		groupTreeNode:AddEventListener ("UserAdded",   "GroupTreeSaver." .. self:GetHashCode (), self.UserAdded)		
+		groupTreeNode:AddEventListener ("UserRemoved", "GroupTreeSaver." .. self:GetHashCode (), self.UserRemoved)
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:AddEventListener ("NodeAdded",   self:GetHashCode (), self.NodeAdded)
-		groupTreeNode:AddEventListener ("NodeRemoved", self:GetHashCode (), self.NodeRemoved)
+		groupTreeNode:AddEventListener ("NodeAdded",   "GroupTreeSaver." .. self:GetHashCode (), self.NodeAdded)
+		groupTreeNode:AddEventListener ("NodeRemoved", "GroupTreeSaver." .. self:GetHashCode (), self.NodeRemoved)
 	end
 	
-	groupTreeNode:AddEventListener ("HostChanged", self:GetHashCode (), self.HostChanged)
-	groupTreeNode:AddEventListener ("Removed",     self:GetHashCode (), self.Removed)
+	groupTreeNode:AddEventListener ("HostChanged", "GroupTreeSaver." .. self:GetHashCode (), self.HostChanged)
+	groupTreeNode:AddEventListener ("Removed",     "GroupTreeSaver." .. self:GetHashCode (), self.Removed)
 	
 	if groupTreeNode:GetHost () == GAuth.GetLocalId () then
-		groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", self:GetHashCode (), self.PermissionsChanged)
+		groupTreeNode:GetPermissionBlock ():AddEventListener ("PermissionsChanged", "GroupTreeSaver." .. self:GetHashCode (), self.PermissionsChanged)
 	end
 end
 
@@ -95,17 +95,17 @@ end
 
 function self:UnhookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:RemoveEventListener ("UserAdded",   self:GetHashCode ())
-		groupTreeNode:RemoveEventListener ("UserRemoved", self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("UserAdded",   "GroupTreeSaver." .. self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("UserRemoved", "GroupTreeSaver." .. self:GetHashCode ())
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:RemoveEventListener ("NodeAdded",   self:GetHashCode ())
-		groupTreeNode:RemoveEventListener ("NodeRemoved", self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("NodeAdded",   "GroupTreeSaver." .. self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("NodeRemoved", "GroupTreeSaver." .. self:GetHashCode ())
 	end
 	
-	groupTreeNode:RemoveEventListener ("HostChanged", self:GetHashCode ())
-	groupTreeNode:RemoveEventListener ("Removed",     self:GetHashCode ())
+	groupTreeNode:RemoveEventListener ("HostChanged", "GroupTreeSaver." .. self:GetHashCode ())
+	groupTreeNode:RemoveEventListener ("Removed",     "GroupTreeSaver." .. self:GetHashCode ())
 	
-	groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", self:GetHashCode ())
+	groupTreeNode:GetPermissionBlock ():RemoveEventListener ("PermissionsChanged", "GroupTreeSaver." .. self:GetHashCode ())
 end
 
 function self:FlagUnsaved ()

@@ -136,23 +136,23 @@ end
 function self:HookBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:HookBlock : " .. permissionBlock:GetName ())
 
-	permissionBlock:AddEventListener ("GroupEntryAdded",           self:GetHashCode (), self.GroupEntryAdded)
-	permissionBlock:AddEventListener ("GroupEntryRemoved",         self:GetHashCode (), self.GroupEntryRemoved)
-	permissionBlock:AddEventListener ("GroupPermissionChanged",    self:GetHashCode (), self.GroupPermissionChanged)
-	permissionBlock:AddEventListener ("InheritOwnerChanged",       self:GetHashCode (), self.InheritOwnerChanged)
-	permissionBlock:AddEventListener ("InheritPermissionsChanged", self:GetHashCode (), self.InheritPermissionsChanged)
-	permissionBlock:AddEventListener ("OwnerChanged",              self:GetHashCode (), self.OwnerChanged)
+	permissionBlock:AddEventListener ("GroupEntryAdded",           "PermissionBlockNetworker." .. self:GetHashCode (), self.GroupEntryAdded)
+	permissionBlock:AddEventListener ("GroupEntryRemoved",         "PermissionBlockNetworker." .. self:GetHashCode (), self.GroupEntryRemoved)
+	permissionBlock:AddEventListener ("GroupPermissionChanged",    "PermissionBlockNetworker." .. self:GetHashCode (), self.GroupPermissionChanged)
+	permissionBlock:AddEventListener ("InheritOwnerChanged",       "PermissionBlockNetworker." .. self:GetHashCode (), self.InheritOwnerChanged)
+	permissionBlock:AddEventListener ("InheritPermissionsChanged", "PermissionBlockNetworker." .. self:GetHashCode (), self.InheritPermissionsChanged)
+	permissionBlock:AddEventListener ("OwnerChanged",              "PermissionBlockNetworker." .. self:GetHashCode (), self.OwnerChanged)
 end
 
 function self:HookRemoteBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:HookRemoteBlock : " .. permissionBlock:GetName ())
 	
-	permissionBlock:AddEventListener ("RequestAddGroupEntry",         self:GetHashCode (), self.RequestAddGroupEntry)
-	permissionBlock:AddEventListener ("RequestRemoveGroupEntry",      self:GetHashCode (), self.RequestRemoveGroupEntry)
-	permissionBlock:AddEventListener ("RequestSetGroupPermission",    self:GetHashCode (), self.RequestSetGroupPermission)
-	permissionBlock:AddEventListener ("RequestSetInheritOwner",       self:GetHashCode (), self.RequestSetInheritOwner)
-	permissionBlock:AddEventListener ("RequestSetInheritPermissions", self:GetHashCode (), self.RequestSetInheritPermissions)
-	permissionBlock:AddEventListener ("RequestSetOwner",              self:GetHashCode (), self.RequestSetOwner)
+	permissionBlock:AddEventListener ("RequestAddGroupEntry",         "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestAddGroupEntry)
+	permissionBlock:AddEventListener ("RequestRemoveGroupEntry",      "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestRemoveGroupEntry)
+	permissionBlock:AddEventListener ("RequestSetGroupPermission",    "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestSetGroupPermission)
+	permissionBlock:AddEventListener ("RequestSetInheritOwner",       "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestSetInheritOwner)
+	permissionBlock:AddEventListener ("RequestSetInheritPermissions", "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestSetInheritPermissions)
+	permissionBlock:AddEventListener ("RequestSetOwner",              "PermissionBlockNetworker." .. self:GetHashCode (), self.RequestSetOwner)
 	
 	if SERVER then self:HookBlock (permissionBlock) end
 end
@@ -160,19 +160,19 @@ end
 function self:UnhookBlock (permissionBlock)
 	GAuth.Debug (self.SystemName .. ".PermissionBlockNetworker:UnhookBlock : " .. permissionBlock:GetName ())
 	
-	permissionBlock:RemoveEventListener ("GroupEntryAdded",              self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("GroupEntryRemoved",            self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("GroupPermissionChanged",       self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("InheritOwnerChanged",          self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("InheritPermissionsChanged",    self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("OwnerChanged",                 self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupEntryAdded",              "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupEntryRemoved",            "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("GroupPermissionChanged",       "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("InheritOwnerChanged",          "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("InheritPermissionsChanged",    "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("OwnerChanged",                 "PermissionBlockNetworker." .. self:GetHashCode ())
 	
-	permissionBlock:RemoveEventListener ("RequestAddGroupEntry",         self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("RequestRemoveGroupEntry",      self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("RequestSetGroupPermission",    self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("RequestSetInheritOwner",       self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("RequestSetInheritPermissions", self:GetHashCode ())
-	permissionBlock:RemoveEventListener ("RequestSetOwner",              self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestAddGroupEntry",         "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestRemoveGroupEntry",      "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetGroupPermission",    "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetInheritOwner",       "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetInheritPermissions", "PermissionBlockNetworker." .. self:GetHashCode ())
+	permissionBlock:RemoveEventListener ("RequestSetOwner",              "PermissionBlockNetworker." .. self:GetHashCode ())
 end
 
 function self:DispatchNotification (permissionBlock, notification)

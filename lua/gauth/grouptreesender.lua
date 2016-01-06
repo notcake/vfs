@@ -58,15 +58,15 @@ end
 
 function self:HookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:AddEventListener ("UserAdded",   self:GetHashCode (), self.UserAdded)		
-		groupTreeNode:AddEventListener ("UserRemoved", self:GetHashCode (), self.UserRemoved)
+		groupTreeNode:AddEventListener ("UserAdded",   "GroupTreeSender." .. self:GetHashCode (), self.UserAdded)		
+		groupTreeNode:AddEventListener ("UserRemoved", "GroupTreeSender." .. self:GetHashCode (), self.UserRemoved)
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:AddEventListener ("NodeAdded",   self:GetHashCode (), self.NodeAdded)
-		groupTreeNode:AddEventListener ("NodeRemoved", self:GetHashCode (), self.NodeRemoved)
+		groupTreeNode:AddEventListener ("NodeAdded",   "GroupTreeSender." .. self:GetHashCode (), self.NodeAdded)
+		groupTreeNode:AddEventListener ("NodeRemoved", "GroupTreeSender." .. self:GetHashCode (), self.NodeRemoved)
 	end
 	
-	groupTreeNode:AddEventListener ("HostChanged", self:GetHashCode (), self.HostChanged)
-	groupTreeNode:AddEventListener ("Removed",     self:GetHashCode (), self.Removed)
+	groupTreeNode:AddEventListener ("HostChanged", "GroupTreeSender." .. self:GetHashCode (), self.HostChanged)
+	groupTreeNode:AddEventListener ("Removed",     "GroupTreeSender." .. self:GetHashCode (), self.Removed)
 	
 	if groupTreeNode:IsHostedLocally () then
 		self.PermissionBlockNetworker:HookBlock (groupTreeNode:GetPermissionBlock ())
@@ -102,15 +102,15 @@ end
 
 function self:UnhookNode (groupTreeNode)
 	if groupTreeNode:IsGroup () then
-		groupTreeNode:RemoveEventListener ("UserAdded",   self:GetHashCode ())
-		groupTreeNode:RemoveEventListener ("UserRemoved", self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("UserAdded",   "GroupTreeSender." .. self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("UserRemoved", "GroupTreeSender." .. self:GetHashCode ())
 	elseif groupTreeNode:IsGroupTree () then
-		groupTreeNode:RemoveEventListener ("NodeAdded",   self:GetHashCode ())
-		groupTreeNode:RemoveEventListener ("NodeRemoved", self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("NodeAdded",   "GroupTreeSender." .. self:GetHashCode ())
+		groupTreeNode:RemoveEventListener ("NodeRemoved", "GroupTreeSender." .. self:GetHashCode ())
 	end
 	
-	groupTreeNode:RemoveEventListener ("HostChanged", self:GetHashCode ())
-	groupTreeNode:RemoveEventListener ("Removed",     self:GetHashCode ())
+	groupTreeNode:RemoveEventListener ("HostChanged", "GroupTreeSender." .. self:GetHashCode ())
+	groupTreeNode:RemoveEventListener ("Removed",     "GroupTreeSender." .. self:GetHashCode ())
 	
 	self.PermissionBlockNetworker:UnhookBlock (groupTreeNode:GetPermissionBlock ())
 end
