@@ -41,7 +41,7 @@ function self:Load ()
 		local path = inBuffer:String ()
 		self:SetPath (dialogId, path)
 		
-		inBuffer:Char () -- discard newline
+		inBuffer:Bytes (1) -- discard newline
 		dialogId = inBuffer:String ()
 	end
 	self.NeedsSaving = false
@@ -54,7 +54,7 @@ function self:Save ()
 	for dialogId, path in pairs (self.DialogPaths) do
 		outBuffer:String (dialogId)
 		outBuffer:String (path)
-		outBuffer:Char ("\n")
+		outBuffer:Bytes ("\n")
 	end
 	outBuffer:String ("")
 	

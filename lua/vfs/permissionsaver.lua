@@ -168,7 +168,7 @@ function self:Load (callback)
 			node:GetPermissionBlock ():Deserialize (subInBuffer)
 		end
 		
-		inBuffer:Char () -- discard newline
+		inBuffer:Bytes (1) -- discard newline
 		path = inBuffer:String ()
 	end
 end
@@ -201,7 +201,7 @@ Warning: Do not try editing this file without a hex editor.
 	for path, permissionBlockData in pairs (self.SavedBlocks) do
 		outBuffer:String (path)
 		outBuffer:String (permissionBlockData)
-		outBuffer:Char ("\n")
+		outBuffer:Bytes ("\n")
 	end
 	outBuffer:String ("")
 	

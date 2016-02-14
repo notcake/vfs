@@ -151,7 +151,7 @@ function self:LoadNextGroup (inBuffer, callback)
 					end
 				end
 			end
-			inBuffer:Char () -- discard the newline
+			inBuffer:Bytes (1) -- discard the newline
 			self:LoadNextGroupDelayed (inBuffer, callback) 
 		end
 	)
@@ -210,10 +210,10 @@ function self:SaveNode (groupTreeNode, outBuffer)
 				end
 			end
 			outBuffer:String ("")
-			outBuffer:Char ("\n")
+			outBuffer:Bytes ("\n")
 		end
 	elseif groupTreeNode:IsGroupTree () then
-		if save then outBuffer:Char ("\n") end
+		if save then outBuffer:Bytes ("\n") end
 		for _, childNode in groupTreeNode:GetChildEnumerator () do
 			self:SaveNode (childNode, outBuffer)
 		end
