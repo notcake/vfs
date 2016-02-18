@@ -132,7 +132,7 @@ function self:Copy (source)
 	self.GroupEntries        = {}
 	
 	self.InheritOwner        = source:InheritsOwner ()
-	self.InheritPermissions  = source:InheritPermissions ()
+	self.InheritPermissions  = source:InheritsPermissions ()
 	
 	self.Parent              = source.Parent
 	self.ParentFunction      = source.ParentFunction
